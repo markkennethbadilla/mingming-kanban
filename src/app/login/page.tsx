@@ -61,7 +61,7 @@ const LoginPage: React.FC = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "88vh",
+        height: "87vh",
         backgroundColor: "var(--background-color)",
         padding: "20px",
       }}

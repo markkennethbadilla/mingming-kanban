@@ -39,7 +39,7 @@ const CreateTaskPage: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: "100vh",
+          minHeight: "87",
           textAlign: "center",
         }}
       >
