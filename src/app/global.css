@@ -1,0 +1,18 @@
+
+@import 'primereact/resources/themes/saga-blue/theme.css';
+@import 'primereact/resources/primereact.min.css';
+@import 'primeicons/primeicons.css';
+@import 'primeflex/primeflex.css';
+
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary-color: #3CB4AC;
+    --secondary-color: #F98A8A;
+    --background-color: #FAF8F5;
+    --text-color: #3D3D3D;
+    --highlight-color: #FCE77D;
+    --neutral-color: #858585;
+  }
+  

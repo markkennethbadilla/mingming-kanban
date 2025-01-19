@@ -1,84 +1,82 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Task } from '../types/task';
+import React from "react";
+import { Button } from "primereact/button";
 
-export default function HomePage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [error, setError] = useState('');
-
-  const fetchTasks = async () => {
-    try {
-      const res = await axios.get('/api/tasks');
-      setTasks(res.data);
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        // Now TypeScript knows `err` is of type `AxiosError`
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred');
-      }
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(`/api/tasks/${id}`);
-      setTasks((prev) => prev.filter((task) => task.id !== id));
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred');
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
+const LandingPage: React.FC = () => {
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Task Manager</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      <div className="mb-4">
-        <Link href="/new">
-          <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            Create New Task
-          </button>
-        </Link>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "87vh",
+        backgroundImage: "url('/background-image.png')", // Replace with the path to your background image
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        textAlign: "center",
+        padding: "20px",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "650px",
+          padding: "32px 24px", // Increased top and bottom padding for balance
+          borderRadius: "12px",
+          backgroundColor: "rgba(255, 255, 255, 0.9)", // Semi-transparent white background for readability
+          boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "3rem",
+            fontWeight: "800",
+            color: "var(--primary-color)",
+          }}
+        >
+          Discover Your Productivity
+        </h1>
+        <p
+          style={{
+            fontSize: "1.25rem",
+            color: "var(--text-color)",
+            marginBottom: "32px", // Consistent spacing below the paragraph
+            lineHeight: "1.6",
+          }}
+        >
+          Welcome to <strong>Mingming Task Manager</strong>, your personal companion for staying organized and motivated. 
+          Break down your goals into manageable tasks, and let us help you achieve greatness.
+        </p>
+        <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginBottom: "32px" }}>
+          <Button
+            label="Log In"
+            style={{
+              padding: "12px 32px",
+              borderRadius: "8px",
+              backgroundColor: "var(--primary-color)",
+              color: "#fff",
+              fontWeight: "700",
+              fontSize: "1rem",
+            }}
+            onClick={() => (window.location.href = "/login")}
+          />
+          <Button
+            label="Sign Up"
+            style={{
+              padding: "12px 32px",
+              borderRadius: "8px",
+              backgroundColor: "var(--secondary-color)",
+              color: "#fff",
+              fontWeight: "700",
+              fontSize: "1rem",
+            }}
+            onClick={() => (window.location.href = "/register")}
+          />
+        </div>
       </div>
-      <ul>
-        {tasks.map((task) => (
-          <li
-            key={task.id}
-            className="mb-2 border p-2 rounded flex justify-between items-center"
-          >
-            <div>
-              <div className="font-semibold">{task.title}</div>
-              <div>Start: {task.startTime}</div>
-              <div>End: {task.endTime}</div>
-            </div>
-            <div className="flex space-x-2">
-              <Link href={`/edit/${task.id}`}>
-                <button className="text-blue-500 hover:text-blue-700">
-                  <FaEdit />
-                </button>
-              </Link>
-              <button
-                className="text-red-500 hover:text-red-700"
-                onClick={() => handleDelete(task.id)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
-}
+};
+
+export default LandingPage;

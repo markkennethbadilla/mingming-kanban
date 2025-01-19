@@ -1,9 +1,18 @@
-// src/types/task.d.ts
+import { Tag } from './tag';
+
 export interface Task {
-    id: number;
-    title: string;
-    description?: string;
-    startTime: string;
-    endTime: string;
-    priority: number;
+  id: number;
+  title: string;
+  description: string | null;
+  dueDate: Date;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
+  userId: number;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // Sequelize association methods for tags
+  addTags: (tags: Tag[] | number[]) => Promise<void>;
+  getTags: () => Promise<Tag[]>;
+  setTags: (tags: Tag[] | number[]) => Promise<void>;
 }

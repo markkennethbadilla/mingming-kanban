@@ -1,165 +1,286 @@
-'use client';
-
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import axios from 'axios';
-import { useEffect } from 'react';
-import { Task } from '@/types/task';
-
-const schema = yup.object().shape({
-    title: yup.string().required('Title is required'),
-    description: yup.string(),
-    startTime: yup
-        .string()
-        .required('Start time is required')
-        .test('is-valid-date', 'Invalid date', (value) => !value || !isNaN(Date.parse(value))),
-    endTime: yup
-        .string()
-        .required('End time is required')
-        .test('is-valid-date', 'Invalid date', (value) => !value || !isNaN(Date.parse(value))),
-    priority: yup.number().default(1).min(1).max(5),
-});
-
-// Fields for the form (no ID here since it's auto-assigned by the DB)
-interface TaskFormValues {
-    title: string;
-    description?: string;
-    startTime: string;
-    endTime: string;
-    priority: number;
-}
+import React from "react";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Dropdown } from "primereact/dropdown";
+import { Calendar } from "primereact/calendar";
+import { Button } from "primereact/button";
 
 interface TaskFormProps {
-    editMode?: boolean;
-    // For editing, we expect a full Task object (with ID, etc.)
-    initialValues?: Task;
-    onTaskCreated?: (task: Task) => void;
-    onTaskUpdated?: () => void;
+  initialData?: TaskFormData;
+  onSubmit: (data: TaskFormData) => void;
 }
 
-export default function TaskForm({
-    editMode,
-    initialValues,
-    onTaskCreated,
-    onTaskUpdated,
-}: TaskFormProps) {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm<TaskFormValues>({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            title: '',
-            description: '',
-            startTime: '',
-            endTime: '',
-            priority: 1,
-        },
-    });
+const taskSchema = z.object({
+  title: z.string().nonempty("Title is required"),
+  description: z.string().optional(),
+  dueDate: z
+    .date()
+    .refine((date) => !isNaN(date.getTime()), { message: "Invalid date" })
+    .nullable(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  status: z.enum(["TO_DO", "IN_PROGRESS", "DONE"]),
+});
 
-    useEffect(() => {
-        if (editMode && initialValues) {
-            const patchValues: Partial<TaskFormValues> = {
-                title: initialValues.title,
-                description: initialValues.description,
-                startTime: initialValues.startTime.slice(0, 16), // Format as "YYYY-MM-DDTHH:mm"
-                endTime: initialValues.endTime.slice(0, 16),     // Format as "YYYY-MM-DDTHH:mm"
-                priority: initialValues.priority,
-            };
-            reset(patchValues);
-        }
-    }, [editMode, initialValues, reset]);
+type TaskFormData = z.infer<typeof taskSchema>;
 
+const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit }) => {
+  const defaultValues: TaskFormData = initialData
+    ? {
+        ...initialData,
+        dueDate: initialData.dueDate ? new Date(initialData.dueDate) : null,
+      }
+    : {
+        title: "",
+        description: "",
+        dueDate: null,
+        priority: "MEDIUM",
+        status: "TO_DO",
+      };
 
-    const onSubmit = async (data: TaskFormValues) => {
-        const taskData = {
-            ...data,
-            startTime: new Date(data.startTime), // Convert to Date
-            endTime: new Date(data.endTime),     // Convert to Date
-        };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TaskFormData>({
+    defaultValues,
+    resolver: zodResolver(taskSchema),
+  });
 
-        try {
-            if (editMode && initialValues?.id) {
-                await axios.put(`/api/tasks/${initialValues.id}`, taskData);
-                onTaskUpdated?.();
-            } else {
-                const res = await axios.post('/api/tasks', taskData);
-                onTaskCreated?.(res.data);
-            }
-        } catch (err: unknown) {
-            if (axios.isAxiosError(err)) {
-                console.error('Axios error:', err.message);
-            } else if (err instanceof Error) {
-                console.error('General error:', err.message);
-            } else {
-                console.error('Unknown error');
-            }
-        }
-    };
+  const priorityOptions = [
+    { label: "Low", value: "LOW" },
+    { label: "Medium", value: "MEDIUM" },
+    { label: "High", value: "HIGH" },
+  ];
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-                <label className="block font-medium">Title</label>
-                <input
-                    {...register('title')}
-                    className="border p-1 block w-full"
-                    type="text"
-                    placeholder="Task Title"
-                />
-                {errors.title && (
-                    <p className="text-red-500 text-sm">{errors.title.message}</p>
-                )}
-            </div>
-            <div>
-                <label className="block font-medium">Description</label>
-                <textarea
-                    {...register('description')}
-                    className="border p-1 block w-full"
-                    placeholder="Task Description"
-                />
-            </div>
-            <div>
-                <label className="block font-medium">Start Time</label>
-                <input
-                    type="datetime-local"
-                    {...register('startTime')}
-                    className="border p-1 block w-full"
-                />
-                {errors.startTime && (
-                    <p className="text-red-500 text-sm">{errors.startTime.message}</p>
-                )}
-            </div>
-            <div>
-                <label className="block font-medium">End Time</label>
-                <input
-                    type="datetime-local"
-                    {...register('endTime')}
-                    className="border p-1 block w-full"
-                />
-                {errors.endTime && (
-                    <p className="text-red-500 text-sm">{errors.endTime.message}</p>
-                )}
-            </div>
-            <div>
-                <label className="block font-medium">Priority</label>
-                <input
-                    type="number"
-                    {...register('priority')}
-                    className="border p-1 block w-full"
-                    min={1}
-                    max={5}
-                />
-            </div>
-            <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-                {editMode ? 'Update Task' : 'Create Task'}
-            </button>
-        </form>
-    );
-}
+  const statusOptions = [
+    { label: "To Do", value: "TO_DO" },
+    { label: "In Progress", value: "IN_PROGRESS" },
+    { label: "Done", value: "DONE" },
+  ];
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      style={{
+        display: "grid",
+        gap: "16px",
+        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+        alignItems: "center",
+      }}
+    >
+      {/* Title Field */}
+      <div>
+        <label
+          htmlFor="title"
+          style={{
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            marginBottom: "4px",
+            display: "block",
+            color: "var(--text-color)",
+          }}
+        >
+          Title
+        </label>
+        <Controller
+          name="title"
+          control={control}
+          render={({ field }) => (
+            <InputText
+              {...field}
+              id="title"
+              style={{
+                width: "100%",
+                borderRadius: "6px",
+                border: `1px solid ${
+                  errors.title ? "var(--secondary-color)" : "var(--neutral-color)"
+                }`,
+                padding: "8px",
+                fontSize: "0.9rem",
+              }}
+              placeholder="Task title"
+            />
+          )}
+        />
+        {errors.title && (
+          <small style={{ color: "var(--secondary-color)", fontSize: "0.8rem" }}>
+            {errors.title.message}
+          </small>
+        )}
+      </div>
+
+      {/* Due Date Field */}
+      <div>
+        <label
+          htmlFor="dueDate"
+          style={{
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            marginBottom: "4px",
+            display: "block",
+            color: "var(--text-color)",
+          }}
+        >
+          Due Date
+        </label>
+        <Controller
+          name="dueDate"
+          control={control}
+          render={({ field }) => (
+            <Calendar
+              {...field}
+              id="dueDate"
+              dateFormat="yy-mm-dd"
+              showIcon
+              style={{
+                width: "100%",
+                borderRadius: "6px",
+                border: `1px solid ${
+                  errors.dueDate ? "var(--secondary-color)" : "var(--neutral-color)"
+                }`,
+              }}
+              inputStyle={{
+                width: "100%",
+                padding: "8px",
+                fontSize: "0.9rem",
+                borderRadius: "6px",
+              }}
+              placeholder="Select date"
+            />
+          )}
+        />
+        {errors.dueDate && (
+          <small style={{ color: "var(--secondary-color)", fontSize: "0.8rem" }}>
+            {errors.dueDate.message}
+          </small>
+        )}
+      </div>
+
+      {/* Priority Field */}
+      <div>
+        <label
+          htmlFor="priority"
+          style={{
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            marginBottom: "4px",
+            display: "block",
+            color: "var(--text-color)",
+          }}
+        >
+          Priority
+        </label>
+        <Controller
+          name="priority"
+          control={control}
+          render={({ field }) => (
+            <Dropdown
+              {...field}
+              id="priority"
+              options={priorityOptions}
+              placeholder="Priority"
+              style={{
+                width: "100%",
+                borderRadius: "6px",
+                border: `1px solid var(--neutral-color)`,
+                fontSize: "0.9rem",
+              }}
+            />
+          )}
+        />
+      </div>
+
+      {/* Status Field */}
+      <div>
+        <label
+          htmlFor="status"
+          style={{
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            marginBottom: "4px",
+            display: "block",
+            color: "var(--text-color)",
+          }}
+        >
+          Status
+        </label>
+        <Controller
+          name="status"
+          control={control}
+          render={({ field }) => (
+            <Dropdown
+              {...field}
+              id="status"
+              options={statusOptions}
+              placeholder="Status"
+              style={{
+                width: "100%",
+                borderRadius: "6px",
+                border: `1px solid var(--neutral-color)`,
+                fontSize: "0.9rem",
+              }}
+            />
+          )}
+        />
+      </div>
+
+      {/* Description Field */}
+      <div style={{ gridColumn: "span 2" }}>
+        <label
+          htmlFor="description"
+          style={{
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            marginBottom: "4px",
+            display: "block",
+            color: "var(--text-color)",
+          }}
+        >
+          Description
+        </label>
+        <Controller
+          name="description"
+          control={control}
+          render={({ field }) => (
+            <InputTextarea
+              {...field}
+              id="description"
+              rows={3}
+              style={{
+                width: "100%",
+                borderRadius: "6px",
+                border: `1px solid var(--neutral-color)`,
+                padding: "8px",
+                fontSize: "0.9rem",
+              }}
+              placeholder="Task description"
+            />
+          )}
+        />
+      </div>
+
+      {/* Submit Button */}
+      <div style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "16px" }}>
+        <Button
+          type="submit"
+          label="Save Task"
+          icon="pi pi-save"
+          style={{
+            width: "100%",
+            padding: "10px",
+            borderRadius: "6px",
+            backgroundColor: "var(--primary-color)",
+            color: "#fff",
+            fontSize: "0.9rem",
+            fontWeight: "600",
+          }}
+        />
+      </div>
+    </form>
+  );
+};
+
+export default TaskForm;

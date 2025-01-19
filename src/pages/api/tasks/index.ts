@@ -1,31 +1,37 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Task } from '@/models/Task';
-
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    if (req.method === 'GET') {
-      const tasks = await Task.findAll();
-      return res.status(200).json(tasks);
+import { Task } from '../../../models';
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { method } = req;
+  switch (method) {
+    case 'GET': {
+      const { userId } = req.query;
+      if (!userId) {
+        return res.status(400).json({ success: false, message: 'User ID is required' });
+      }
+      try {
+        const tasks = await Task.findAll({ where: { userId } });
+        res.status(200).json({ success: true, tasks });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error fetching tasks' });
+      }
+      break;
     }
-
-    if (req.method === 'POST') {
-      const { title, description, startTime, endTime, priority } = req.body;
-      const newTask = await Task.create({
-        title,
-        description,
-        startTime: startTime ? new Date(startTime).toISOString() : null,
-        endTime: endTime ? new Date(endTime).toISOString() : null,
-        priority,
-      });
-      return res.status(201).json(newTask);
+    case 'POST': {
+      const { title, description, dueDate, priority, status, userId } = req.body;
+      if (!title || !dueDate || !priority || !status || !userId) {
+        return res.status(400).json({ success: false, message: 'Missing required fields' });
+      }
+      try {
+        const task = await Task.create({ title, description, dueDate, priority, status, userId });
+        res.status(201).json({ success: true, task });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error creating task' });
+      }
+      break;
     }
-
-    res.setHeader('Allow', ['GET', 'POST']);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  } catch (err: unknown) {
-    console.error('Error in /api/tasks:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    default:
+      res.status(405).json({ success: false, message: 'Method not allowed' });
   }
-};
-
-export default handler;
+}

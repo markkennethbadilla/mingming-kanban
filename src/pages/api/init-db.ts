@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import sequelize from '../../config/sequelize-config';
+import sequelize from '@/config/sequelize';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
