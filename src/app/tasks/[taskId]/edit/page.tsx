@@ -1,25 +1,59 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import TaskForm from "@/components/TaskForm";
+import { Toast } from "primereact/toast";
 
 const EditTaskPage: React.FC = () => {
   const [initialData, setInitialData] = useState(null);
   const [error, setError] = useState("");
+  const toast = useRef<Toast>(null);
   const params = useParams();
   const router = useRouter();
   const taskId = params.taskId;
 
+  const fetchUser = async () => {
+    try {
+      const response = await fetch("/api/session", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        let errorMessage = "Failed to fetch user session.";
+        if (response.status === 401) {
+          errorMessage = errorData.message || "Unauthorized. Please log in again.";
+        } else if (response.status === 404) {
+          errorMessage = errorData.message || "User not found.";
+        }
+        throw new Error(errorMessage);
+      }
+      return true; // User session is valid
+    } catch (error: any) {
+      console.error("Error fetching user session:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message || "Failed to fetch user session.",
+        life: 5000,
+      });
+      return false; // Invalid session
+    }
+  };
+
   useEffect(() => {
     const fetchTask = async () => {
+      const userSessionValid = await fetchUser(); // Check session before fetching task
+      if (!userSessionValid) return; // If session is invalid, do not proceed
+
       try {
         const response = await fetch(`/api/tasks/${taskId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-
         if (!response.ok) {
           if (response.status === 404) {
             setError("Task not found.");
@@ -28,7 +62,6 @@ const EditTaskPage: React.FC = () => {
           }
           return;
         }
-
         const data = await response.json();
         setInitialData(data.task);
       } catch (error) {
@@ -36,11 +69,46 @@ const EditTaskPage: React.FC = () => {
         setError(error.message || "Something went wrong.");
       }
     };
-
     fetchTask();
   }, [taskId]);
 
+  const handleTaskDelete = async () => {
+    const userSessionValid = await fetchUser(); // Check session before deleting task
+    if (!userSessionValid) return; // If session is invalid, do not proceed
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete task.");
+      }
+      toast.current?.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Task deleted successfully.",
+        life: 3000,
+      });
+      setTimeout(() => router.back(), 3000);
+    } catch (error) {
+      console.error(error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message || "Failed to delete task.",
+        life: 3000,
+      });
+    }
+  };
+
   const handleTaskSubmit = async (data: any) => {
+    const userSessionValid = await fetchUser(); // Check session before submitting task
+    if (!userSessionValid) return; // If session is invalid, do not proceed
+
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(`/api/tasks/${taskId}`, {
@@ -51,14 +119,24 @@ const EditTaskPage: React.FC = () => {
         },
         body: JSON.stringify(data),
       });
-
       if (!response.ok) {
         throw new Error("Failed to update task.");
       }
-
-      router.push("/dashboard");
+      toast.current?.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Task updated successfully.",
+        life: 3000,
+      });
+      setTimeout(() => router.back(), 3000);
     } catch (error) {
       console.error(error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message || "Failed to update task.",
+        life: 3000,
+      });
     }
   };
 
@@ -70,7 +148,7 @@ const EditTaskPage: React.FC = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: "87",
+          minHeight: "87vh",
           textAlign: "center",
         }}
       >
@@ -87,11 +165,11 @@ const EditTaskPage: React.FC = () => {
             border: "none",
             transition: "background-color 0.2s",
           }}
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.back()}
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--primary-color-light)")}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--primary-color)")}
         >
-          Back to Dashboard
+          Back
         </button>
       </div>
     );
@@ -105,9 +183,10 @@ const EditTaskPage: React.FC = () => {
         justifyContent: "center",
         backgroundColor: "var(--background-color)",
         padding: "24px 0",
-        height: "87vh"
+        height: "87vh",
       }}
     >
+      <Toast ref={toast} />
       <div
         style={{
           width: "100%",
@@ -127,13 +206,12 @@ const EditTaskPage: React.FC = () => {
             cursor: "pointer",
             textDecoration: "none",
           }}
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.back()}
           onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
           onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
         >
-          &larr; Back to Dashboard
+          &larr; Back
         </a>
-
         {/* Page Header */}
         <h2
           style={{
@@ -146,10 +224,13 @@ const EditTaskPage: React.FC = () => {
         >
           Edit Task
         </h2>
-
         {/* Task Form */}
         {initialData ? (
-          <TaskForm onSubmit={handleTaskSubmit} initialData={initialData} />
+          <TaskForm
+            onSubmit={handleTaskSubmit}
+            onDelete={handleTaskDelete}
+            initialData={initialData}
+          />
         ) : (
           <p
             style={{

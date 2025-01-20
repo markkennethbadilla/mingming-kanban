@@ -54,6 +54,7 @@ const Navbar: React.FC = () => {
   const items = isLoggedIn
     ? [
         { label: "Dashboard", icon: "pi pi-home", url: "/dashboard" },
+        { label: "Calendar", icon: "pi pi-calendar", url: "/calendar" }, // Added Calendar Link
         { label: "Create Task", icon: "pi pi-plus", url: "/tasks/create" },
         { label: "Profile", icon: "pi pi-user", url: "/profile" },
         { label: "Logout", icon: "pi pi-sign-out", command: handleLogout },

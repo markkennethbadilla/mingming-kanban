@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,14 @@ const LoginPage: React.FC = () => {
   const toast = useRef<any>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Check if the user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      window.location.href = "/dashboard"; // Redirect to dashboard if logged in
+    }
+  }, []);
+
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await fetch("/api/auth/login", {
@@ -40,11 +48,11 @@ const LoginPage: React.FC = () => {
 
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.message || "Invalid credentials");
+        throw new Error(result.message);
       }
 
       localStorage.setItem("authToken", result.token);
-      window.location.href = "/dashboard";
+      window.location.href = "/dashboard"; // Redirect to dashboard on successful login
     } catch (error) {
       toast.current.show({
         severity: "error",

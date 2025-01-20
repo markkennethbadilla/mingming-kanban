@@ -1,4 +1,3 @@
-import { Tag } from './tag';
 
 export interface Task {
   id: number;
@@ -10,9 +9,4 @@ export interface Task {
   userId: number;
   createdAt: Date;
   updatedAt: Date;
-
-  // Sequelize association methods for tags
-  addTags: (tags: Tag[] | number[]) => Promise<void>;
-  getTags: () => Promise<Tag[]>;
-  setTags: (tags: Tag[] | number[]) => Promise<void>;
 }

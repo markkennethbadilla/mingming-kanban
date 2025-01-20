@@ -1,9 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
 
 const LandingPage: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    setIsLoggedIn(!!token); // Set logged-in state based on the presence of the auth token
+  }, []);
+
   return (
     <div
       style={{
@@ -45,34 +52,59 @@ const LandingPage: React.FC = () => {
             lineHeight: "1.6",
           }}
         >
-          Welcome to <strong>Mingming Task Manager</strong>, your personal companion for staying organized and motivated. 
-          Break down your goals into manageable tasks, and let us help you achieve greatness.
+          Welcome to <strong>Mingming Task Manager</strong>, your personal
+          companion for staying organized and motivated. Break down your goals
+          into manageable tasks, and let us help you achieve greatness.
         </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginBottom: "32px" }}>
-          <Button
-            label="Log In"
-            style={{
-              padding: "12px 32px",
-              borderRadius: "8px",
-              backgroundColor: "var(--primary-color)",
-              color: "#fff",
-              fontWeight: "700",
-              fontSize: "1rem",
-            }}
-            onClick={() => (window.location.href = "/login")}
-          />
-          <Button
-            label="Sign Up"
-            style={{
-              padding: "12px 32px",
-              borderRadius: "8px",
-              backgroundColor: "var(--secondary-color)",
-              color: "#fff",
-              fontWeight: "700",
-              fontSize: "1rem",
-            }}
-            onClick={() => (window.location.href = "/register")}
-          />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "16px",
+            marginBottom: "32px",
+          }}
+        >
+          {isLoggedIn ? (
+            <Button
+              label="Go to Dashboard"
+              style={{
+                padding: "12px 32px",
+                borderRadius: "8px",
+                backgroundColor: "var(--primary-color)",
+                color: "#fff",
+                fontWeight: "700",
+                fontSize: "1rem",
+              }}
+              onClick={() => (window.location.href = "/dashboard")}
+            />
+          ) : (
+            <>
+              <Button
+                label="Log In"
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: "8px",
+                  backgroundColor: "var(--primary-color)",
+                  color: "#fff",
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                }}
+                onClick={() => (window.location.href = "/login")}
+              />
+              <Button
+                label="Sign Up"
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: "8px",
+                  backgroundColor: "var(--secondary-color)",
+                  color: "#fff",
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                }}
+                onClick={() => (window.location.href = "/register")}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>

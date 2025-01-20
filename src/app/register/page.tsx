@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,6 +30,14 @@ const RegisterPage: React.FC = () => {
   const toast = useRef<any>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Check if the user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      window.location.href = "/dashboard"; // Redirect to dashboard if logged in
+    }
+  }, []);
+
   const onSubmit = async (data: RegisterFormData) => {
     try {
       const response = await fetch("/api/auth/register", {
@@ -52,7 +60,7 @@ const RegisterPage: React.FC = () => {
         life: 3000,
       });
 
-      window.location.href = "/login";
+      window.location.href = "/login"; // Redirect to login on successful registration
     } catch (error) {
       toast.current.show({
         severity: "error",

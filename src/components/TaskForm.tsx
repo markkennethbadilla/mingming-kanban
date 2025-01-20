@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,10 +7,12 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 
 interface TaskFormProps {
   initialData?: TaskFormData;
   onSubmit: (data: TaskFormData) => void;
+  onDelete?: () => void;
 }
 
 const taskSchema = z.object({
@@ -26,23 +28,28 @@ const taskSchema = z.object({
 
 type TaskFormData = z.infer<typeof taskSchema>;
 
-const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) => {
+  const isEditMode = !!initialData;
+
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const defaultValues: TaskFormData = initialData
     ? {
-        ...initialData,
-        dueDate: initialData.dueDate ? new Date(initialData.dueDate) : null,
-      }
+      ...initialData,
+      dueDate: initialData.dueDate ? new Date(initialData.dueDate) : null,
+    }
     : {
-        title: "",
-        description: "",
-        dueDate: null,
-        priority: "MEDIUM",
-        status: "TO_DO",
-      };
+      title: "",
+      description: "",
+      dueDate: null,
+      priority: "MEDIUM",
+      status: "TO_DO",
+    };
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<TaskFormData>({
     defaultValues,
@@ -69,6 +76,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit }) => {
         gap: "16px",
         gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
         alignItems: "center",
+        backgroundColor: "var(--background-color)",
+        padding: "24px",
+        borderRadius: "12px",
       }}
     >
       {/* Title Field */}
@@ -95,9 +105,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit }) => {
               style={{
                 width: "100%",
                 borderRadius: "6px",
-                border: `1px solid ${
-                  errors.title ? "var(--secondary-color)" : "var(--neutral-color)"
-                }`,
+                border: `1px solid ${errors.title ? "var(--secondary-color)" : "var(--neutral-color)"
+                  }`,
                 padding: "8px",
                 fontSize: "0.9rem",
               }}
@@ -138,9 +147,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit }) => {
               style={{
                 width: "100%",
                 borderRadius: "6px",
-                border: `1px solid ${
-                  errors.dueDate ? "var(--secondary-color)" : "var(--neutral-color)"
-                }`,
+                border: `1px solid ${errors.dueDate ? "var(--secondary-color)" : "var(--neutral-color)"
+                  }`,
               }}
               inputStyle={{
                 width: "100%",
@@ -262,23 +270,88 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit }) => {
         />
       </div>
 
-      {/* Submit Button */}
-      <div style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "16px" }}>
+      {/* Action Buttons */}
+      <div
+        style={{
+          gridColumn: "1 / -1",
+          display: "flex",
+          gap: "16px",
+          justifyContent: "center",
+          marginTop: "16px",
+        }}
+      >
         <Button
           type="submit"
-          label="Save Task"
+          label="Save"
           icon="pi pi-save"
           style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "6px",
             backgroundColor: "var(--primary-color)",
             color: "#fff",
-            fontSize: "0.9rem",
             fontWeight: "600",
+            padding: "10px 24px",
+            borderRadius: "8px",
           }}
         />
+        {isEditMode && (
+          <>
+            <Button
+              type="button"
+              label="Undo"
+              icon="pi pi-undo"
+              className="p-button-secondary"
+              onClick={() => reset()}
+              style={{
+                fontWeight: "600",
+                padding: "10px 24px",
+                borderRadius: "8px",
+              }}
+            />
+            <Button
+              type="button"
+              label="Delete"
+              icon="pi pi-trash"
+              className="p-button-danger"
+              onClick={() => setShowConfirm(true)}
+              style={{
+                fontWeight: "600",
+                padding: "10px 24px",
+                borderRadius: "8px",
+              }}
+            />
+          </>
+        )}
       </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        visible={showConfirm}
+        onHide={() => setShowConfirm(false)}
+        header="Confirm Deletion"
+        footer={
+          <div>
+            <Button
+              label="Cancel"
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => setShowConfirm(false)}
+            />
+            <Button
+              label="Delete"
+              icon="pi pi-check"
+              className="p-button-danger"
+              onClick={() => {
+                setShowConfirm(false);
+                if (onDelete) {
+                  onDelete();
+                }
+
+              }}
+            />
+          </div>
+        }
+      >
+        <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+      </Dialog>
     </form>
   );
 };

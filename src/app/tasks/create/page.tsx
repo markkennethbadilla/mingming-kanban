@@ -1,70 +1,104 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import TaskForm from "@/components/TaskForm";
+import { Toast } from "primereact/toast";
 
 const CreateTaskPage: React.FC = () => {
-  const [error, setError] = useState("");
+  const toast = useRef<Toast>(null);
   const router = useRouter();
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch("/api/session", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        let errorMessage = "Failed to fetch user session.";
+        if (response.status === 401) {
+          errorMessage = errorData.message || "Unauthorized. Please log in again.";
+        } else if (response.status === 404) {
+          errorMessage = errorData.message || "User not found.";
+        }
+        throw new Error(errorMessage);
+      }
+
+      const { user } = await response.json();
+      return user.id; // Return the user ID
+    } catch (error: any) {
+      console.error("Error fetching user session:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message || "Failed to fetch user session.",
+        life: 5000,
+      });
+      throw error; // Rethrow to stop further execution
+    }
+  };
 
   const handleTaskSubmit = async (data: any) => {
     try {
-      const token = localStorage.getItem("authToken");
+      const userId = await fetchUser(); // Fetch user session to get user ID
+
+      const payload = {
+        ...data,
+        userId, // Include the user ID in the payload
+      };
+
+      console.log("Data to be submitted:", payload);
+
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
+      console.log("Response status:", response.status);
+      const responseData = await response.json();
+      console.log("Response data:", responseData);
+
       if (!response.ok) {
-        throw new Error("Failed to create task.");
+        let errorMessage = "Failed to create task.";
+        if (response.status === 400) {
+          errorMessage = responseData.message || "Invalid task data provided.";
+        } else if (response.status === 401) {
+          errorMessage = "Unauthorized. Please log in again.";
+        } else if (response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+        throw new Error(errorMessage);
       }
 
-      router.push("/dashboard");
-    } catch (error) {
-      console.error(error);
-      setError(error.message || "Something went wrong.");
+      // Show success toast and navigate back
+      toast.current?.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Task created successfully.",
+        life: 3000,
+      });
+
+      setTimeout(() => router.back(), 3000);
+    } catch (error: any) {
+      console.error("Error creating task:", error);
+
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message || "An unexpected error occurred.",
+        life: 5000,
+      });
     }
   };
-
-  if (error) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "87",
-          textAlign: "center",
-        }}
-      >
-        <p style={{ color: "var(--secondary-color)", fontSize: "1rem" }}>{error}</p>
-        <button
-          style={{
-            marginTop: "16px",
-            padding: "10px 16px",
-            backgroundColor: "var(--primary-color)",
-            color: "#fff",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontSize: "1rem",
-            border: "none",
-            transition: "background-color 0.2s",
-          }}
-          onClick={() => router.push("/dashboard")}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--primary-color-light)")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--primary-color)")}
-        >
-          Back to Dashboard
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div
@@ -74,9 +108,11 @@ const CreateTaskPage: React.FC = () => {
         justifyContent: "center",
         backgroundColor: "var(--background-color)",
         padding: "24px 0",
-        height: "87vh"
+        height: "87vh",
       }}
     >
+      {/* Toast for notifications */}
+      <Toast ref={toast} />
       <div
         style={{
           width: "100%",
@@ -96,11 +132,11 @@ const CreateTaskPage: React.FC = () => {
             cursor: "pointer",
             textDecoration: "none",
           }}
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.back()}
           onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
           onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
         >
-          &larr; Back to Dashboard
+          &larr; Back
         </a>
 
         {/* Page Header */}
@@ -110,7 +146,7 @@ const CreateTaskPage: React.FC = () => {
             color: "var(--primary-color)",
             fontSize: "1.5rem",
             fontWeight: "600",
-            marginBottom: "32px"
+            marginBottom: "32px",
           }}
         >
           Create Task

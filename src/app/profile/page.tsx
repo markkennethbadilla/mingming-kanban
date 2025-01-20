@@ -9,6 +9,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import Loader from "@/components/Loader";
+import { useRouter } from "next/navigation";
 
 const validationSchema = z.object({
   username: z.string().nonempty("Username is required"),
@@ -37,6 +38,7 @@ const ProfilePage: React.FC = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const toast = React.useRef<Toast>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -57,7 +59,7 @@ const ProfilePage: React.FC = () => {
             life: 3000,
           });
           setTimeout(() => {
-            window.location.href = "/login";
+            window.location.href = "/landing";
           }, 3000);
           return;
         }
@@ -116,9 +118,14 @@ const ProfilePage: React.FC = () => {
     });
   };
 
-  if (loading) return <Loader/>;
+  if (loading) return <Loader />;
 
-  if (error) return <p style={{ textAlign: "center", color: "var(--secondary-color)" }}>{error}</p>;
+  if (error)
+    return (
+      <p style={{ textAlign: "center", color: "var(--secondary-color)" }}>
+        {error}
+      </p>
+    );
 
   return (
     <div
@@ -127,7 +134,7 @@ const ProfilePage: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "var(--background-color)",
-        height: "87vh"
+        height: "87vh",
       }}
     >
       <Toast ref={toast} />
@@ -142,6 +149,22 @@ const ProfilePage: React.FC = () => {
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         }}
       >
+        <a
+          style={{
+            display: "inline-block",
+            marginBottom: "16px",
+            fontSize: "0.875rem",
+            color: "var(--primary-color)",
+            cursor: "pointer",
+            textDecoration: "none",
+          }}
+          onClick={() => router.back()}
+          onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+        >
+          &larr; Back
+        </a>
+
         <h2
           style={{
             textAlign: "center",
@@ -153,6 +176,7 @@ const ProfilePage: React.FC = () => {
         >
           Profile Settings
         </h2>
+
         <form onSubmit={handleSubmit(onSubmit)} style={{ display: "grid", gap: "16px" }}>
           {/* Username Field */}
           <div>
@@ -186,7 +210,9 @@ const ProfilePage: React.FC = () => {
               )}
             />
             {errors.username && (
-              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>{errors.username.message}</small>
+              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>
+                {errors.username.message}
+              </small>
             )}
           </div>
 
@@ -222,7 +248,9 @@ const ProfilePage: React.FC = () => {
               )}
             />
             {errors.email && (
-              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>{errors.email.message}</small>
+              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>
+                {errors.email.message}
+              </small>
             )}
           </div>
 
@@ -275,7 +303,9 @@ const ProfilePage: React.FC = () => {
               />
             </div>
             {errors.password && (
-              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>{errors.password.message}</small>
+              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>
+                {errors.password.message}
+              </small>
             )}
           </div>
 
