@@ -59,7 +59,7 @@ const ProfilePage: React.FC = () => {
             life: 3000,
           });
           setTimeout(() => {
-            window.location.href = "/landing";
+            window.location.href = "/";
           }, 3000);
           return;
         }

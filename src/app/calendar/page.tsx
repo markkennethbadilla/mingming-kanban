@@ -45,7 +45,7 @@ const CalendarPage: React.FC = () => {
           life: 3000,
         });
         localStorage.removeItem("authToken");
-        router.push("/landing");
+        router.push("/");
       }
     };
 

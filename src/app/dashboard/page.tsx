@@ -34,7 +34,7 @@ const DashboardPage: React.FC = () => {
         if (!userResponse.ok) {
           if (userResponse.status === 401) {
             localStorage.removeItem("authToken");
-            router.push("/landing");
+            router.push("/");
             return;
           }
           throw new Error("Failed to fetch user data.");
