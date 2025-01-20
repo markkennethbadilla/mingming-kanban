@@ -269,7 +269,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     borderRadius: "4px",
                     backgroundColor:
                       status === statusKey
-                        ? "var(--highlight-color-light)"
+                        ? "#d3d3d3" // lighter grey
                         : "transparent",
                     color: "var(--neutral-color)",
                   }}

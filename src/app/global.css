@@ -96,10 +96,5 @@ span[data-pc-section="daylabel"] {
 
 .hover-animate:hover {
   transform: scale(1.1);
-  color: var(--primary-color-hover);
-}
-
-.active-status {
-  color: var(--primary-color) !important;
-  text-decoration: underline;
+  color: var(--primary-color);
 }
