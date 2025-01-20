@@ -51,7 +51,7 @@
 span[data-pc-section="daylabel"] {
   display: block; /* Full block for flexible content */
   width: 100%; /* Full width of cell */
-  height: 100%; /* Full height of cell */
+  height: 110%; /* Full height of cell */
   display: flex;
   align-items: center; /* Center number vertically */
   justify-content: center; /* Center number horizontally */
@@ -84,5 +84,5 @@ span[data-pc-section="daylabel"] {
   background-color: var(--secondary-color); /* Use the secondary color */
   border-radius: 50%;
   position: absolute; /* Position relative to parent */
-  bottom: 0px; /* Place the dot below the number */
+  bottom: 2px; /* Place the dot below the number */
 }
