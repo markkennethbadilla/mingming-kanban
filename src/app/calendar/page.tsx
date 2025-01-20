@@ -10,13 +10,14 @@ import axios from "axios";
 import TaskCard from "../../components/TaskCard";
 import { Task } from "@/types/task";
 import { ToastProvider } from "@/context/ToastContext";
+import { Button } from "primereact/button";
 
 const CalendarPage: React.FC = () => {
   const router = useRouter();
   const toast = useRef<Toast>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date()); // Default to today
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -88,8 +89,47 @@ const CalendarPage: React.FC = () => {
     if (userId) fetchTasks();
   }, [userId]);
 
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
+  const formatDate = (date: Date): string => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    const tomorrow = new Date(today);
+
+    yesterday.setDate(today.getDate() - 1);
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return `Today, ${date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      })}`;
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return `Yesterday, ${date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      })}`;
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return `Tomorrow, ${date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      })}`;
+    }
+
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+    };
+
+  const handleDateChange = (days: number) => {
+    setSelectedDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setDate(newDate.getDate() + days);
+      return newDate;
+    });
   };
 
   const dateTemplate = (event: CalendarDateTemplateEvent) => {
@@ -102,8 +142,7 @@ const CalendarPage: React.FC = () => {
     return (
       <div className="calendar-day">
         <span className="day-number">{day}</span>
-        {hasTask && <div className="task-dot"></div>}{" "}
-        {/* Dot for days with tasks */}
+        {hasTask && <div className="task-dot"></div>} {/* Dot for days with tasks */}
       </div>
     );
   };
@@ -134,18 +173,18 @@ const CalendarPage: React.FC = () => {
   return (
     <ToastProvider>
       <DndProvider backend={HTML5Backend}>
-        <div className="min-h-screen bg-gray-100 px-6 flex flex-col items-center">
+        <div className="min-h-screen px-6 flex flex-col items-center" style={{ backgroundColor: "var(--background-color)" }}>
           <Toast ref={toast} />
-            <h1 className="text-4xl font-bold my-4" style={{ color: "var(--primary-color)" }}>
+          <h1 className="text-4xl font-bold my-4" style={{ color: "var(--primary-color)" }}>
             Task Calendar
-            </h1>
+          </h1>
           <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6">
             {/* Calendar Section */}
             <div className="bg-white shadow-lg rounded-lg p-4 flex items-center justify-center">
               <Calendar
                 inline
                 value={selectedDate}
-                onSelect={(e) => handleDateSelect(e.value as Date)}
+                onSelect={(e) => setSelectedDate(e.value as Date)}
                 dateTemplate={dateTemplate}
                 showWeek
                 numberOfMonths={1}
@@ -155,11 +194,29 @@ const CalendarPage: React.FC = () => {
 
             {/* Task Preview Section */}
             <div className="bg-white shadow-lg rounded-lg p-4 flex-grow lg:w-[40%] flex flex-col">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                {selectedDate
-                  ? `Tasks for ${selectedDate.toLocaleDateString()}`
-                  : "Select a date"}
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <Button
+                  icon="pi pi-chevron-left"
+                  className="p-button-text"
+                  style={{
+                    color: "gray"
+                  }}
+                  onClick={() => handleDateChange(-1)}
+                />
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  {selectedDate
+                    ? `${formatDate(selectedDate)}`
+                    : "Select a date"}
+                </h2>
+                <Button
+                  icon="pi pi-chevron-right"
+                  className="p-button-text"
+                  style={{
+                    color: "gray"
+                  }}
+                  onClick={() => handleDateChange(1)}
+                />
+              </div>
               <div className="flex-1 overflow-y-auto space-y-4">
                 {tasksForSelectedDate && tasksForSelectedDate.length > 0 ? (
                   tasksForSelectedDate.map((task) => (

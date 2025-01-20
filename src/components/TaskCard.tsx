@@ -1,18 +1,19 @@
 import React, { useState, useRef } from "react";
 import { useDrag } from "react-dnd";
-import { useRouter } from "next/navigation";
-import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { Tooltip } from "primereact/tooltip";
+import { FaTrash, FaPencilAlt } from "react-icons/fa";
+import { Button } from "primereact/button";
 import { useToast } from "../context/ToastContext";
 
 interface TaskCardProps {
   id: number;
   title: string;
   description: string;
-  dueDate: string | Date; // Allow both string and Date
+  dueDate: string | Date;
   priority: "LOW" | "MEDIUM" | "HIGH";
   status: "TO_DO" | "IN_PROGRESS" | "DONE";
-  onStatusChange?: (id: number, status: string) => void; // Optional
+  onStatusChange?: (id: number, status: string) => void;
   onDelete: (id: number) => void;
 }
 
@@ -26,10 +27,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   onStatusChange,
   onDelete,
 }) => {
-  const router = useRouter();
+  const cardRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
-
-  const dragRef = useRef<HTMLDivElement>(null);
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TASK",
     item: { id, status },
@@ -37,35 +36,43 @@ const TaskCard: React.FC<TaskCardProps> = ({
       isDragging: !!monitor.isDragging(),
     }),
   }));
+  const [isHovered, setIsHovered] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  // To handle delayed collapse
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const dueDateString =
-    typeof dueDate === "string" ? dueDate : dueDate.toISOString();
-
-  const isMissed =
-    status === "TO_DO" && new Date(dueDateString) < new Date();
-  const priorityStyles = {
-    LOW: { backgroundColor: "var(--neutral-color)", color: "#fff" },
-    MEDIUM: { backgroundColor: "var(--highlight-color)", color: "var(--text-color)" },
-    HIGH: { backgroundColor: "var(--secondary-color)", color: "#fff" },
+  const handleMouseEnter = () => {
+    if (hoverTimeout.current) {
+      clearTimeout(hoverTimeout.current); // Clear any pending timeout
+      hoverTimeout.current = null;
+    }
+    setIsHovered(true);
   };
 
-  const handleCardClick = () => {
-    if (!showConfirmation) {
-      router.push(`/tasks/${id}/edit`);
-    }
+  const handleMouseLeave = () => {
+    hoverTimeout.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 1000); // Delay of 1 second
+  };
+
+  const currentYear = new Date().getFullYear();
+  const taskDate = new Date(typeof dueDate === "string" ? dueDate : dueDate);
+  const isMissed = status === "TO_DO" && taskDate < new Date();
+  const priorityColors = {
+    LOW: "var(--neutral-color)",
+    MEDIUM: "var(--highlight-color)",
+    HIGH: "var(--secondary-color)",
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowConfirmation(true);
+    setShowConfirm(true);
   };
 
   const confirmDelete = () => {
+    setShowConfirm(false);
     onDelete(id);
-    setShowConfirmation(false);
-
     showToast({
       severity: "success",
       summary: "Task Deleted",
@@ -74,161 +81,227 @@ const TaskCard: React.FC<TaskCardProps> = ({
     });
   };
 
-  const cancelDelete = () => {
-    setShowConfirmation(false);
-  };
-
   const handleStatusChange = (newStatus: string) => {
-    if (onStatusChange) {
+    if (onStatusChange && status !== newStatus) {
       onStatusChange(id, newStatus);
-
       showToast({
         severity: "info",
         summary: "Status Updated",
-        detail: `Task "${title}" status updated to ${newStatus.replace("_", " ")}.`,
+        detail: `Task "${title}" status updated to ${newStatus.replace(
+          "_",
+          " "
+        )}.`,
         life: 3000,
       });
     }
   };
 
-  drag(dragRef);
+  const handleEditClick = () => {
+    window.location.href = `/tasks/${id}/edit`;
+  };
+
+  drag(cardRef);
 
   return (
     <div
-      ref={dragRef}
-      onClick={handleCardClick}
+      ref={cardRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
-        padding: "8px",
+        padding: isHovered ? "0px 12px 12px 12px" : "8px",
         borderRadius: "8px",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-        transition: "box-shadow 0.2s",
+        boxShadow: isHovered
+          ? "0 6px 12px rgba(0, 0, 0, 0.15)"
+          : "0 1px 3px rgba(0, 0, 0, 0.1)",
+        transition: "box-shadow 0.3s, padding 0.2s",
         marginBottom: "8px",
-        cursor: "pointer",
+        cursor: "default",
         opacity: isDragging ? 0.5 : 1,
-        backgroundColor: isMissed ? "var(--highlight-color-light)" : "var(--background-color)",
-        borderLeft: `4px solid ${isMissed ? "var(--secondary-color)" : "var(--primary-color)"}`,
+        backgroundColor: isMissed
+          ? "var(--highlight-color-light)"
+          : "var(--card-background)",
+        borderLeft: `4px solid ${priorityColors[priority]}`,
         position: "relative",
+        overflow: "hidden",
+        minHeight: isHovered ? "auto" : "48px",
       }}
     >
-      {/* Delete Button */}
-      <button
-        onClick={handleDeleteClick}
-        style={{
-          position: "absolute",
-          top: "-2px",
-          right: "0px",
-          backgroundColor: "transparent",
-          color: "var(--secondary-color)",
-          border: "none",
-          borderRadius: "50%",
-          width: "24px",
-          height: "24px",
-          fontSize: "0.875rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          cursor: "pointer",
-          transition: "background-color 0.2s",
-        }}
-      >
-        ×
-      </button>
-
-      {/* Header: Title and Priority */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "8px",
-          alignItems: "center",
-        }}
-      >
-        <h3
+      {isHovered && (
+        <span
           style={{
-            fontSize: "0.875rem",
-            fontWeight: "500",
-            color: "var(--primary-color)",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
+            position: "absolute",
+            top: "8px",
+            right: "12px",
+            padding: "4px 8px",
+            borderRadius: "12px",
+            fontSize: "0.75rem",
+            fontWeight: "600",
+            backgroundColor: priorityColors[priority],
+            color: "white",
           }}
         >
-          {title}
-        </h3>
+          {priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()}
+        </span>
+      )}
+
+      {!isHovered && (
         <div
           style={{
-            display: "inline-flex",
+            display: "flex",
+            justifyContent: "space-between",
             alignItems: "center",
-            justifyContent: "center",
-            padding: "2px 6px",
-            fontSize: "0.75rem",
-            fontWeight: "500",
-            borderRadius: "4px",
-            ...priorityStyles[priority],
           }}
         >
-          {priority}
-        </div>
-      </div>
-
-      {/* Description */}
-      <p
-        style={{
-          fontSize: "0.75rem",
-          color: "var(--text-color)",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          marginBottom: "8px",
-        }}
-      >
-        {description}
-      </p>
-
-      {/* Footer: Due Date and Status Dropdown */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "0.75rem",
-          alignItems: "center",
-        }}
-      >
-        <p
-          style={{
-            color: isMissed ? "var(--secondary-color)" : "var(--neutral-color)",
-            fontWeight: isMissed ? "600" : "400",
-          }}
-        >
-          Due: {new Date(dueDateString).toLocaleDateString()}
-        </p>
-        <div onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
-          <select
-            value={status}
-            onChange={(e) => handleStatusChange(e.target.value)}
+          <h3
             style={{
-              fontSize: "0.75rem",
-              backgroundColor: "var(--background-color)",
-              border: `1px solid var(--neutral-color)`,
-              borderRadius: "4px",
-              padding: "4px",
-              outline: "none",
-              cursor: "pointer",
+              fontSize: "1rem",
+              fontWeight: "500",
+              color: "var(--primary-color)",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
-            {["TO_DO", "IN_PROGRESS", "DONE"].map((option) => (
-              <option key={option} value={option}>
-                {option.replace("_", " ")}
-              </option>
-            ))}
-          </select>
+            {title}
+          </h3>
+          <p
+            style={{
+              fontSize: "0.65rem",
+              color: isMissed
+                ? "var(--secondary-color)"
+                : "var(--neutral-color)",
+            }}
+          >
+            {taskDate.toLocaleDateString(undefined, {
+              day: "numeric",
+              month: "short",
+              year:
+                taskDate.getFullYear() !== currentYear ? "numeric" : undefined,
+            })}
+          </p>
         </div>
-      </div>
+      )}
 
-      {/* Confirmation Dialog */}
+      {isHovered && (
+        <>
+          <div style={{ marginBottom: "12px" }}>
+            <h3
+              style={{
+                fontSize: "1.2rem",
+                fontWeight: "500",
+                color: "var(--primary-color)",
+                marginBottom: "4px",
+                wordWrap: "break-word",
+              }}
+            >
+              {title}
+            </h3>
+            <p
+              style={{
+                fontSize: "0.8rem",
+                color: "grey",
+                whiteSpace: "normal",
+              }}
+            >
+              {description}
+            </p>
+            <p
+              style={{
+                fontSize: "0.7rem",
+                color: "var(--neutral-color)",
+                marginBottom: "30px",
+                fontStyle: "italic",
+              }}
+            >
+              Due on{" "}
+              {taskDate.toLocaleDateString(undefined, {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "0.75rem",
+              color: "var(--neutral-color)",
+            }}
+          >
+            <span
+              className="p-overlay-badge hover-animate"
+              data-pr-tooltip="Edit Task"
+              data-pr-position="top"
+              style={{
+                cursor: "pointer",
+                color: "var(--primary-color)",
+                fontSize: "0.875rem",
+              }}
+              onClick={handleEditClick}
+            >
+              <FaPencilAlt />
+            </span>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              {["TO_DO", "IN_PROGRESS", "DONE"].map((statusKey) => (
+                <span
+                  key={statusKey}
+                  className={`hover-animate ${
+                    status === statusKey ? "active-status" : ""
+                  }`}
+                  data-pr-tooltip={statusKey.replace("_", " ")}
+                  data-pr-position="top"
+                  onClick={() => handleStatusChange(statusKey)}
+                  style={{
+                    cursor: status === statusKey ? "not-allowed" : "pointer",
+                    fontSize: "0.7rem",
+                    fontWeight: "600",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                    backgroundColor:
+                      status === statusKey
+                        ? "var(--highlight-color-light)"
+                        : "transparent",
+                    color: "var(--neutral-color)",
+                  }}
+                >
+                  {statusKey
+                    .replace("_", " ")
+                    .toLowerCase()
+                    .replace(/^\w/, (c) => c.toUpperCase())}
+                </span>
+              ))}
+            </div>
+
+            <span
+              className="p-overlay-badge hover-animate"
+              data-pr-tooltip="Delete Task"
+              data-pr-position="top"
+              onClick={handleDeleteClick}
+              style={{
+                cursor: "pointer",
+                color: "var(--secondary-color)",
+                fontSize: "0.875rem",
+              }}
+            >
+              <FaTrash />
+            </span>
+          </div>
+        </>
+      )}
+
       <Dialog
-        visible={showConfirmation}
-        onHide={cancelDelete}
+        visible={showConfirm}
+        onHide={() => setShowConfirm(false)}
         header="Confirm Deletion"
         footer={
           <div>
@@ -236,7 +309,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               label="Cancel"
               icon="pi pi-times"
               className="p-button-text"
-              onClick={cancelDelete}
+              onClick={() => setShowConfirm(false)}
             />
             <Button
               label="Delete"
@@ -247,8 +320,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         }
       >
-        <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+        <p>
+          Are you sure you want to delete this task? This action cannot be
+          undone.
+        </p>
       </Dialog>
+      <Tooltip target=".p-overlay-badge" />
     </div>
   );
 };

@@ -11,8 +11,9 @@
   --secondary-color: #F98A8A;
   --background-color: #FAF8F5;
   --text-color: #3D3D3D;
-  --highlight-color: #FCE77D;
+  --highlight-color: #E6C84E;
   --neutral-color: #727272;
+  --card-background: #F3F4F6; /* bg-gray-100 */
 }
 
 
@@ -85,4 +86,20 @@ span[data-pc-section="daylabel"] {
   border-radius: 50%;
   position: absolute; /* Position relative to parent */
   bottom: 2px; /* Place the dot below the number */
+}
+
+
+/* task card */
+.hover-animate {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.hover-animate:hover {
+  transform: scale(1.1);
+  color: var(--primary-color-hover);
+}
+
+.active-status {
+  color: var(--primary-color) !important;
+  text-decoration: underline;
 }

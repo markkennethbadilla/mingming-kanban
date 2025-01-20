@@ -18,6 +18,7 @@ const LandingPage: React.FC = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "87vh",
+        backgroundColor: "var(--background-color)",
         backgroundImage: "url('/background-image.png')", // Replace with the path to your background image
         backgroundSize: "cover",
         backgroundPosition: "center",

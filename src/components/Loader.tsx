@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const Loader: React.FC = () => {
   return (
@@ -15,15 +16,16 @@ const Loader: React.FC = () => {
       }}
     >
       {/* Cat Animation */}
-      <div style={{ marginBottom: "12px" }}> {/* Reduced spacing */}
-        <img
-          src="cat-loading.gif" // Replace with a path to your cat animation GIF
+
+      <div style={{ marginBottom: "12px" }}>
+        {" "}
+        {/* Reduced spacing */}
+        <Image
+          src="/cat-loading.gif" // Replace with a path to your cat animation GIF
           alt="Loading cat animation"
-          style={{
-            height: "150px", // Larger fixed height
-            width: "auto", // Proportional width
-            objectFit: "contain",
-          }}
+          height={150} // Larger fixed height
+          width={200} // Fixed width to maintain aspect ratio
+          objectFit="contain"
         />
       </div>
 

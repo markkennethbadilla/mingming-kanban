@@ -177,6 +177,7 @@ const DashboardPage: React.FC = () => {
       <DndProvider backend={HTML5Backend}>
         <div
           style={{
+            backgroundColor: "var(--background-color)",
             padding: "20px",
             height: "98vh",
           }}

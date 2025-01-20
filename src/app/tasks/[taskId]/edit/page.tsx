@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import TaskForm from "@/components/TaskForm";
 import { Toast } from "primereact/toast";
+import Loader from "@/components/Loader";
 
 const EditTaskPage: React.FC = () => {
   const [initialData, setInitialData] = useState(null);
@@ -187,62 +188,54 @@ const EditTaskPage: React.FC = () => {
       }}
     >
       <Toast ref={toast} />
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "800px",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          padding: "24px",
-          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <a
+      {initialData ? (
+        <div
           style={{
-            display: "inline-block",
-            marginBottom: "16px",
-            fontSize: "0.875rem",
-            color: "var(--primary-color)",
-            cursor: "pointer",
-            textDecoration: "none",
-          }}
-          onClick={() => router.back()}
-          onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
-          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
-        >
-          &larr; Back
-        </a>
-        {/* Page Header */}
-        <h2
-          style={{
-            textAlign: "center",
-            color: "var(--primary-color)",
-            fontSize: "1.5rem",
-            fontWeight: "600",
-            marginBottom: "32px",
+            width: "100%",
+            maxWidth: "800px",
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            padding: "24px",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
           }}
         >
-          Edit Task
-        </h2>
-        {/* Task Form */}
-        {initialData ? (
+          <a
+            style={{
+              display: "inline-block",
+              marginBottom: "16px",
+              fontSize: "0.875rem",
+              color: "var(--primary-color)",
+              cursor: "pointer",
+              textDecoration: "none",
+            }}
+            onClick={() => router.back()}
+            onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+            onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+          >
+            &larr; Back
+          </a>
+          {/* Page Header */}
+          <h2
+            style={{
+              textAlign: "center",
+              color: "var(--primary-color)",
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              marginBottom: "32px",
+            }}
+          >
+            Edit Task
+          </h2>
+          {/* Task Form */}
           <TaskForm
             onSubmit={handleTaskSubmit}
             onDelete={handleTaskDelete}
             initialData={initialData}
           />
-        ) : (
-          <p
-            style={{
-              textAlign: "center",
-              color: "var(--neutral-color)",
-              fontSize: "1rem",
-            }}
-          >
-            Loading task details...
-          </p>
-        )}
-      </div>
+        </div>
+      ) : (
+        <Loader />
+      )}
     </div>
   );
 };
