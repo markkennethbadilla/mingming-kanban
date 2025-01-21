@@ -12,14 +12,21 @@ import { Task } from "@/types/task";
 import { ToastProvider } from "@/context/ToastContext";
 import { Button } from "primereact/button";
 
-import "@/styles/CalendarPage.css"; // Scoped CSS for the calendar
+import "@/styles/CalendarPage.css";
 
 const CalendarPage: React.FC = () => {
   const router = useRouter();
   const toast = useRef<Toast>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const normalizeToLocalMidnight = (date: Date): Date => {
+    const localMidnight = new Date(date);
+    localMidnight.setHours(0, 0, 0, 0);
+    return localMidnight;
+  };
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -67,7 +74,17 @@ const CalendarPage: React.FC = () => {
         });
 
         if (response.data.success) {
-          setTasks(response.data.tasks || []);
+          const normalizedTasks = response.data.tasks.map((task: Task) => ({
+            ...task,
+            dueDate: normalizeToLocalMidnight(new Date(task.dueDate)),
+          }));
+
+          setTasks(normalizedTasks);
+
+          // Set today's date after loading tasks
+          setSelectedDate(normalizeToLocalMidnight(new Date()));
+
+          setLoading(false);
         } else {
           throw new Error("Failed to fetch tasks.");
         }
@@ -79,35 +96,38 @@ const CalendarPage: React.FC = () => {
           detail: "Failed to fetch tasks.",
           life: 3000,
         });
+        setLoading(false);
       }
     };
 
     if (userId) fetchTasks();
   }, [userId]);
 
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
+  const handleDateChange = (days: number) => {
+    if (selectedDate) {
+      setSelectedDate((prevDate) => {
+        const newDate = new Date(prevDate!);
+        newDate.setDate(newDate.getDate() + days);
+        return normalizeToLocalMidnight(newDate);
+      });
+    }
   };
 
-  const handleDateChange = (days: number) => {
-    setSelectedDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setDate(newDate.getDate() + days);
-      return newDate;
+  const tasksForSelectedDate =
+    selectedDate &&
+    tasks.filter((task) => {
+      const taskDateLocal = normalizeToLocalMidnight(task.dueDate);
+      const selectedDateLocal = normalizeToLocalMidnight(selectedDate);
+      return taskDateLocal.getTime() === selectedDateLocal.getTime();
     });
-  };
 
   const dateTemplate = (event: CalendarDateTemplateEvent) => {
     const { day, month, year } = event;
     const reconstructedDate = new Date(year, month, day);
-    const dateKey = reconstructedDate.toISOString().split("T")[0];
+    const dateKey = normalizeToLocalMidnight(reconstructedDate).toISOString().split("T")[0];
     const hasTask = tasks.some(
-      (task) => new Date(task.dueDate).toISOString().split("T")[0] === dateKey
+      (task) =>
+        normalizeToLocalMidnight(task.dueDate).toISOString().split("T")[0] === dateKey
     );
     return (
       <div className="calendar-day">
@@ -132,26 +152,29 @@ const CalendarPage: React.FC = () => {
     }
   };
 
-  const tasksForSelectedDate = tasks.filter(
-    (task) =>
-      new Date(task.dueDate).toISOString().split("T")[0] ===
-      selectedDate.toISOString().split("T")[0]
-  );
+  if (loading || !selectedDate) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <ToastProvider>
       <DndProvider backend={HTML5Backend}>
-        <div className="min-h-screen flex flex-col items-center bg-gray-100 px-6">
+        <div className="flex flex-col items-center px-6">
           <Toast ref={toast} />
-            <h1 className="text-3xl font-bold" style={{ color: "var(--primary-color)" }}>Task Calendar</h1>
-          
+          <h1
+            className="text-3xl font-bold"
+            style={{ color: "var(--primary-color)" }}
+          >
+            Task Calendar
+          </h1>
+
           <div className="flex w-full max-w-6xl gap-6">
             {/* Calendar Container */}
-            <div className="bg-white rounded-lg shadow p-4 flex justify-center items-center">
+            <div className="bg-white rounded-lg shadow p-4 h-fit" >
               <Calendar
                 inline
                 value={selectedDate}
-                onSelect={(e) => setSelectedDate(e.value as Date)}
+                onSelect={(e) => setSelectedDate(normalizeToLocalMidnight(e.value as Date))}
                 dateTemplate={dateTemplate}
                 showWeek
                 numberOfMonths={1}
@@ -160,22 +183,29 @@ const CalendarPage: React.FC = () => {
             </div>
 
             {/* Task List Container */}
-            <div className="flex flex-col bg-white rounded-lg shadow p-4 w-96">
+            <div className="flex flex-col bg-white rounded-lg shadow p-4 w-96 h-[75vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <Button
                   icon="pi pi-chevron-left"
                   className="p-button-text"
                   onClick={() => handleDateChange(-1)}
                 />
-                <h2 className="text-xl font-semibold">{formatDate(selectedDate)}</h2>
+                <h2 className="text-xl font-semibold">
+                  {normalizeToLocalMidnight(selectedDate).toLocaleDateString("en-US", {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </h2>
                 <Button
                   icon="pi pi-chevron-right"
                   className="p-button-text"
                   onClick={() => handleDateChange(1)}
                 />
               </div>
-              <div className="flex flex-col gap-4">
-                {tasksForSelectedDate.length > 0 ? (
+              <div className="flex flex-col">
+                {tasksForSelectedDate && tasksForSelectedDate.length > 0 ? (
                   tasksForSelectedDate.map((task) => (
                     <TaskCard
                       key={task.id}
@@ -185,7 +215,9 @@ const CalendarPage: React.FC = () => {
                     />
                   ))
                 ) : (
-                  <p className="text-gray-500 italic text-center">No tasks for this date.</p>
+                  <p className="text-gray-500 italic text-center">
+                    No tasks for this date.
+                  </p>
                 )}
               </div>
             </div>
