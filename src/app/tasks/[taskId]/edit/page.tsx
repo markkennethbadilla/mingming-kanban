@@ -94,7 +94,7 @@ const EditTaskPage: React.FC = () => {
         detail: "Task deleted successfully.",
         life: 3000,
       });
-      setTimeout(() => router.back(), 3000);
+      setTimeout(() =>  router.push(document.referrer), 3000);
     } catch (error) {
       console.error(error);
       toast.current?.show({
@@ -129,7 +129,7 @@ const EditTaskPage: React.FC = () => {
         detail: "Task updated successfully.",
         life: 3000,
       });
-      setTimeout(() => router.back(), 3000);
+      setTimeout(() => router.push(document.referrer), 3000);
     } catch (error) {
       console.error(error);
       toast.current?.show({

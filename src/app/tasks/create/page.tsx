@@ -117,7 +117,7 @@ const CreateTaskPage: React.FC = () => {
         life: 3000,
       });
 
-      setTimeout(() => router.back(), 3000);
+      setTimeout(() =>  router.push(document.referrer), 3000);
     } catch (error: any) {
       console.error("Error creating task:", error);
 

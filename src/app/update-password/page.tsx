@@ -68,8 +68,7 @@ const UpdatePasswordPage: React.FC = () => {
         });
 
         if (response.ok) {
-          router.push("/dashboard"); // Redirect to dashboard if session is valid
-        }
+          router.push(document.referrer)        }
       } catch {}
     };
 
