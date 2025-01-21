@@ -16,6 +16,10 @@
   --card-background: #F3F4F6; /* bg-gray-100 */
 }
 
+body main {
+  background-color: var(--background-color);
+}
+
 
 /* password field */
 /* Ensure the p-password container spans the full width */

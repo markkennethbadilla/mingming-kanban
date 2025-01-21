@@ -12,7 +12,7 @@ if (
 }
 
 const SECRET_KEY = process.env.SECRET_KEY; // JWT secret
-const FRONTEND_URL = process.env.FRONTEND_URL; // Frontend URL (e.g., https://yourapp.vercel.app)
+const URL = process.env.URL; 
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       subject: "Password Reset",
       html: `
         <p>You requested a password reset. Click the link below to reset your password:</p>
-        <a href="${FRONTEND_URL}/update-password?token=${token}">Reset Password</a>
+        <a href="${URL}/update-password?token=${token}">Reset Password</a>
         <p>This link will expire in 15 minutes.</p>
       `,
     });

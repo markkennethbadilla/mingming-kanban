@@ -1,13 +1,47 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import TaskForm from "@/components/TaskForm";
 import { Toast } from "primereact/toast";
+import axios from "axios";
 
 const CreateTaskPage: React.FC = () => {
   const toast = useRef<Toast>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
+
+        const response = await axios.get("/api/session", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data.success) {
+        } else {
+          throw new Error("Failed to fetch user session.");
+        }
+      } catch (error) {
+        console.error("Error fetching user session:", error);
+        toast.current?.show({
+          severity: "error",
+          summary: "Session Error",
+          detail: "Unable to fetch user session. Please log in again.",
+          life: 3000,
+        });
+        localStorage.removeItem("authToken");
+        router.push("/");
+      }
+    };
+
+    fetchUserId();
+  }, [router]);
 
   const fetchUser = async () => {
     try {
