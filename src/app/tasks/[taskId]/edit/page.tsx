@@ -40,7 +40,7 @@ const EditTaskPage: React.FC = () => {
         detail: error.message || "Failed to fetch user session.",
         life: 5000,
       });
-      return false; // Invalid session
+      window.location.href = "/"; // Redirect to home page
     }
   };
 

@@ -59,11 +59,9 @@ const RegisterPage: React.FC = () => {
         });
 
         if (response.ok) {
-          window.location.href = "/dashboard"; // Redirect to dashboard if session is valid
+          window.location.href = "/"; // Redirect if session is valid
         }
-      } catch (error) {
-        console.error("Session validation error:", error);
-      }
+      }  catch {}
     };
 
     checkSession();

@@ -13,7 +13,9 @@ import { Password } from "primereact/password";
 const validationSchema = z
   .object({
     password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm Password must be at least 6 characters"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords must match",
@@ -68,9 +70,7 @@ const UpdatePasswordPage: React.FC = () => {
         if (response.ok) {
           router.push("/dashboard"); // Redirect to dashboard if session is valid
         }
-      } catch (error) {
-        console.error("Session validation error:", error);
-      }
+      } catch {}
     };
 
     checkSession();
@@ -150,7 +150,10 @@ const UpdatePasswordPage: React.FC = () => {
         >
           Reset Your Password
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)} style={{ display: "grid", gap: "16px" }}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          style={{ display: "grid", gap: "16px" }}
+        >
           {/* New Password Field */}
           <div>
             <label

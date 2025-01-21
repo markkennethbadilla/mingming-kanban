@@ -39,7 +39,7 @@ const CreateTaskPage: React.FC = () => {
         detail: error.message || "Failed to fetch user session.",
         life: 5000,
       });
-      throw error; // Rethrow to stop further execution
+      window.location.href = "/"; // Redirect to home page
     }
   };
 
