@@ -23,7 +23,7 @@
 /* Custom Calendar Styling */
 .custom-calendar {
   width: 500px; /* Fixed width */
-  height: 550px; /* Slightly taller than the width */
+  height: 500px; /* Slightly taller than the width */
   border: none; /* No border */
   padding: 0; /* No padding */
   margin: 0; /* No margin */
@@ -89,12 +89,18 @@ span[data-pc-section="daylabel"] {
 }
 
 
-/* task card */
-.hover-animate {
-  transition: transform 0.2s ease, color 0.2s ease;
+/* password field */
+/* Ensure the p-password container spans the full width */
+.p-password.p-component {
+  width: 100%;
+  display: block; /* Ensures it behaves like a block-level input */
 }
 
-.hover-animate:hover {
-  transform: scale(1.1);
-  color: var(--primary-color);
+/* Ensure the password input itself also spans the full width */
+.p-password-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-color, #ccc);
+  box-sizing: border-box; /* Prevents padding from affecting width */
 }

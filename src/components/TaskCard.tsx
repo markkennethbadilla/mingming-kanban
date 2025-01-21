@@ -232,15 +232,24 @@ const TaskCard: React.FC<TaskCardProps> = ({
             }}
           >
             <span
-              className="p-overlay-badge hover-animate"
+              className="p-overlay-badge"
               data-pr-tooltip="Edit Task"
               data-pr-position="top"
               style={{
-                cursor: "pointer",
-                color: "var(--primary-color)",
-                fontSize: "0.875rem",
+              cursor: "pointer",
+              color: "var(--primary-color)",
+              fontSize: "0.875rem",
+              transition: "transform 0.2s ease, color 0.2s ease",
               }}
               onClick={handleEditClick}
+              onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1.1)";
+              (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+              }}
+              onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+              (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+              }}
             >
               <FaPencilAlt />
             </span>
@@ -252,45 +261,61 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 gap: "6px",
               }}
             >
-              {["TO_DO", "IN_PROGRESS", "DONE"].map((statusKey) => (
+                {["TO_DO", "IN_PROGRESS", "DONE"].map((statusKey) => (
                 <span
                   key={statusKey}
-                  className={`hover-animate ${
-                    status === statusKey ? "active-status" : ""
-                  }`}
+                  className={`${status === statusKey ? "active-status" : ""}`}
                   data-pr-tooltip={statusKey.replace("_", " ")}
                   data-pr-position="top"
                   onClick={() => handleStatusChange(statusKey)}
                   style={{
-                    cursor: status === statusKey ? "not-allowed" : "pointer",
-                    fontSize: "0.7rem",
-                    fontWeight: "600",
-                    padding: "2px 6px",
-                    borderRadius: "4px",
-                    backgroundColor:
-                      status === statusKey
-                        ? "#d3d3d3" // lighter grey
-                        : "transparent",
-                    color: "var(--neutral-color)",
+                  cursor: status === statusKey ? "not-allowed" : "pointer",
+                  fontSize: "0.7rem",
+                  fontWeight: "600",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  backgroundColor:
+                    status === statusKey
+                    ? "#d3d3d3" // lighter grey
+                    : "transparent",
+                  color: "var(--neutral-color)",
+                  transition: "transform 0.2s ease, color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = "scale(1.1)";
+                  (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+                  }}
+                  onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+                  (e.currentTarget as HTMLElement).style.color = "var(--neutral-color)";
                   }}
                 >
                   {statusKey
-                    .replace("_", " ")
-                    .toLowerCase()
-                    .replace(/^\w/, (c) => c.toUpperCase())}
+                  .replace("_", " ")
+                  .toLowerCase()
+                  .replace(/^\w/, (c) => c.toUpperCase())}
                 </span>
-              ))}
+                ))}
             </div>
 
             <span
-              className="p-overlay-badge hover-animate"
+              className="p-overlay-badge"
               data-pr-tooltip="Delete Task"
               data-pr-position="top"
               onClick={handleDeleteClick}
               style={{
-                cursor: "pointer",
-                color: "var(--secondary-color)",
-                fontSize: "0.875rem",
+              cursor: "pointer",
+              color: "var(--secondary-color)",
+              fontSize: "0.875rem",
+              transition: "transform 0.2s ease, color 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1.1)";
+              (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+              }}
+              onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+              (e.currentTarget as HTMLElement).style.color = "var(--secondary-color)";
               }}
             >
               <FaTrash />

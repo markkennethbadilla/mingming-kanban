@@ -29,8 +29,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    console.log('Retrieved User Data:', user.dataValues);
-
     const isValidPassword = await bcrypt.compare(password, user.dataValues.password);
 
     if (!isValidPassword) {

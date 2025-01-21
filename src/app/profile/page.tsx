@@ -1,44 +1,65 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InputText } from "primereact/inputtext";
+import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import Loader from "@/components/Loader";
+import { Dialog } from "primereact/dialog";
+import { InputSwitch } from "primereact/inputswitch";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
 
-const validationSchema = z.object({
-  username: z.string().nonempty("Username is required"),
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
-});
+// Validation schema
+const validationSchema = (enablePasswordChange: boolean) =>
+  z
+    .object({
+      username: z.string().nonempty("Username is required"),
+      email: z.string().email("Invalid email format"),
+      password: enablePasswordChange
+        ? z.string().min(6, "Password must be at least 6 characters")
+        : z.string().optional(),
+      confirmPassword: enablePasswordChange
+        ? z.string().min(6, "Confirm Password must be at least 6 characters")
+        : z.string().optional(),
+    })
+    .refine(
+      (data) => !enablePasswordChange || data.password === data.confirmPassword,
+      {
+        message: "Passwords must match",
+        path: ["confirmPassword"],
+      }
+    );
 
-type ProfileFormData = z.infer<typeof validationSchema>;
+type ProfileFormData = z.infer<ReturnType<typeof validationSchema>>;
 
 const ProfilePage: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [enablePasswordChange, setEnablePasswordChange] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState(""); // State for the current password
+  const [isDialogVisible, setIsDialogVisible] = useState(false); // Dialog visibility
+  const toast = useRef<Toast>(null);
+  const router = useRouter();
+
   const {
     control,
     handleSubmit,
     setValue,
+    trigger,
+    getValues,
     formState: { errors },
   } = useForm<ProfileFormData>({
+    resolver: zodResolver(validationSchema(enablePasswordChange)),
     defaultValues: {
       username: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
-    resolver: zodResolver(validationSchema),
   });
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const toast = React.useRef<Toast>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -71,7 +92,12 @@ const ProfilePage: React.FC = () => {
         setValue("email", data.user.email);
         setLoading(false);
       } catch (err) {
-        setError(err.message || "An error occurred.");
+        toast.current?.show({
+          severity: "error",
+          summary: "Error",
+          detail: err.message || "An error occurred.",
+          life: 3000,
+        });
         setLoading(false);
       }
     };
@@ -79,53 +105,95 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [setValue]);
 
-  const onSubmit = async (data: ProfileFormData) => {
-    confirmDialog({
-      message: "Do you want to save the changes?",
-      header: "Confirmation",
-      icon: "pi pi-exclamation-triangle",
-      accept: async () => {
-        try {
-          const token = localStorage.getItem("authToken");
-          if (!token) throw new Error("Not authenticated. Please log in.");
+  const onSubmit = async () => {
 
-          const response = await fetch("/api/users/update-profile", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(data),
-          });
-
-          if (!response.ok) throw new Error("Failed to update profile.");
-
-          toast.current?.show({
-            severity: "success",
-            summary: "Profile Updated",
-            detail: "Your profile was updated successfully.",
-            life: 3000,
-          });
-        } catch (err) {
+    const valid = await trigger(); // Trigger validation
+    if (!valid) {
+      // Display validation errors as toast notifications
+      Object.keys(errors).forEach((field) => {
+        const error = errors[field as keyof ProfileFormData]?.message;
+        if (error) {
           toast.current?.show({
             severity: "error",
-            summary: "Update Failed",
-            detail: err.message || "Something went wrong.",
+            summary: "Validation Error",
+            detail: error,
             life: 3000,
           });
         }
-      },
-    });
+      });
+      return;
+    }
+
+    setIsDialogVisible(true);
+  };
+
+  const handleConfirm = async () => {
+    const newPassword = getValues("password");
+
+    if (enablePasswordChange && newPassword === currentPassword) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "New password cannot be the same as the current password.",
+        life: 3000,
+      });
+      return;
+    }
+
+    setIsDialogVisible(false);
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("No auth token found.");
+        throw new Error("Not authenticated. Please log in.");
+      }
+
+      const payload: Partial<ProfileFormData> = {
+        username: getValues("username"),
+        email: getValues("email"),
+        ...(enablePasswordChange && {
+          password: newPassword,
+          confirmPassword: getValues("confirmPassword"),
+        }),
+      };
+
+      const response = await fetch("/api/users/update-profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...payload, currentPassword }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update profile:", response.statusText);
+        throw new Error("Failed to update profile.");
+      }
+
+      toast.current?.show({
+        severity: "success",
+        summary: "Profile Updated",
+        detail: "Your profile was updated successfully.",
+        life: 3000,
+      });
+
+      if (enablePasswordChange) {
+        setValue("password", ""); // Clear password fields only
+        setValue("confirmPassword", "");
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      toast.current?.show({
+        severity: "error",
+        summary: "Update Failed",
+        detail: err.message || "Something went wrong.",
+        life: 3000,
+      });
+    }
   };
 
   if (loading) return <Loader />;
-
-  if (error)
-    return (
-      <p style={{ textAlign: "center", color: "var(--secondary-color)" }}>
-        {error}
-      </p>
-    );
 
   return (
     <div
@@ -138,7 +206,42 @@ const ProfilePage: React.FC = () => {
       }}
     >
       <Toast ref={toast} />
-      <ConfirmDialog />
+      <Dialog
+        visible={isDialogVisible}
+        header="Confirm Changes"
+        modal
+        onHide={() => setIsDialogVisible(false)}
+        footer={
+          <div>
+            <Button
+              label="Cancel"
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => setIsDialogVisible(false)}
+            />
+            <Button label="Confirm" icon="pi pi-check" onClick={handleConfirm} />
+          </div>
+        }
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ fontSize: "2rem", color: "var(--warn-color, #f39c12)" }}
+          />
+          <div style={{ flex: 1 }}>
+            <p>Enter your current password to confirm changes:</p>
+            <Password
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Current Password"
+              feedback={false}
+              toggleMask
+              style={{ marginTop: "10px", width: "100%" }}
+            />
+          </div>
+        </div>
+      </Dialog>
+
       <div
         style={{
           width: "100%",
@@ -159,8 +262,6 @@ const ProfilePage: React.FC = () => {
             textDecoration: "none",
           }}
           onClick={() => router.back()}
-          onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
-          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
         >
           &larr; Back
         </a>
@@ -177,153 +278,94 @@ const ProfilePage: React.FC = () => {
           Profile Settings
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} style={{ display: "grid", gap: "16px" }}>
-          {/* Username Field */}
-          <div>
-            <label
-              htmlFor="username"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontSize: "1rem",
-                color: "var(--text-color)",
-                fontWeight: "600",
-              }}
-            >
-              Username
-            </label>
-            <Controller
-              name="username"
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  {...field}
-                  id="username"
-                  placeholder="Enter your username"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: "8px",
-                    border: `1px solid ${errors.username ? "var(--secondary-color)" : "var(--neutral-color)"}`,
-                  }}
-                />
-              )}
-            />
-            {errors.username && (
-              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>
-                {errors.username.message}
-              </small>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          style={{ display: "grid", gap: "16px" }}
+        >
+          <Controller
+            name="username"
+            control={control}
+            render={({ field }) => (
+              <InputText
+                {...field}
+                placeholder="Enter your username"
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--neutral-color, #ccc)",
+                }}
+              />
             )}
+          />
+
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <InputText
+                {...field}
+                placeholder="Enter your email"
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--neutral-color, #ccc)",
+                }}
+              />
+            )}
+          />
+
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <label style={{ color: "var(--text-color)", fontWeight: "500" }}>
+              Change Password
+            </label>
+            <InputSwitch
+              checked={enablePasswordChange}
+              onChange={(e) => setEnablePasswordChange(e.value)}
+            />
           </div>
 
-          {/* Email Field */}
-          <div>
-            <label
-              htmlFor="email"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontSize: "1rem",
-                color: "var(--text-color)",
-                fontWeight: "600",
-              }}
-            >
-              Email
-            </label>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  {...field}
-                  id="email"
-                  placeholder="Enter your email"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: "8px",
-                    border: `1px solid ${errors.email ? "var(--secondary-color)" : "var(--neutral-color)"}`,
-                  }}
-                />
-              )}
-            />
-            {errors.email && (
-              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>
-                {errors.email.message}
-              </small>
-            )}
-          </div>
-
-          {/* Password Field */}
-          <div>
-            <label
-              htmlFor="password"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontSize: "1rem",
-                color: "var(--text-color)",
-                fontWeight: "600",
-              }}
-            >
-              Password
-            </label>
-            <div style={{ position: "relative" }}>
+          {enablePasswordChange && (
+            <>
               <Controller
                 name="password"
                 control={control}
                 render={({ field }) => (
-                  <InputText
+                  <Password
                     {...field}
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: `1px solid ${errors.password ? "var(--secondary-color)" : "var(--neutral-color)"}`,
-                    }}
+                    placeholder="Enter new password"
+                    feedback
+                    toggleMask
                   />
                 )}
               />
-              <Button
-                type="button"
-                icon={showPassword ? "pi pi-eye-slash" : "pi pi-eye"}
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  right: "10px",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  color: "var(--neutral-color)",
-                }}
+              <Controller
+                name="confirmPassword"
+                control={control}
+                render={({ field }) => (
+                  <Password
+                    {...field}
+                    placeholder="Confirm new password"
+                    feedback={false}
+                    toggleMask
+                  />
+                )}
               />
-            </div>
-            {errors.password && (
-              <small style={{ color: "var(--secondary-color)", fontSize: "0.875rem" }}>
-                {errors.password.message}
-              </small>
-            )}
-          </div>
+            </>
+          )}
 
-          {/* Submit Button */}
-          <div style={{ textAlign: "center" }}>
-            <Button
-              label="Save Changes"
-              type="submit"
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "8px",
-                backgroundColor: "var(--primary-color)",
-                color: "#fff",
-                fontWeight: "600",
-              }}
-            />
-          </div>
+          <Button
+            label="Save Changes"
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              backgroundColor: "var(--primary-color)",
+              color: "#fff",
+            }}
+          />
         </form>
       </div>
     </div>

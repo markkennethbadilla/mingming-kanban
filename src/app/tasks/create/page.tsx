@@ -52,8 +52,6 @@ const CreateTaskPage: React.FC = () => {
         userId, // Include the user ID in the payload
       };
 
-      console.log("Data to be submitted:", payload);
-
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: {
@@ -63,9 +61,7 @@ const CreateTaskPage: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log("Response status:", response.status);
       const responseData = await response.json();
-      console.log("Response data:", responseData);
 
       if (!response.ok) {
         let errorMessage = "Failed to create task.";

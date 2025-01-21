@@ -178,8 +178,7 @@ const DashboardPage: React.FC = () => {
         <div
           style={{
             backgroundColor: "var(--background-color)",
-            padding: "20px",
-            height: "98vh",
+            padding: "20px"
           }}
         >
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>

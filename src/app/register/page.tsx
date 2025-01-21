@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { Password } from "primereact/password";
 
 // Validation schema using zod
 const validationSchema = z.object({
@@ -18,7 +19,7 @@ const validationSchema = z.object({
 type RegisterFormData = z.infer<typeof validationSchema>;
 
 const RegisterPage: React.FC = () => {
-  const { control, handleSubmit } = useForm<RegisterFormData>({
+  const { control, handleSubmit, formState } = useForm<RegisterFormData>({
     resolver: zodResolver(validationSchema),
     defaultValues: {
       username: "",
@@ -28,14 +29,44 @@ const RegisterPage: React.FC = () => {
   });
 
   const toast = useRef<any>(null);
-  const [showPassword, setShowPassword] = useState(false);
+
+  // Show validation errors as Toast messages
+  useEffect(() => {
+    if (formState.errors) {
+      Object.values(formState.errors).forEach((error) => {
+        toast.current.show({
+          severity: "warn",
+          summary: "Validation Error",
+          detail: error.message,
+          life: 3000,
+        });
+      });
+    }
+  }, [formState.errors]);
 
   // Check if the user is already logged in
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      window.location.href = "/dashboard"; // Redirect to dashboard if logged in
-    }
+    const checkSession = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+
+        const response = await fetch("/api/session", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          window.location.href = "/dashboard"; // Redirect to dashboard if session is valid
+        }
+      } catch (error) {
+        console.error("Session validation error:", error);
+      }
+    };
+
+    checkSession();
   }, []);
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -61,7 +92,7 @@ const RegisterPage: React.FC = () => {
       });
 
       window.location.href = "/login"; // Redirect to login on successful registration
-    } catch (error) {
+    } catch (error: any) {
       toast.current.show({
         severity: "error",
         summary: "Registration Failed",
@@ -104,7 +135,10 @@ const RegisterPage: React.FC = () => {
         >
           Sign Up
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)} style={{ display: "grid", gap: "16px" }}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          style={{ display: "grid", gap: "16px" }}
+        >
           {/* Username Field */}
           <div>
             <label
@@ -122,7 +156,7 @@ const RegisterPage: React.FC = () => {
             <Controller
               name="username"
               control={control}
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <InputText
                   id="username"
                   {...field}
@@ -130,9 +164,7 @@ const RegisterPage: React.FC = () => {
                     width: "100%",
                     padding: "12px",
                     borderRadius: "8px",
-                    border: `1px solid ${
-                      fieldState.invalid ? "var(--secondary-color)" : "var(--neutral-color)"
-                    }`,
+                    border: "1px solid var(--neutral-color)",
                   }}
                 />
               )}
@@ -156,7 +188,7 @@ const RegisterPage: React.FC = () => {
             <Controller
               name="email"
               control={control}
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <InputText
                   id="email"
                   type="email"
@@ -165,9 +197,7 @@ const RegisterPage: React.FC = () => {
                     width: "100%",
                     padding: "12px",
                     borderRadius: "8px",
-                    border: `1px solid ${
-                      fieldState.invalid ? "var(--secondary-color)" : "var(--neutral-color)"
-                    }`,
+                    border: "1px solid var(--neutral-color)",
                   }}
                 />
               )}
@@ -188,41 +218,24 @@ const RegisterPage: React.FC = () => {
             >
               Password
             </label>
-            <div style={{ position: "relative" }}>
-              <Controller
-                name="password"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <InputText
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    {...field}
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      borderRadius: "8px",
-                      border: `1px solid ${
-                        fieldState.invalid ? "var(--secondary-color)" : "var(--neutral-color)"
-                      }`,
-                    }}
-                  />
-                )}
-              />
-              <Button
-                type="button"
-                icon={showPassword ? "pi pi-eye-slash" : "pi pi-eye"}
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  right: "10px",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  color: "var(--neutral-color)",
-                }}
-              />
-            </div>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <Password
+                  id="password"
+                  {...field}
+                  toggleMask
+                  feedback={true}
+                  inputStyle={{
+                    width: "100%",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    border: "1px solid var(--neutral-color)",
+                  }}
+                />
+              )}
+            />
           </div>
 
           {/* Submit Button */}
@@ -240,6 +253,33 @@ const RegisterPage: React.FC = () => {
             }}
           />
         </form>
+
+        {/* Already Have Account Links */}
+        <div
+          style={{
+            marginTop: "16px",
+            display: "flex",
+            justifyContent: "center",
+            fontSize: "0.9rem",
+            color: "var(--neutral-color)",
+          }}
+        >
+          <a
+            href="/login"
+            style={{
+              color: "var(--primary-color)",
+              textDecoration: "none",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.textDecoration = "underline")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.textDecoration = "none")
+            }
+          >
+            Already have an account?
+          </a>
+        </div>
       </div>
     </div>
   );
