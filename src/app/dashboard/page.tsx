@@ -76,14 +76,25 @@ const DashboardPage: React.FC = () => {
         )
       );
     } else if (filterType === "priority") {
+      console.log(tasks);
+      const priorityOrder: Record<string, number> = {
+        HIGH: 1,
+        MEDIUM: 2,
+        LOW: 3,
+      };
+
       setFilteredTasks(
         [...tasks].sort((a, b) => {
-          if (a.priority === b.priority) {
+          const priorityComparison =
+            (priorityOrder[a.priority] || 4) - (priorityOrder[b.priority] || 4);
+
+          if (priorityComparison === 0) {
             return (
               new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
             );
           }
-          return a.priority.localeCompare(b.priority);
+
+          return priorityComparison;
         })
       );
     }
@@ -178,7 +189,7 @@ const DashboardPage: React.FC = () => {
         <div
           style={{
             backgroundColor: "var(--background-color)",
-            padding: "20px"
+            padding: "20px",
           }}
         >
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
