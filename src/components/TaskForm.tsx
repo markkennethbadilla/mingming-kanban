@@ -28,23 +28,26 @@ const taskSchema = z.object({
 
 type TaskFormData = z.infer<typeof taskSchema>;
 
-const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) => {
+const TaskForm: React.FC<TaskFormProps> = ({
+  initialData,
+  onSubmit,
+  onDelete,
+}) => {
   const isEditMode = !!initialData;
-
   const [showConfirm, setShowConfirm] = useState(false);
 
   const defaultValues: TaskFormData = initialData
     ? {
-      ...initialData,
-      dueDate: initialData.dueDate ? new Date(initialData.dueDate) : null,
-    }
+        ...initialData,
+        dueDate: initialData.dueDate ? new Date(initialData.dueDate) : null,
+      }
     : {
-      title: "",
-      description: "",
-      dueDate: null,
-      priority: "MEDIUM",
-      status: "TO_DO",
-    };
+        title: "",
+        description: "",
+        dueDate: null,
+        priority: "MEDIUM",
+        status: "TO_DO",
+      };
 
   const {
     control,
@@ -105,8 +108,11 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
               style={{
                 width: "100%",
                 borderRadius: "6px",
-                border: `1px solid ${errors.title ? "var(--secondary-color)" : "var(--neutral-color)"
-                  }`,
+                border: `1px solid ${
+                  errors.title
+                    ? "var(--secondary-color)"
+                    : "var(--neutral-color)"
+                }`,
                 padding: "8px",
                 fontSize: "0.9rem",
               }}
@@ -115,26 +121,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
           )}
         />
         {errors.title && (
-          <small style={{ color: "var(--secondary-color)", fontSize: "0.8rem" }}>
+          <small
+            style={{ color: "var(--secondary-color)", fontSize: "0.8rem" }}
+          >
             {errors.title.message}
           </small>
         )}
       </div>
 
       {/* Due Date Field */}
-      <div>
-        <label
-          htmlFor="dueDate"
-          style={{
-            fontSize: "0.9rem",
-            fontWeight: "500",
-            marginBottom: "4px",
-            display: "block",
-            color: "var(--text-color)",
-          }}
-        >
-          Due Date
-        </label>
+      <div className="taskform-calendar-wrapper">
+        <label htmlFor="dueDate">Due Date</label>
         <Controller
           name="dueDate"
           control={control}
@@ -144,24 +141,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
               id="dueDate"
               dateFormat="yy-mm-dd"
               showIcon
-              style={{
-                width: "100%",
-                borderRadius: "6px",
-                border: `1px solid ${errors.dueDate ? "var(--secondary-color)" : "var(--neutral-color)"
-                  }`,
-              }}
               inputStyle={{
                 width: "100%",
-                padding: "8px",
-                fontSize: "0.9rem",
                 borderRadius: "6px",
               }}
               placeholder="Select date"
+              className="taskform-calendar"
             />
           )}
         />
         {errors.dueDate && (
-          <small style={{ color: "var(--secondary-color)", fontSize: "0.8rem" }}>
+          <small style={{ color: "var(--secondary-color)" }}>
             {errors.dueDate.message}
           </small>
         )}
@@ -344,13 +334,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
                 if (onDelete) {
                   onDelete();
                 }
-
               }}
             />
           </div>
         }
       >
-        <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+        <p>
+          Are you sure you want to delete this task? This action cannot be
+          undone.
+        </p>
       </Dialog>
     </form>
   );

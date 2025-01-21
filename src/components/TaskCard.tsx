@@ -152,18 +152,18 @@ const TaskCard: React.FC<TaskCardProps> = ({
             alignItems: "center",
           }}
         >
-          <h3
-            style={{
+            <h3
+              style={{
               fontSize: "1rem",
               fontWeight: "500",
-              color: "var(--primary-color)",
+              color: "var(--text-color)",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
-            }}
-          >
-            {title}
-          </h3>
+              }}
+            >
+              {title}
+            </h3>
           <p
             style={{
               fontSize: "0.65rem",
@@ -189,7 +189,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               style={{
                 fontSize: "1.2rem",
                 fontWeight: "500",
-                color: "var(--primary-color)",
+                color: "var(--text-color)",
                 marginBottom: "4px",
                 wordWrap: "break-word",
               }}
