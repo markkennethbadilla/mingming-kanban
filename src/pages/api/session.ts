@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../../models';
 
-const SECRET_KEY = 'secret_key';
+if (!process.env.SECRET_KEY) {
+  throw new Error('SECRET_KEY environment variable is not defined');
+}
+const SECRET_KEY = process.env.SECRET_KEY;
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 import { Dialect } from 'sequelize';
-import config from './sequelize-config.json';
+import config from './sequelize-config';
 
 const env = process.env.NODE_ENV || 'development';
 const dbConfig = config[env];

@@ -3,7 +3,10 @@ import bcrypt from 'bcrypt';
 import { User } from '../../../models';
 import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = 'secret_key';
+if (!process.env.SECRET_KEY) {
+  throw new Error('SECRET_KEY environment variable is not defined');
+}
+const SECRET_KEY = process.env.SECRET_KEY;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'PUT') {
