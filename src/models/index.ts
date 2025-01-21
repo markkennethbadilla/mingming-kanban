@@ -5,7 +5,7 @@ import Task from './task';
 export function initializeModels() {
   User.initModel(sequelize);
   Task.initModel(sequelize);
-  
+
   User.hasMany(Task, { foreignKey: 'userId', onDelete: 'CASCADE' });
   Task.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' });
 }

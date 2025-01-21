@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { Menubar } from "primereact/menubar";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import { Menubar } from 'primereact/menubar';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const Navbar: React.FC = () => {
   const [mounted, setMounted] = useState(false);
@@ -11,14 +11,14 @@ const Navbar: React.FC = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem('authToken');
     setIsLoggedIn(false);
-    router.push("/login");
+    router.push('/login');
   };
 
   useEffect(() => {
     const checkSession = async () => {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem('authToken');
 
       if (!token) {
         setIsLoggedIn(false);
@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
       }
 
       try {
-        const response = await fetch("/api/session", {
+        const response = await fetch('/api/session', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -38,12 +38,12 @@ const Navbar: React.FC = () => {
           setIsLoggedIn(false);
         }
       } catch (error) {
-        console.error("Error checking session:", error);
+        console.error('Error checking session:', error);
         setIsLoggedIn(false);
       }
     };
 
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       setMounted(true);
       checkSession();
     }
@@ -53,28 +53,30 @@ const Navbar: React.FC = () => {
 
   const items = isLoggedIn
     ? [
-        { label: "Dashboard", icon: "pi pi-home", url: "/dashboard" },
-        { label: "Calendar", icon: "pi pi-calendar", url: "/calendar" }, // Added Calendar Link
-        { label: "Create Task", icon: "pi pi-plus", url: "/tasks/create" },
-        { label: "Profile", icon: "pi pi-user", url: "/profile" },
-        { label: "Logout", icon: "pi pi-sign-out", command: handleLogout },
+        { label: 'Dashboard', icon: 'pi pi-home', url: '/dashboard' },
+        { label: 'Calendar', icon: 'pi pi-calendar', url: '/calendar' }, // Added Calendar Link
+        { label: 'Create Task', icon: 'pi pi-plus', url: '/tasks/create' },
+        { label: 'Profile', icon: 'pi pi-user', url: '/profile' },
+        { label: 'Logout', icon: 'pi pi-sign-out', command: handleLogout },
       ]
     : [
-        { label: "Log In", icon: "pi pi-sign-in", url: "/login" },
-        { label: "Sign Up", icon: "pi pi-user-plus", url: "/register" },
+        { label: 'Log In', icon: 'pi pi-sign-in', url: '/login' },
+        { label: 'Sign Up', icon: 'pi pi-user-plus', url: '/register' },
       ];
 
   return (
-    <div style={{ padding: "0.5rem 2rem", display: "flex", alignItems: "center" }}>
+    <div
+      style={{ padding: '0.5rem 2rem', display: 'flex', alignItems: 'center' }}
+    >
       {/* Logo and Title Section */}
       <div
-        onClick={() => router.push(isLoggedIn ? "/dashboard" : "/")}
+        onClick={() => router.push(isLoggedIn ? '/dashboard' : '/')}
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          cursor: "pointer",
-          flex: "1",
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          cursor: 'pointer',
+          flex: '1',
         }}
       >
         <Image
@@ -82,13 +84,13 @@ const Navbar: React.FC = () => {
           alt="Logo"
           width={40}
           height={40}
-          style={{ borderRadius: "8px" }}
+          style={{ borderRadius: '8px' }}
         />
         <span
           style={{
-            fontSize: "1.25rem",
-            fontWeight: "bold",
-            color: "var(--primary-color)",
+            fontSize: '1.25rem',
+            fontWeight: 'bold',
+            color: 'var(--primary-color)',
           }}
         >
           Mingming Task Manager
@@ -99,10 +101,10 @@ const Navbar: React.FC = () => {
       <Menubar
         model={items}
         style={{
-          background: "transparent",
-          border: "none",
-          flex: "2",
-          justifyContent: "flex-end",
+          background: 'transparent',
+          border: 'none',
+          flex: '2',
+          justifyContent: 'flex-end',
         }}
       />
     </div>

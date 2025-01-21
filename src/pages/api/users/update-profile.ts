@@ -8,14 +8,21 @@ if (!process.env.SECRET_KEY) {
 }
 const SECRET_KEY = process.env.SECRET_KEY;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== 'PUT') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
+    return res
+      .status(405)
+      .json({ success: false, message: 'Method not allowed' });
   }
 
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Token not provided' });
+    return res
+      .status(401)
+      .json({ success: false, message: 'Token not provided' });
   }
 
   try {
@@ -23,7 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const user = await User.findByPk(decoded.id);
 
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'User not found' });
     }
 
     const { username, email, password } = req.body;
@@ -38,7 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Update user
     await user.update(updateData);
 
-    res.status(200).json({ success: true, message: 'Profile updated successfully' });
+    res
+      .status(200)
+      .json({ success: true, message: 'Profile updated successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Error updating profile' });

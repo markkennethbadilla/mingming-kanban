@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { InputText } from "primereact/inputtext";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Dropdown } from "primereact/dropdown";
-import { Calendar } from "primereact/calendar";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
+import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from 'primereact/calendar';
+import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
 
 interface TaskFormProps {
   initialData?: TaskFormData;
@@ -16,14 +16,14 @@ interface TaskFormProps {
 }
 
 const taskSchema = z.object({
-  title: z.string().nonempty("Title is required"),
+  title: z.string().nonempty('Title is required'),
   description: z.string().optional(),
   dueDate: z
     .date()
-    .refine((date) => !isNaN(date.getTime()), { message: "Invalid date" })
+    .refine((date) => !isNaN(date.getTime()), { message: 'Invalid date' })
     .nullable(),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
-  status: z.enum(["TO_DO", "IN_PROGRESS", "DONE"]),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+  status: z.enum(['TO_DO', 'IN_PROGRESS', 'DONE']),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -42,11 +42,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
         dueDate: initialData.dueDate ? new Date(initialData.dueDate) : null,
       }
     : {
-        title: "",
-        description: "",
+        title: '',
+        description: '',
         dueDate: null,
-        priority: "MEDIUM",
-        status: "TO_DO",
+        priority: 'MEDIUM',
+        status: 'TO_DO',
       };
 
   const {
@@ -60,28 +60,28 @@ const TaskForm: React.FC<TaskFormProps> = ({
   });
 
   const priorityOptions = [
-    { label: "Low", value: "LOW" },
-    { label: "Medium", value: "MEDIUM" },
-    { label: "High", value: "HIGH" },
+    { label: 'Low', value: 'LOW' },
+    { label: 'Medium', value: 'MEDIUM' },
+    { label: 'High', value: 'HIGH' },
   ];
 
   const statusOptions = [
-    { label: "To Do", value: "TO_DO" },
-    { label: "In Progress", value: "IN_PROGRESS" },
-    { label: "Done", value: "DONE" },
+    { label: 'To Do', value: 'TO_DO' },
+    { label: 'In Progress', value: 'IN_PROGRESS' },
+    { label: 'Done', value: 'DONE' },
   ];
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       style={{
-        display: "grid",
-        gap: "16px",
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-        alignItems: "center",
-        backgroundColor: "var(--background-color)",
-        padding: "24px",
-        borderRadius: "12px",
+        display: 'grid',
+        gap: '16px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        alignItems: 'center',
+        backgroundColor: 'var(--background-color)',
+        padding: '24px',
+        borderRadius: '12px',
       }}
     >
       {/* Title Field */}
@@ -89,11 +89,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <label
           htmlFor="title"
           style={{
-            fontSize: "0.9rem",
-            fontWeight: "500",
-            marginBottom: "4px",
-            display: "block",
-            color: "var(--text-color)",
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            marginBottom: '4px',
+            display: 'block',
+            color: 'var(--text-color)',
           }}
         >
           Title
@@ -106,15 +106,15 @@ const TaskForm: React.FC<TaskFormProps> = ({
               {...field}
               id="title"
               style={{
-                width: "100%",
-                borderRadius: "6px",
+                width: '100%',
+                borderRadius: '6px',
                 border: `1px solid ${
                   errors.title
-                    ? "var(--secondary-color)"
-                    : "var(--neutral-color)"
+                    ? 'var(--secondary-color)'
+                    : 'var(--neutral-color)'
                 }`,
-                padding: "8px",
-                fontSize: "0.9rem",
+                padding: '8px',
+                fontSize: '0.9rem',
               }}
               placeholder="Task title"
             />
@@ -122,7 +122,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         />
         {errors.title && (
           <small
-            style={{ color: "var(--secondary-color)", fontSize: "0.8rem" }}
+            style={{ color: 'var(--secondary-color)', fontSize: '0.8rem' }}
           >
             {errors.title.message}
           </small>
@@ -142,8 +142,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
               dateFormat="yy-mm-dd"
               showIcon
               inputStyle={{
-                width: "100%",
-                borderRadius: "6px",
+                width: '100%',
+                borderRadius: '6px',
               }}
               placeholder="Select date"
               className="taskform-calendar"
@@ -151,7 +151,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
           )}
         />
         {errors.dueDate && (
-          <small style={{ color: "var(--secondary-color)" }}>
+          <small style={{ color: 'var(--secondary-color)' }}>
             {errors.dueDate.message}
           </small>
         )}
@@ -162,11 +162,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <label
           htmlFor="priority"
           style={{
-            fontSize: "0.9rem",
-            fontWeight: "500",
-            marginBottom: "4px",
-            display: "block",
-            color: "var(--text-color)",
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            marginBottom: '4px',
+            display: 'block',
+            color: 'var(--text-color)',
           }}
         >
           Priority
@@ -181,10 +181,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
               options={priorityOptions}
               placeholder="Priority"
               style={{
-                width: "100%",
-                borderRadius: "6px",
+                width: '100%',
+                borderRadius: '6px',
                 border: `1px solid var(--neutral-color)`,
-                fontSize: "0.9rem",
+                fontSize: '0.9rem',
               }}
             />
           )}
@@ -196,11 +196,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <label
           htmlFor="status"
           style={{
-            fontSize: "0.9rem",
-            fontWeight: "500",
-            marginBottom: "4px",
-            display: "block",
-            color: "var(--text-color)",
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            marginBottom: '4px',
+            display: 'block',
+            color: 'var(--text-color)',
           }}
         >
           Status
@@ -215,10 +215,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
               options={statusOptions}
               placeholder="Status"
               style={{
-                width: "100%",
-                borderRadius: "6px",
+                width: '100%',
+                borderRadius: '6px',
                 border: `1px solid var(--neutral-color)`,
-                fontSize: "0.9rem",
+                fontSize: '0.9rem',
               }}
             />
           )}
@@ -226,15 +226,15 @@ const TaskForm: React.FC<TaskFormProps> = ({
       </div>
 
       {/* Description Field */}
-      <div style={{ gridColumn: "span 2" }}>
+      <div style={{ gridColumn: 'span 2' }}>
         <label
           htmlFor="description"
           style={{
-            fontSize: "0.9rem",
-            fontWeight: "500",
-            marginBottom: "4px",
-            display: "block",
-            color: "var(--text-color)",
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            marginBottom: '4px',
+            display: 'block',
+            color: 'var(--text-color)',
           }}
         >
           Description
@@ -248,11 +248,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="description"
               rows={3}
               style={{
-                width: "100%",
-                borderRadius: "6px",
+                width: '100%',
+                borderRadius: '6px',
                 border: `1px solid var(--neutral-color)`,
-                padding: "8px",
-                fontSize: "0.9rem",
+                padding: '8px',
+                fontSize: '0.9rem',
               }}
               placeholder="Task description"
             />
@@ -263,11 +263,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
       {/* Action Buttons */}
       <div
         style={{
-          gridColumn: "1 / -1",
-          display: "flex",
-          gap: "16px",
-          justifyContent: "center",
-          marginTop: "16px",
+          gridColumn: '1 / -1',
+          display: 'flex',
+          gap: '16px',
+          justifyContent: 'center',
+          marginTop: '16px',
         }}
       >
         <Button
@@ -275,11 +275,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
           label="Save"
           icon="pi pi-save"
           style={{
-            backgroundColor: "var(--primary-color)",
-            color: "#fff",
-            fontWeight: "600",
-            padding: "10px 24px",
-            borderRadius: "8px",
+            backgroundColor: 'var(--primary-color)',
+            color: '#fff',
+            fontWeight: '600',
+            padding: '10px 24px',
+            borderRadius: '8px',
           }}
         />
         {isEditMode && (
@@ -291,9 +291,9 @@ const TaskForm: React.FC<TaskFormProps> = ({
               className="p-button-secondary"
               onClick={() => reset()}
               style={{
-                fontWeight: "600",
-                padding: "10px 24px",
-                borderRadius: "8px",
+                fontWeight: '600',
+                padding: '10px 24px',
+                borderRadius: '8px',
               }}
             />
             <Button
@@ -303,9 +303,9 @@ const TaskForm: React.FC<TaskFormProps> = ({
               className="p-button-danger"
               onClick={() => setShowConfirm(true)}
               style={{
-                fontWeight: "600",
-                padding: "10px 24px",
-                borderRadius: "8px",
+                fontWeight: '600',
+                padding: '10px 24px',
+                borderRadius: '8px',
               }}
             />
           </>

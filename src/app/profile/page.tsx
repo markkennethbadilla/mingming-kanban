@@ -1,37 +1,37 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useRef } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { InputText } from "primereact/inputtext";
-import { Password } from "primereact/password";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { Dialog } from "primereact/dialog";
-import { InputSwitch } from "primereact/inputswitch";
-import { useRouter } from "next/navigation";
-import Loader from "@/components/Loader";
-import axios from "axios";
+import React, { useEffect, useState, useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+import { Dialog } from 'primereact/dialog';
+import { InputSwitch } from 'primereact/inputswitch';
+import { useRouter } from 'next/navigation';
+import Loader from '@/components/Loader';
+import axios from 'axios';
 
 // Validation schema
 const validationSchema = (enablePasswordChange: boolean) =>
   z
     .object({
-      username: z.string().nonempty("Username is required"),
-      email: z.string().email("Invalid email format"),
+      username: z.string().nonempty('Username is required'),
+      email: z.string().email('Invalid email format'),
       password: enablePasswordChange
-        ? z.string().min(6, "Password must be at least 6 characters")
+        ? z.string().min(6, 'Password must be at least 6 characters')
         : z.string().optional(),
       confirmPassword: enablePasswordChange
-        ? z.string().min(6, "Confirm Password must be at least 6 characters")
+        ? z.string().min(6, 'Confirm Password must be at least 6 characters')
         : z.string().optional(),
     })
     .refine(
       (data) => !enablePasswordChange || data.password === data.confirmPassword,
       {
-        message: "Passwords must match",
-        path: ["confirmPassword"],
+        message: 'Passwords must match',
+        path: ['confirmPassword'],
       }
     );
 
@@ -40,7 +40,7 @@ type ProfileFormData = z.infer<ReturnType<typeof validationSchema>>;
 const ProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [enablePasswordChange, setEnablePasswordChange] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState(""); // State for the current password
+  const [currentPassword, setCurrentPassword] = useState(''); // State for the current password
   const [isDialogVisible, setIsDialogVisible] = useState(false); // Dialog visibility
   const toast = useRef<Toast>(null);
   const router = useRouter();
@@ -52,43 +52,44 @@ const ProfilePage: React.FC = () => {
     trigger,
     getValues,
     formState: { errors },
+    reset,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(validationSchema(enablePasswordChange)),
     defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
   useEffect(() => {
     const fetchUserId = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem('authToken');
         if (!token) {
-          router.push("/login");
+          router.push('/login');
           return;
         }
 
-        const response = await axios.get("/api/session", {
+        const response = await axios.get('/api/session', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.data.success) {
         } else {
-          throw new Error("Failed to fetch user session.");
+          throw new Error('Failed to fetch user session.');
         }
       } catch (error) {
-        console.error("Error fetching user session:", error);
+        console.error('Error fetching user session:', error);
         toast.current?.show({
-          severity: "error",
-          summary: "Session Error",
-          detail: "Unable to fetch user session. Please log in again.",
+          severity: 'error',
+          summary: 'Session Error',
+          detail: 'Unable to fetch user session. Please log in again.',
           life: 3000,
         });
-        localStorage.removeItem("authToken");
-        router.push("/");
+        localStorage.removeItem('authToken');
+        router.push('/');
       }
     };
 
@@ -98,38 +99,38 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("Not authenticated. Please log in.");
+        const token = localStorage.getItem('authToken');
+        if (!token) throw new Error('Not authenticated. Please log in.');
 
-        const response = await fetch("/api/session", {
+        const response = await fetch('/api/session', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.status === 401) {
-          localStorage.removeItem("authToken");
+          localStorage.removeItem('authToken');
           toast.current?.show({
-            severity: "warn",
-            summary: "Session Expired",
-            detail: "Your session has expired. Please log in again.",
+            severity: 'warn',
+            summary: 'Session Expired',
+            detail: 'Your session has expired. Please log in again.',
             life: 3000,
           });
           setTimeout(() => {
-            window.location.href = "/";
+            window.location.href = '/';
           }, 3000);
           return;
         }
 
-        if (!response.ok) throw new Error("Failed to fetch profile data.");
+        if (!response.ok) throw new Error('Failed to fetch profile data.');
 
         const data = await response.json();
-        setValue("username", data.user.username);
-        setValue("email", data.user.email);
+        setValue('username', data.user.username);
+        setValue('email', data.user.email);
         setLoading(false);
       } catch (err) {
         toast.current?.show({
-          severity: "error",
-          summary: "Error",
-          detail: err.message || "An error occurred.",
+          severity: 'error',
+          summary: 'Error',
+          detail: err.message || 'An error occurred.',
           life: 3000,
         });
         setLoading(false);
@@ -139,8 +140,11 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [setValue]);
 
-  const onSubmit = async () => {
+  useEffect(() => {
+    reset(getValues()); // Reset the form with current values to avoid clearing fields
+  }, [enablePasswordChange, reset, getValues]);
 
+  const onSubmit = async () => {
     const valid = await trigger(); // Trigger validation
     if (!valid) {
       // Display validation errors as toast notifications
@@ -148,8 +152,8 @@ const ProfilePage: React.FC = () => {
         const error = errors[field as keyof ProfileFormData]?.message;
         if (error) {
           toast.current?.show({
-            severity: "error",
-            summary: "Validation Error",
+            severity: 'error',
+            summary: 'Validation Error',
             detail: error,
             life: 3000,
           });
@@ -162,13 +166,13 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleConfirm = async () => {
-    const newPassword = getValues("password");
+    const newPassword = getValues('password');
 
     if (enablePasswordChange && newPassword === currentPassword) {
       toast.current?.show({
-        severity: "error",
-        summary: "Validation Error",
-        detail: "New password cannot be the same as the current password.",
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'New password cannot be the same as the current password.',
         life: 3000,
       });
       return;
@@ -176,52 +180,52 @@ const ProfilePage: React.FC = () => {
 
     setIsDialogVisible(false);
     try {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem('authToken');
       if (!token) {
-        console.error("No auth token found.");
-        throw new Error("Not authenticated. Please log in.");
+        console.error('No auth token found.');
+        throw new Error('Not authenticated. Please log in.');
       }
 
       const payload: Partial<ProfileFormData> = {
-        username: getValues("username"),
-        email: getValues("email"),
+        username: getValues('username'),
+        email: getValues('email'),
         ...(enablePasswordChange && {
           password: newPassword,
-          confirmPassword: getValues("confirmPassword"),
+          confirmPassword: getValues('confirmPassword'),
         }),
       };
 
-      const response = await fetch("/api/users/update-profile", {
-        method: "PUT",
+      const response = await fetch('/api/users/update-profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ ...payload, currentPassword }),
       });
 
       if (!response.ok) {
-        console.error("Failed to update profile:", response.statusText);
-        throw new Error("Failed to update profile.");
+        console.error('Failed to update profile:', response.statusText);
+        throw new Error('Failed to update profile.');
       }
 
       toast.current?.show({
-        severity: "success",
-        summary: "Profile Updated",
-        detail: "Your profile was updated successfully.",
+        severity: 'success',
+        summary: 'Profile Updated',
+        detail: 'Your profile was updated successfully.',
         life: 3000,
       });
 
       if (enablePasswordChange) {
-        setValue("password", ""); // Clear password fields only
-        setValue("confirmPassword", "");
+        setValue('password', ''); // Clear password fields only
+        setValue('confirmPassword', '');
       }
     } catch (err) {
-      console.error("Error updating profile:", err);
+      console.error('Error updating profile:', err);
       toast.current?.show({
-        severity: "error",
-        summary: "Update Failed",
-        detail: err.message || "Something went wrong.",
+        severity: 'error',
+        summary: 'Update Failed',
+        detail: err.message || 'Something went wrong.',
         life: 3000,
       });
     }
@@ -232,11 +236,11 @@ const ProfilePage: React.FC = () => {
   return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "var(--background-color)",
-        height: "87vh",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'var(--background-color)',
+        height: '87vh',
       }}
     >
       <Toast ref={toast} />
@@ -253,14 +257,18 @@ const ProfilePage: React.FC = () => {
               className="p-button-text"
               onClick={() => setIsDialogVisible(false)}
             />
-            <Button label="Confirm" icon="pi pi-check" onClick={handleConfirm} />
+            <Button
+              label="Confirm"
+              icon="pi pi-check"
+              onClick={handleConfirm}
+            />
           </div>
         }
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <i
             className="pi pi-exclamation-triangle"
-            style={{ fontSize: "2rem", color: "var(--warn-color, #f39c12)" }}
+            style={{ fontSize: '2rem', color: 'var(--warn-color, #f39c12)' }}
           />
           <div style={{ flex: 1 }}>
             <p>Enter your current password to confirm changes:</p>
@@ -270,7 +278,7 @@ const ProfilePage: React.FC = () => {
               placeholder="Current Password"
               feedback={false}
               toggleMask
-              style={{ marginTop: "10px", width: "100%" }}
+              style={{ marginTop: '10px', width: '100%' }}
             />
           </div>
         </div>
@@ -278,22 +286,22 @@ const ProfilePage: React.FC = () => {
 
       <div
         style={{
-          width: "100%",
-          maxWidth: "600px",
-          backgroundColor: "#fff",
-          borderRadius: "12px",
-          padding: "24px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          width: '100%',
+          maxWidth: '600px',
+          backgroundColor: '#fff',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
         }}
       >
         <a
           style={{
-            display: "inline-block",
-            marginBottom: "16px",
-            fontSize: "0.875rem",
-            color: "var(--primary-color)",
-            cursor: "pointer",
-            textDecoration: "none",
+            display: 'inline-block',
+            marginBottom: '16px',
+            fontSize: '0.875rem',
+            color: 'var(--primary-color)',
+            cursor: 'pointer',
+            textDecoration: 'none',
           }}
           onClick={() => router.back()}
         >
@@ -302,11 +310,11 @@ const ProfilePage: React.FC = () => {
 
         <h2
           style={{
-            textAlign: "center",
-            fontSize: "1.5rem",
-            fontWeight: "600",
-            color: "var(--primary-color)",
-            marginBottom: "16px",
+            textAlign: 'center',
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            color: 'var(--primary-color)',
+            marginBottom: '16px',
           }}
         >
           Profile Settings
@@ -314,7 +322,7 @@ const ProfilePage: React.FC = () => {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          style={{ display: "grid", gap: "16px" }}
+          style={{ display: 'grid', gap: '16px' }}
         >
           <Controller
             name="username"
@@ -324,10 +332,10 @@ const ProfilePage: React.FC = () => {
                 {...field}
                 placeholder="Enter your username"
                 style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  border: "1px solid var(--neutral-color, #ccc)",
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--neutral-color, #ccc)',
                 }}
               />
             )}
@@ -341,17 +349,17 @@ const ProfilePage: React.FC = () => {
                 {...field}
                 placeholder="Enter your email"
                 style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  border: "1px solid var(--neutral-color, #ccc)",
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--neutral-color, #ccc)',
                 }}
               />
             )}
           />
 
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <label style={{ color: "var(--text-color)", fontWeight: "500" }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <label style={{ color: 'var(--text-color)', fontWeight: '500' }}>
               Change Password
             </label>
             <InputSwitch
@@ -393,11 +401,11 @@ const ProfilePage: React.FC = () => {
             label="Save Changes"
             type="submit"
             style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              backgroundColor: "var(--primary-color)",
-              color: "#fff",
+              width: '100%',
+              padding: '12px',
+              borderRadius: '8px',
+              backgroundColor: 'var(--primary-color)',
+              color: '#fff',
             }}
           />
         </form>

@@ -1,18 +1,18 @@
-import React, { useState, useRef } from "react";
-import { useDrag } from "react-dnd";
-import { Dialog } from "primereact/dialog";
-import { Tooltip } from "primereact/tooltip";
-import { FaTrash, FaPencilAlt } from "react-icons/fa";
-import { Button } from "primereact/button";
-import { useToast } from "../context/ToastContext";
+import React, { useState, useRef } from 'react';
+import { useDrag } from 'react-dnd';
+import { Dialog } from 'primereact/dialog';
+import { Tooltip } from 'primereact/tooltip';
+import { FaTrash, FaPencilAlt } from 'react-icons/fa';
+import { Button } from 'primereact/button';
+import { useToast } from '../context/ToastContext';
 
 interface TaskCardProps {
   id: number;
   title: string;
   description: string;
   dueDate: string | Date;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  status: "TO_DO" | "IN_PROGRESS" | "DONE";
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
   onStatusChange?: (id: number, status: string) => void;
   onDelete: (id: number) => void;
 }
@@ -30,7 +30,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: "TASK",
+    type: 'TASK',
     item: { id, status },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
@@ -57,12 +57,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   const currentYear = new Date().getFullYear();
-  const taskDate = new Date(typeof dueDate === "string" ? dueDate : dueDate);
-  const isMissed = status === "TO_DO" && taskDate < new Date();
+  const taskDate = new Date(typeof dueDate === 'string' ? dueDate : dueDate);
+  const isMissed = status === 'TO_DO' && taskDate < new Date();
   const priorityColors = {
-    LOW: "var(--neutral-color)",
-    MEDIUM: "var(--highlight-color)",
-    HIGH: "var(--secondary-color)",
+    LOW: 'var(--neutral-color)',
+    MEDIUM: 'var(--highlight-color)',
+    HIGH: 'var(--secondary-color)',
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -74,8 +74,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
     setShowConfirm(false);
     onDelete(id);
     showToast({
-      severity: "success",
-      summary: "Task Deleted",
+      severity: 'success',
+      summary: 'Task Deleted',
       detail: `Task "${title}" has been deleted.`,
       life: 3000,
     });
@@ -85,11 +85,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (onStatusChange && status !== newStatus) {
       onStatusChange(id, newStatus);
       showToast({
-        severity: "info",
-        summary: "Status Updated",
+        severity: 'info',
+        summary: 'Status Updated',
         detail: `Task "${title}" status updated to ${newStatus.replace(
-          "_",
-          " "
+          '_',
+          ' '
         )}.`,
         life: 3000,
       });
@@ -108,36 +108,36 @@ const TaskCard: React.FC<TaskCardProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
-        padding: isHovered ? "0px 12px 12px 12px" : "8px",
-        borderRadius: "8px",
+        padding: isHovered ? '0px 12px 12px 12px' : '8px',
+        borderRadius: '8px',
         boxShadow: isHovered
-          ? "0 6px 12px rgba(0, 0, 0, 0.15)"
-          : "0 1px 3px rgba(0, 0, 0, 0.1)",
-        transition: "box-shadow 0.3s, padding 0.2s",
-        marginBottom: "8px",
-        cursor: "default",
+          ? '0 6px 12px rgba(0, 0, 0, 0.15)'
+          : '0 1px 3px rgba(0, 0, 0, 0.1)',
+        transition: 'box-shadow 0.3s, padding 0.2s',
+        marginBottom: '8px',
+        cursor: 'default',
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isMissed
-          ? "var(--highlight-color-light)"
-          : "var(--card-background)",
+          ? 'var(--highlight-color-light)'
+          : 'var(--card-background)',
         borderLeft: `4px solid ${priorityColors[priority]}`,
-        position: "relative",
-        overflow: "hidden",
-        minHeight: isHovered ? "auto" : "48px",
+        position: 'relative',
+        overflow: 'hidden',
+        minHeight: isHovered ? 'auto' : '48px',
       }}
     >
       {isHovered && (
         <span
           style={{
-            position: "absolute",
-            top: "8px",
-            right: "12px",
-            padding: "4px 8px",
-            borderRadius: "12px",
-            fontSize: "0.75rem",
-            fontWeight: "600",
+            position: 'absolute',
+            top: '8px',
+            right: '12px',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            fontSize: '0.75rem',
+            fontWeight: '600',
             backgroundColor: priorityColors[priority],
-            color: "white",
+            color: 'white',
           }}
         >
           {priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()}
@@ -147,36 +147,36 @@ const TaskCard: React.FC<TaskCardProps> = ({
       {!isHovered && (
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-            <h3
-              style={{
-              fontSize: "1rem",
-              fontWeight: "500",
-              color: "var(--text-color)",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              }}
-            >
-              {title}
-            </h3>
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: '500',
+              color: 'var(--text-color)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {title}
+          </h3>
           <p
             style={{
-              fontSize: "0.65rem",
+              fontSize: '0.65rem',
               color: isMissed
-                ? "var(--secondary-color)"
-                : "var(--neutral-color)",
+                ? 'var(--secondary-color)'
+                : 'var(--neutral-color)',
             }}
           >
             {taskDate.toLocaleDateString(undefined, {
-              day: "numeric",
-              month: "short",
+              day: 'numeric',
+              month: 'short',
               year:
-                taskDate.getFullYear() !== currentYear ? "numeric" : undefined,
+                taskDate.getFullYear() !== currentYear ? 'numeric' : undefined,
             })}
           </p>
         </div>
@@ -184,51 +184,51 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
       {isHovered && (
         <>
-          <div style={{ marginBottom: "12px" }}>
+          <div style={{ marginBottom: '12px' }}>
             <h3
               style={{
-                fontSize: "1.2rem",
-                fontWeight: "500",
-                color: "var(--text-color)",
-                marginBottom: "4px",
-                wordWrap: "break-word",
+                fontSize: '1.2rem',
+                fontWeight: '500',
+                color: 'var(--text-color)',
+                marginBottom: '4px',
+                wordWrap: 'break-word',
               }}
             >
               {title}
             </h3>
             <p
               style={{
-                fontSize: "0.8rem",
-                color: "grey",
-                whiteSpace: "normal",
+                fontSize: '0.8rem',
+                color: 'grey',
+                whiteSpace: 'normal',
               }}
             >
               {description}
             </p>
             <p
               style={{
-                fontSize: "0.7rem",
-                color: "var(--neutral-color)",
-                marginBottom: "30px",
-                fontStyle: "italic",
+                fontSize: '0.7rem',
+                color: 'var(--neutral-color)',
+                marginBottom: '30px',
+                fontStyle: 'italic',
               }}
             >
-              Due on{" "}
+              Due on{' '}
               {taskDate.toLocaleDateString(undefined, {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
               })}
             </p>
           </div>
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontSize: "0.75rem",
-              color: "var(--neutral-color)",
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: '0.75rem',
+              color: 'var(--neutral-color)',
             }}
           >
             <span
@@ -236,19 +236,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
               data-pr-tooltip="Edit Task"
               data-pr-position="top"
               style={{
-              cursor: "pointer",
-              color: "var(--primary-color)",
-              fontSize: "0.875rem",
-              transition: "transform 0.2s ease, color 0.2s ease",
+                cursor: 'pointer',
+                color: 'var(--primary-color)',
+                fontSize: '0.875rem',
+                transition: 'transform 0.2s ease, color 0.2s ease',
               }}
               onClick={handleEditClick}
               onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "scale(1.1)";
-              (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1.1)';
+                (e.currentTarget as HTMLElement).style.color =
+                  'var(--primary-color)';
               }}
               onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-              (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+                (e.currentTarget as HTMLElement).style.color =
+                  'var(--primary-color)';
               }}
             >
               <FaPencilAlt />
@@ -256,46 +258,50 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
-                {["TO_DO", "IN_PROGRESS", "DONE"].map((statusKey) => (
+              {['TO_DO', 'IN_PROGRESS', 'DONE'].map((statusKey) => (
                 <span
                   key={statusKey}
-                  className={`${status === statusKey ? "active-status" : ""}`}
-                  data-pr-tooltip={statusKey.replace("_", " ")}
+                  className={`${status === statusKey ? 'active-status' : ''}`}
+                  data-pr-tooltip={statusKey.replace('_', ' ')}
                   data-pr-position="top"
                   onClick={() => handleStatusChange(statusKey)}
                   style={{
-                  cursor: status === statusKey ? "not-allowed" : "pointer",
-                  fontSize: "0.7rem",
-                  fontWeight: "600",
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  backgroundColor:
-                    status === statusKey
-                    ? "#d3d3d3" // lighter grey
-                    : "transparent",
-                  color: "var(--neutral-color)",
-                  transition: "transform 0.2s ease, color 0.2s ease",
+                    cursor: status === statusKey ? 'not-allowed' : 'pointer',
+                    fontSize: '0.7rem',
+                    fontWeight: '600',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    backgroundColor:
+                      status === statusKey
+                        ? '#d3d3d3' // lighter grey
+                        : 'transparent',
+                    color: 'var(--neutral-color)',
+                    transition: 'transform 0.2s ease, color 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = "scale(1.1)";
-                  (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+                    (e.currentTarget as HTMLElement).style.transform =
+                      'scale(1.1)';
+                    (e.currentTarget as HTMLElement).style.color =
+                      'var(--primary-color)';
                   }}
                   onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-                  (e.currentTarget as HTMLElement).style.color = "var(--neutral-color)";
+                    (e.currentTarget as HTMLElement).style.transform =
+                      'scale(1)';
+                    (e.currentTarget as HTMLElement).style.color =
+                      'var(--neutral-color)';
                   }}
                 >
                   {statusKey
-                  .replace("_", " ")
-                  .toLowerCase()
-                  .replace(/^\w/, (c) => c.toUpperCase())}
+                    .replace('_', ' ')
+                    .toLowerCase()
+                    .replace(/^\w/, (c) => c.toUpperCase())}
                 </span>
-                ))}
+              ))}
             </div>
 
             <span
@@ -304,18 +310,20 @@ const TaskCard: React.FC<TaskCardProps> = ({
               data-pr-position="top"
               onClick={handleDeleteClick}
               style={{
-              cursor: "pointer",
-              color: "var(--secondary-color)",
-              fontSize: "0.875rem",
-              transition: "transform 0.2s ease, color 0.2s ease",
+                cursor: 'pointer',
+                color: 'var(--secondary-color)',
+                fontSize: '0.875rem',
+                transition: 'transform 0.2s ease, color 0.2s ease',
               }}
               onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "scale(1.1)";
-              (e.currentTarget as HTMLElement).style.color = "var(--primary-color)";
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1.1)';
+                (e.currentTarget as HTMLElement).style.color =
+                  'var(--primary-color)';
               }}
               onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-              (e.currentTarget as HTMLElement).style.color = "var(--secondary-color)";
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+                (e.currentTarget as HTMLElement).style.color =
+                  'var(--secondary-color)';
               }}
             >
               <FaTrash />

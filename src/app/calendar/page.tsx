@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { Calendar, CalendarDateTemplateEvent } from "primereact/calendar";
-import { Toast } from "primereact/toast";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import TaskCard from "../../components/TaskCard";
-import { Task } from "@/types/task";
-import { ToastProvider } from "@/context/ToastContext";
-import { Button } from "primereact/button";
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, CalendarDateTemplateEvent } from 'primereact/calendar';
+import { Toast } from 'primereact/toast';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import TaskCard from '../../components/TaskCard';
+import { Task } from '@/types/task';
+import { ToastProvider } from '@/context/ToastContext';
+import { Button } from 'primereact/button';
 
-import "@/styles/CalendarPage.css";
-import Loader from "@/components/Loader";
+import '@/styles/CalendarPage.css';
+import Loader from '@/components/Loader';
 
 const CalendarPage: React.FC = () => {
   const router = useRouter();
@@ -32,31 +32,31 @@ const CalendarPage: React.FC = () => {
   useEffect(() => {
     const fetchUserId = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem('authToken');
         if (!token) {
-          router.push("/login");
+          router.push('/login');
           return;
         }
 
-        const response = await axios.get("/api/session", {
+        const response = await axios.get('/api/session', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.data.success) {
           setUserId(response.data.user.id);
         } else {
-          throw new Error("Failed to fetch user session.");
+          throw new Error('Failed to fetch user session.');
         }
       } catch (error) {
-        console.error("Error fetching user session:", error);
+        console.error('Error fetching user session:', error);
         toast.current?.show({
-          severity: "error",
-          summary: "Session Error",
-          detail: "Unable to fetch user session. Please log in again.",
+          severity: 'error',
+          summary: 'Session Error',
+          detail: 'Unable to fetch user session. Please log in again.',
           life: 3000,
         });
-        localStorage.removeItem("authToken");
-        router.push("/");
+        localStorage.removeItem('authToken');
+        router.push('/');
       }
     };
 
@@ -66,7 +66,7 @@ const CalendarPage: React.FC = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem('authToken');
         if (!token || !userId) return;
 
         const response = await axios.get(`/api/tasks`, {
@@ -87,14 +87,14 @@ const CalendarPage: React.FC = () => {
 
           setLoading(false);
         } else {
-          throw new Error("Failed to fetch tasks.");
+          throw new Error('Failed to fetch tasks.');
         }
       } catch (error) {
-        console.error("Error fetching tasks:", error);
+        console.error('Error fetching tasks:', error);
         toast.current?.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to fetch tasks.",
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to fetch tasks.',
           life: 3000,
         });
         setLoading(false);
@@ -127,10 +127,10 @@ const CalendarPage: React.FC = () => {
     const reconstructedDate = new Date(year, month, day);
     const dateKey = normalizeToLocalMidnight(reconstructedDate)
       .toISOString()
-      .split("T")[0];
+      .split('T')[0];
     const hasTask = tasks.some(
       (task) =>
-        normalizeToLocalMidnight(task.dueDate).toISOString().split("T")[0] ===
+        normalizeToLocalMidnight(task.dueDate).toISOString().split('T')[0] ===
         dateKey
     );
     return (
@@ -143,8 +143,8 @@ const CalendarPage: React.FC = () => {
 
   const handleTaskDelete = async (id: number) => {
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("User is not authenticated.");
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error('User is not authenticated.');
 
       await axios.delete(`/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -152,7 +152,38 @@ const CalendarPage: React.FC = () => {
 
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
     } catch (error) {
-      console.error("Error deleting task:", error);
+      console.error('Error deleting task:', error);
+    }
+  };
+
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error('User is not authenticated.');
+
+      await axios.put(
+        `/api/tasks/${id}`,
+        { status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === id
+            ? { ...task, status: newStatus as 'TO_DO' | 'IN_PROGRESS' | 'DONE' }
+            : task
+        )
+      );
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update task status.',
+        life: 3000,
+      });
     }
   };
 
@@ -171,7 +202,7 @@ const CalendarPage: React.FC = () => {
           <Toast ref={toast} />
           <h1
             className="text-3xl font-bold"
-            style={{ color: "var(--primary-color)" }}
+            style={{ color: 'var(--primary-color)' }}
           >
             Task Calendar
           </h1>
@@ -202,12 +233,12 @@ const CalendarPage: React.FC = () => {
                 />
                 <h2 className="text-xl font-semibold">
                   {normalizeToLocalMidnight(selectedDate).toLocaleDateString(
-                    "en-US",
+                    'en-US',
                     {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
                     }
                   )}
                 </h2>
@@ -224,7 +255,7 @@ const CalendarPage: React.FC = () => {
                       key={task.id}
                       {...task}
                       onDelete={handleTaskDelete}
-                      onStatusChange={() => {}}
+                      onStatusChange={handleStatusChange}
                     />
                   ))
                 ) : (

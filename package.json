@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && rm -rf src/migrations src/seeders",
     "start": "next start",
     "lint": "next lint",
-    "clean": "rimraf .next"
+    "clean": "rimraf .next",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -47,6 +48,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.4",
     "postcss": "^8",
+    "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
     "sequelize-cli": "^6.6.2",
     "tailwindcss": "^3.4.1",

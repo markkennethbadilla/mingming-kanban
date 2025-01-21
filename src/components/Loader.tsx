@@ -1,24 +1,24 @@
-import React from "react";
-import Image from "next/image";
+import React from 'react';
+import Image from 'next/image';
 
 const Loader: React.FC = () => {
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "87vh",
-        backgroundColor: "var(--background-color)",
-        textAlign: "center",
-        padding: "20px",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '87vh',
+        backgroundColor: 'var(--background-color)',
+        textAlign: 'center',
+        padding: '20px',
       }}
     >
       {/* Cat Animation */}
 
-      <div style={{ marginBottom: "12px" }}>
-        {" "}
+      <div style={{ marginBottom: '12px' }}>
+        {' '}
         {/* Reduced spacing */}
         <Image
           src="/cat-loading.gif" // Replace with a path to your cat animation GIF
@@ -32,10 +32,10 @@ const Loader: React.FC = () => {
       {/* Loading Message */}
       <p
         style={{
-          fontSize: "1.5rem", // Slightly larger font size
-          fontWeight: "600",
-          color: "var(--text-color)",
-          margin: "0", // Removed bottom margin for compact design
+          fontSize: '1.5rem', // Slightly larger font size
+          fontWeight: '600',
+          color: 'var(--text-color)',
+          margin: '0', // Removed bottom margin for compact design
         }}
       >
         Hang tight, we&apos;re fetching content! 🐾

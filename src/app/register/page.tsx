@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React, { useRef, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { InputText } from "primereact/inputtext";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { Password } from "primereact/password";
+import React, { useRef, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+import { Password } from 'primereact/password';
 
 // Validation schema using zod
 const validationSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type RegisterFormData = z.infer<typeof validationSchema>;
@@ -22,9 +22,9 @@ const RegisterPage: React.FC = () => {
   const { control, handleSubmit, formState } = useForm<RegisterFormData>({
     resolver: zodResolver(validationSchema),
     defaultValues: {
-      username: "",
-      email: "",
-      password: "",
+      username: '',
+      email: '',
+      password: '',
     },
   });
 
@@ -35,8 +35,8 @@ const RegisterPage: React.FC = () => {
     if (formState.errors) {
       Object.values(formState.errors).forEach((error) => {
         toast.current.show({
-          severity: "warn",
-          summary: "Validation Error",
+          severity: 'warn',
+          summary: 'Validation Error',
           detail: error.message,
           life: 3000,
         });
@@ -48,20 +48,20 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem('authToken');
         if (!token) return;
 
-        const response = await fetch("/api/session", {
-          method: "GET",
+        const response = await fetch('/api/session', {
+          method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         if (response.ok) {
-          window.location.href = "/"; // Redirect if session is valid
+          window.location.href = '/'; // Redirect if session is valid
         }
-      }  catch {}
+      } catch {}
     };
 
     checkSession();
@@ -69,32 +69,32 @@ const RegisterPage: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
 
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.message || "Registration failed");
+        throw new Error(result.message || 'Registration failed');
       }
 
       toast.current.show({
-        severity: "success",
-        summary: "Registration Successful",
-        detail: "Your account has been created.",
+        severity: 'success',
+        summary: 'Registration Successful',
+        detail: 'Your account has been created.',
         life: 3000,
       });
 
-      window.location.href = "/login"; // Redirect to login on successful registration
+      window.location.href = '/login'; // Redirect to login on successful registration
     } catch (error: any) {
       toast.current.show({
-        severity: "error",
-        summary: "Registration Failed",
-        detail: error.message || "An error occurred. Please try again.",
+        severity: 'error',
+        summary: 'Registration Failed',
+        detail: error.message || 'An error occurred. Please try again.',
         life: 3000,
       });
     }
@@ -103,50 +103,50 @@ const RegisterPage: React.FC = () => {
   return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "87vh",
-        backgroundColor: "var(--background-color)",
-        padding: "20px",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '87vh',
+        backgroundColor: 'var(--background-color)',
+        padding: '20px',
       }}
     >
       <Toast ref={toast} />
       <div
         style={{
-          width: "100%",
-          maxWidth: "400px",
-          padding: "24px",
-          borderRadius: "12px",
-          backgroundColor: "#fff",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          width: '100%',
+          maxWidth: '400px',
+          padding: '24px',
+          borderRadius: '12px',
+          backgroundColor: '#fff',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
         }}
       >
         <h2
           style={{
-            fontSize: "1.5rem",
-            fontWeight: "600",
-            textAlign: "center",
-            color: "var(--secondary-color)",
-            marginBottom: "24px",
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            textAlign: 'center',
+            color: 'var(--secondary-color)',
+            marginBottom: '24px',
           }}
         >
           Sign Up
         </h2>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          style={{ display: "grid", gap: "16px" }}
+          style={{ display: 'grid', gap: '16px' }}
         >
           {/* Username Field */}
           <div>
             <label
               htmlFor="username"
               style={{
-                display: "block",
-                marginBottom: "8px",
-                fontSize: "1rem",
-                color: "var(--text-color)",
-                fontWeight: "500",
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '1rem',
+                color: 'var(--text-color)',
+                fontWeight: '500',
               }}
             >
               Username
@@ -159,10 +159,10 @@ const RegisterPage: React.FC = () => {
                   id="username"
                   {...field}
                   style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: "8px",
-                    border: "1px solid var(--neutral-color)",
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--neutral-color)',
                   }}
                 />
               )}
@@ -174,11 +174,11 @@ const RegisterPage: React.FC = () => {
             <label
               htmlFor="email"
               style={{
-                display: "block",
-                marginBottom: "8px",
-                fontSize: "1rem",
-                color: "var(--text-color)",
-                fontWeight: "500",
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '1rem',
+                color: 'var(--text-color)',
+                fontWeight: '500',
               }}
             >
               Email
@@ -192,10 +192,10 @@ const RegisterPage: React.FC = () => {
                   type="email"
                   {...field}
                   style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: "8px",
-                    border: "1px solid var(--neutral-color)",
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--neutral-color)',
                   }}
                 />
               )}
@@ -207,11 +207,11 @@ const RegisterPage: React.FC = () => {
             <label
               htmlFor="password"
               style={{
-                display: "block",
-                marginBottom: "8px",
-                fontSize: "1rem",
-                color: "var(--text-color)",
-                fontWeight: "500",
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '1rem',
+                color: 'var(--text-color)',
+                fontWeight: '500',
               }}
             >
               Password
@@ -226,10 +226,10 @@ const RegisterPage: React.FC = () => {
                   toggleMask
                   feedback={true}
                   inputStyle={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: "8px",
-                    border: "1px solid var(--neutral-color)",
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--neutral-color)',
                   }}
                 />
               )}
@@ -241,13 +241,13 @@ const RegisterPage: React.FC = () => {
             label="Sign Up"
             type="submit"
             style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              backgroundColor: "var(--secondary-color)",
-              color: "#fff",
-              fontWeight: "600",
-              fontSize: "1rem",
+              width: '100%',
+              padding: '12px',
+              borderRadius: '8px',
+              backgroundColor: 'var(--secondary-color)',
+              color: '#fff',
+              fontWeight: '600',
+              fontSize: '1rem',
             }}
           />
         </form>
@@ -255,24 +255,24 @@ const RegisterPage: React.FC = () => {
         {/* Already Have Account Links */}
         <div
           style={{
-            marginTop: "16px",
-            display: "flex",
-            justifyContent: "center",
-            fontSize: "0.9rem",
-            color: "var(--neutral-color)",
+            marginTop: '16px',
+            display: 'flex',
+            justifyContent: 'center',
+            fontSize: '0.9rem',
+            color: 'var(--neutral-color)',
           }}
         >
           <a
             href="/login"
             style={{
-              color: "var(--primary-color)",
-              textDecoration: "none",
+              color: 'var(--primary-color)',
+              textDecoration: 'none',
             }}
             onMouseEnter={(e) =>
-              (e.currentTarget.style.textDecoration = "underline")
+              (e.currentTarget.style.textDecoration = 'underline')
             }
             onMouseLeave={(e) =>
-              (e.currentTarget.style.textDecoration = "none")
+              (e.currentTarget.style.textDecoration = 'none')
             }
           >
             Already have an account?

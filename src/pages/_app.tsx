@@ -9,7 +9,7 @@ import 'primeicons/primeicons.css'; // PrimeIcons CSS
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <PrimeReactProvider>
-        <Component {...pageProps} />
+      <Component {...pageProps} />
     </PrimeReactProvider>
   );
 }

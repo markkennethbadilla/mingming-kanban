@@ -8,12 +8,16 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
+    return res
+      .status(405)
+      .json({ success: false, message: 'Method not allowed' });
   }
 
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Token not provided' });
+    return res
+      .status(401)
+      .json({ success: false, message: 'Token not provided' });
   }
 
   try {
@@ -24,7 +28,9 @@ export default async function handler(req, res) {
     });
 
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'User not found' });
     }
 
     return res.status(200).json({ success: true, user });
