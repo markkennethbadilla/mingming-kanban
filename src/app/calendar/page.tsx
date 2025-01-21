@@ -13,6 +13,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import { Button } from "primereact/button";
 
 import "@/styles/CalendarPage.css";
+import Loader from "@/components/Loader";
 
 const CalendarPage: React.FC = () => {
   const router = useRouter();
@@ -124,10 +125,13 @@ const CalendarPage: React.FC = () => {
   const dateTemplate = (event: CalendarDateTemplateEvent) => {
     const { day, month, year } = event;
     const reconstructedDate = new Date(year, month, day);
-    const dateKey = normalizeToLocalMidnight(reconstructedDate).toISOString().split("T")[0];
+    const dateKey = normalizeToLocalMidnight(reconstructedDate)
+      .toISOString()
+      .split("T")[0];
     const hasTask = tasks.some(
       (task) =>
-        normalizeToLocalMidnight(task.dueDate).toISOString().split("T")[0] === dateKey
+        normalizeToLocalMidnight(task.dueDate).toISOString().split("T")[0] ===
+        dateKey
     );
     return (
       <div className="calendar-day">
@@ -153,7 +157,11 @@ const CalendarPage: React.FC = () => {
   };
 
   if (loading || !selectedDate) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <>
+        <Loader />
+      </>
+    );
   }
 
   return (
@@ -170,11 +178,13 @@ const CalendarPage: React.FC = () => {
 
           <div className="flex w-full max-w-6xl gap-6">
             {/* Calendar Container */}
-            <div className="bg-white rounded-lg shadow p-4 h-fit" >
+            <div className="bg-white rounded-lg shadow p-4 h-fit">
               <Calendar
                 inline
                 value={selectedDate}
-                onSelect={(e) => setSelectedDate(normalizeToLocalMidnight(e.value as Date))}
+                onSelect={(e) =>
+                  setSelectedDate(normalizeToLocalMidnight(e.value as Date))
+                }
                 dateTemplate={dateTemplate}
                 showWeek
                 numberOfMonths={1}
@@ -191,12 +201,15 @@ const CalendarPage: React.FC = () => {
                   onClick={() => handleDateChange(-1)}
                 />
                 <h2 className="text-xl font-semibold">
-                  {normalizeToLocalMidnight(selectedDate).toLocaleDateString("en-US", {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {normalizeToLocalMidnight(selectedDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    }
+                  )}
                 </h2>
                 <Button
                   icon="pi pi-chevron-right"
