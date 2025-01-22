@@ -38,5 +38,5 @@
     ".next/types/**/*.ts",
     "migrations/add-isdone-priority-to-tasks.js"
   ],
-  "exclude": ["node_modules", "migrations", "seeders"]
+  "exclude": ["node_modules", "migrations", "seeders", "sequelize-config.js"]
 }
