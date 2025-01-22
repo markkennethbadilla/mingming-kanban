@@ -26,6 +26,7 @@
     "mysql2": "^3.12.0",
     "next": "15.1.4",
     "nodemailer": "^6.9.16",
+    "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
