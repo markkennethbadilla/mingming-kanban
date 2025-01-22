@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf .next",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postinstall": "npm install pg"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
