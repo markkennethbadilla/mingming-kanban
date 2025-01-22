@@ -1,6 +1,6 @@
 import sequelize from '../config/sequelize'; // Sequelize instance
 import User from '@/models/user';
-import Task from '@/models/task';
+import Task from '@/models/asdfasdfasdf';
 
 export function initializeModels() {
   User.initModel(sequelize);
