@@ -117,9 +117,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         transition: 'box-shadow 0.3s, padding 0.2s',
         cursor: 'default',
         opacity: isDragging ? 0.5 : 1,
-        backgroundColor: isMissed
-          ? 'var(--highlight-color-light)'
-          : 'var(--card-background)',
+        backgroundColor: 'var(--card-background)',
         borderLeft: `4px solid ${priorityColors[priority]}`,
         position: 'relative',
         overflow: 'hidden',

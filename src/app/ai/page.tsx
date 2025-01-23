@@ -246,63 +246,62 @@ const ChatPage = () => {
                   />
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                <div className="flex-1 overflow-y-auto p-2 space-y-2">
                 {messages.map((msg, i) => (
                   <div
-                    key={i}
-                    className={`flex items-start space-x-2 ${
-                      msg.type === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
+                  key={i}
+                  className={`flex items-start space-x-2 ${
+                  msg.type === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
                   >
-                    {msg.type === 'ai' && (
-                      <div>
-                        <Image
-                          src="/logo.svg"
-                          alt="AI"
-                          width={32}
-                          height={32}
-                        />
-                      </div>
-                    )}
-                    <div
-                      className={`rounded-lg p-2 ${
-                        msg.type === 'user' ? 'self-end' : 'self-start'
-                      }`}
-                      style={{
-                        backgroundColor:
-                          msg.type === 'user'
-                            ? 'var(--primary-color)'
-                            : 'var(--secondary-color)',
-                        color: 'white',
-                      }}
-                    >
-                      {msg.text}
+                  {msg.type === 'ai' && (
+                  <div>
+                  <Image
+                    src="/logo.svg"
+                    alt="AI"
+                    width={32}
+                    height={32}
+                  />
+                  </div>
+                  )}
+                  <div
+                  className={`rounded-lg p-2 ${
+                  msg.type === 'user' ? 'self-end' : 'self-start'
+                  }`}
+                  style={{
+                  backgroundColor:
+                    msg.type === 'user'
+                    ? 'var(--primary-color)'
+                    : 'var(--secondary-color)',
+                  color: 'white',
+                  }}
+                  >
+                  {msg.text}
+                  {msg.tasks && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 mt-2" style={{ backgroundColor: 'white' }}>
+                    {msg.tasks.map((task) => (
+                    <div key={task.id} className="flex flex-col">
+                    <TaskCard
+                    id={task.id}
+                    title={task.title}
+                    description={task.description}
+                    dueDate={task.dueDate}
+                    priority={task.priority}
+                    status={task.status}
+                    onDelete={handleTaskDelete}
+                    onStatusChange={(id, newStatus) =>
+                      handleTaskUpdate(id, { status: newStatus })
+                    }
+                    />
                     </div>
-
-                    {msg.tasks && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 mt-2">
-                        {msg.tasks.map((task) => (
-                          <div key={task.id} className="flex flex-col">
-                            <TaskCard
-                              id={task.id}
-                              title={task.title}
-                              description={task.description}
-                              dueDate={task.dueDate}
-                              priority={task.priority}
-                              status={task.status}
-                              onDelete={handleTaskDelete}
-                              onStatusChange={(id, newStatus) =>
-                                handleTaskUpdate(id, { status: newStatus })
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    ))}
+                    </div>
+                  )}
+                  </div>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
-              </div>
+                </div>
             </div>
           </div>
         </div>
