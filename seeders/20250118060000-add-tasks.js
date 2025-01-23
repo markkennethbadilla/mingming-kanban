@@ -5,7 +5,7 @@ module.exports = {
     try {
       // Check if the user already exists
       const [existingUser] = await queryInterface.sequelize.query(
-        `SELECT id FROM Users WHERE email = 'john.doe@example.com'`
+        `SELECT id FROM "Users" WHERE email = 'iammkb2002@gmail.com'`
       );
 
       let userId;
@@ -14,22 +14,7 @@ module.exports = {
         userId = existingUser[0].id;
         console.log('User already exists with ID:', userId);
       } else {
-        // Insert a new user
-        const [newUser] = await queryInterface.bulkInsert(
-          'Users',
-          [
-            {
-              username: 'john_doe',
-              email: 'john.doe@example.com',
-              password: 'hashedpassword123',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
-          ],
-          { returning: ['id'] }
-        );
-        userId = newUser.id;
-        console.log('New user created with ID:', userId);
+        console.log('NO USER WITH THAT EMAIL');
       }
 
       // Insert tasks

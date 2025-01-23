@@ -7,8 +7,28 @@ const LandingPage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    setIsLoggedIn(!!token); // Set logged-in state based on the presence of the auth token
+    const checkSession = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) return; // No token, user needs to log in
+
+        const response = await fetch('/api/session', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setIsLoggedIn(true); // Show the dashboard button if session is valid
+        }
+      } catch {
+        localStorage.removeItem('authToken');
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   return (
@@ -19,7 +39,7 @@ const LandingPage: React.FC = () => {
         alignItems: 'center',
         height: '87vh',
         backgroundColor: 'var(--background-color)',
-        backgroundImage: "url('/background-image.png')", // Replace with the path to your background image
+        backgroundImage: "url('/background-image.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -30,10 +50,11 @@ const LandingPage: React.FC = () => {
       <div
         style={{
           maxWidth: '650px',
-          padding: '32px 24px', // Increased top and bottom padding for balance
+          padding: '32px 24px',
           borderRadius: '12px',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi-transparent white background for readability
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
           boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
+          width: '100%', // Make it responsive
         }}
       >
         <h1
@@ -41,6 +62,7 @@ const LandingPage: React.FC = () => {
             fontSize: '3rem',
             fontWeight: '800',
             color: 'var(--primary-color)',
+            margin: '0 0 16px 0',
           }}
         >
           Discover Your Productivity
@@ -49,7 +71,7 @@ const LandingPage: React.FC = () => {
           style={{
             fontSize: '1.25rem',
             color: 'var(--text-color)',
-            marginBottom: '32px', // Consistent spacing below the paragraph
+            marginBottom: '32px',
             lineHeight: '1.6',
           }}
         >
@@ -63,6 +85,7 @@ const LandingPage: React.FC = () => {
             justifyContent: 'center',
             gap: '16px',
             marginBottom: '32px',
+            flexWrap: 'wrap', // Make buttons wrap on smaller screens
           }}
         >
           {isLoggedIn ? (
@@ -75,6 +98,7 @@ const LandingPage: React.FC = () => {
                 color: '#fff',
                 fontWeight: '700',
                 fontSize: '1rem',
+                flex: '1 1 100%', // Make button full width on small screens
               }}
               onClick={() => (window.location.href = '/dashboard')}
             />
@@ -89,6 +113,7 @@ const LandingPage: React.FC = () => {
                   color: '#fff',
                   fontWeight: '700',
                   fontSize: '1rem',
+                  flex: '1 1 45%', // Make button take 45% width on small screens
                 }}
                 onClick={() => (window.location.href = '/login')}
               />
@@ -101,6 +126,7 @@ const LandingPage: React.FC = () => {
                   color: '#fff',
                   fontWeight: '700',
                   fontSize: '1rem',
+                  flex: '1 1 45%', // Make button take 45% width on small screens
                 }}
                 onClick={() => (window.location.href = '/register')}
               />
