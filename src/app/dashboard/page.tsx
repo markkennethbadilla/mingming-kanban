@@ -76,7 +76,6 @@ const DashboardPage: React.FC = () => {
         )
       );
     } else if (filterType === 'priority') {
-      console.log(tasks);
       const priorityOrder: Record<string, number> = {
         HIGH: 1,
         MEDIUM: 2,
@@ -164,10 +163,11 @@ const DashboardPage: React.FC = () => {
       <div
         ref={ref}
         style={{
-          height: 'calc(98vh - 64px)',
+          maxHeight: 'calc(98vh - 64px)',
           overflowY: 'auto',
           scrollbarWidth: 'thin',
           scrollbarColor: 'var(--neutral-color) var(--background-color)',
+          width: '100%',
         }}
       >
         {children}
@@ -200,6 +200,7 @@ const DashboardPage: React.FC = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '20px',
+                flexWrap: 'wrap',
               }}
             >
               <div>
@@ -260,7 +261,7 @@ const DashboardPage: React.FC = () => {
               }}
             >
               {/* To Do Column */}
-              <div>
+              <div style={{ height: '100%' }}>
                 <h3
                   style={{
                     fontSize: '1.2rem',
@@ -305,7 +306,7 @@ const DashboardPage: React.FC = () => {
                 </Column>
               </div>
               {/* In Progress Column */}
-              <div>
+              <div style={{ height: '100%' }}>
                 <h3
                   style={{
                     fontSize: '1.2rem',
@@ -350,7 +351,7 @@ const DashboardPage: React.FC = () => {
                 </Column>
               </div>
               {/* Done Column */}
-              <div>
+              <div style={{ height: '100%' }}>
                 <h3
                   style={{
                     fontSize: '1.2rem',

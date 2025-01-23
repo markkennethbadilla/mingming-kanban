@@ -97,89 +97,53 @@ const ForgotPasswordPage: React.FC = () => {
   }, [formState.errors]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: 'var(--background-color, #f4f4f4)',
-      }}
-    >
-      <Toast ref={toast} />
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          backgroundColor: '#fff',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <h2
-          style={{
-            textAlign: 'center',
-            color: 'var(--primary-color, #007bff)',
-            marginBottom: '16px',
-          }}
-        >
-          Forgot Password
-        </h2>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          style={{ display: 'grid', gap: '16px' }}
-        >
-          <div>
-            <label
-              htmlFor="email"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color, #333)',
-              }}
-            >
-              Enter your email address:
-            </label>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  id="email"
-                  {...field}
-                  placeholder="example@domain.com"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color, #ccc)',
-                  }}
+    <>
+      <div className="flex flex-col min-h-[87vh] bg-[var(--background-color,#f4f4f4)]">
+        <div className="flex-grow"></div>
+        <div className="flex justify-center items-center">
+          <Toast ref={toast} />
+          <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-center text-[var(--primary-color,#007bff)] mb-4">
+              Forgot Password
+            </h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block mb-2 text-lg text-[var(--text-color,#333)]"
+                >
+                  Enter your email address:
+                </label>
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <InputText
+                      id="email"
+                      {...field}
+                      placeholder="example@domain.com"
+                      className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                    />
+                  )}
                 />
-              )}
-            />
-          </div>
+              </div>
 
-          <Button
-            label="Send Reset Link"
-            type="submit"
-            disabled={formState.isSubmitting}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: 'var(--primary-color, #007bff)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: '600',
-              fontSize: '1rem',
-              cursor: formState.isSubmitting ? 'not-allowed' : 'pointer',
-            }}
-          />
-        </form>
+              <Button
+                label="Send Reset Link"
+                type="submit"
+                disabled={formState.isSubmitting}
+                className={`w-full p-3 bg-[var(--primary-color,#007bff)] text-white border-none rounded-lg font-semibold text-lg ${
+                  formState.isSubmitting
+                    ? 'cursor-not-allowed'
+                    : 'cursor-pointer'
+                }`}
+              />
+            </form>
+          </div>
+        </div>
+        <div className="flex-grow"></div>
       </div>
-    </div>
+    </>
   );
 };
 

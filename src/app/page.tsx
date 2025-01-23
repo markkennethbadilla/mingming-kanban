@@ -33,104 +33,38 @@ const LandingPage: React.FC = () => {
 
   return (
     <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '87vh',
-        backgroundColor: 'var(--background-color)',
-        backgroundImage: "url('/background-image.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        textAlign: 'center',
-        padding: '20px',
-      }}
+      className="flex items-center justify-center min-h-[87vh] bg-[var(--background-color)] bg-cover bg-center bg-no-repeat text-center p-5"
+      style={{ backgroundImage: "url('/background-image.png')" }}
     >
-      <div
-        style={{
-          maxWidth: '650px',
-          padding: '32px 24px',
-          borderRadius: '12px',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
-          width: '100%', // Make it responsive
-        }}
-      >
-        <h1
-          style={{
-            fontSize: '3rem',
-            fontWeight: '800',
-            color: 'var(--primary-color)',
-            margin: '0 0 16px 0',
-          }}
-        >
+      <div className="max-w-lg p-8 bg-white bg-opacity-90 rounded-lg shadow-lg w-full mt-16 sm:mt-0">
+        <h1 className="text-4xl font-extrabold text-[var(--primary-color)] mb-4">
           Discover Your Productivity
         </h1>
-        <p
-          style={{
-            fontSize: '1.25rem',
-            color: 'var(--text-color)',
-            marginBottom: '32px',
-            lineHeight: '1.6',
-          }}
-        >
+        <p className="text-lg text-[var(--text-color)] mb-8 leading-relaxed">
           Welcome to <strong>Mingming Task Manager</strong>, your personal
           companion for staying organized and motivated. Break down your goals
           into manageable tasks, and let us help you achieve greatness.
         </p>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '16px',
-            marginBottom: '32px',
-            flexWrap: 'wrap', // Make buttons wrap on smaller screens
-          }}
-        >
+        <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap mb-8">
           {isLoggedIn ? (
             <Button
               label="Go to Dashboard"
-              style={{
-                padding: '12px 32px',
-                borderRadius: '8px',
-                backgroundColor: 'var(--primary-color)',
-                color: '#fff',
-                fontWeight: '700',
-                fontSize: '1rem',
-                flex: '1 1 100%', // Make button full width on small screens
-              }}
+              className="p-3 rounded-lg bg-[var(--primary-color)] text-white font-bold text-lg w-full sm:w-auto"
               onClick={() => (window.location.href = '/dashboard')}
             />
           ) : (
-            <>
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
               <Button
                 label="Log In"
-                style={{
-                  padding: '12px 32px',
-                  borderRadius: '8px',
-                  backgroundColor: 'var(--primary-color)',
-                  color: '#fff',
-                  fontWeight: '700',
-                  fontSize: '1rem',
-                  flex: '1 1 45%', // Make button take 45% width on small screens
-                }}
+                className="p-3 rounded-lg bg-[var(--primary-color)] text-white font-bold text-lg w-full sm:w-1/2"
                 onClick={() => (window.location.href = '/login')}
               />
               <Button
                 label="Sign Up"
-                style={{
-                  padding: '12px 32px',
-                  borderRadius: '8px',
-                  backgroundColor: 'var(--secondary-color)',
-                  color: '#fff',
-                  fontWeight: '700',
-                  fontSize: '1rem',
-                  flex: '1 1 45%', // Make button take 45% width on small screens
-                }}
+                className="p-3 rounded-lg bg-[var(--secondary-color)] text-white font-bold text-lg w-full sm:w-1/2"
                 onClick={() => (window.location.href = '/register')}
               />
-            </>
+            </div>
           )}
         </div>
       </div>

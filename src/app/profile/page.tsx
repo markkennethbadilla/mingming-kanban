@@ -234,182 +234,134 @@ const ProfilePage: React.FC = () => {
   if (loading) return <Loader />;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'var(--background-color)',
-        height: '87vh',
-      }}
-    >
-      <Toast ref={toast} />
-      <Dialog
-        visible={isDialogVisible}
-        header="Confirm Changes"
-        modal
-        onHide={() => setIsDialogVisible(false)}
-        footer={
-          <div>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              className="p-button-text"
-              onClick={() => setIsDialogVisible(false)}
-            />
-            <Button
-              label="Confirm"
-              icon="pi pi-check"
-              onClick={handleConfirm}
-            />
+    <div className="flex flex-col min-h-[87vh] bg-[var(--background-color,#f4f4f4)]">
+      <div className="flex-grow"></div>
+      <div className="flex justify-center items-center">
+        <Toast ref={toast} />
+        <Dialog
+          visible={isDialogVisible}
+          header="Confirm Changes"
+          modal
+          onHide={() => setIsDialogVisible(false)}
+          footer={
+            <div>
+              <Button
+                label="Cancel"
+                icon="pi pi-times"
+                className="p-button-text"
+                onClick={() => setIsDialogVisible(false)}
+              />
+              <Button
+                label="Confirm"
+                icon="pi pi-check"
+                onClick={handleConfirm}
+              />
+            </div>
+          }
+        >
+          <div className="flex items-center gap-4">
+            <i className="pi pi-exclamation-triangle text-2xl text-[var(--warn-color,#f39c12)]" />
+            <div className="flex-1">
+              <p>Enter your current password to confirm changes:</p>
+              <Password
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Current Password"
+                feedback={false}
+                toggleMask
+                className="mt-2 w-full"
+              />
+            </div>
           </div>
-        }
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ fontSize: '2rem', color: 'var(--warn-color, #f39c12)' }}
-          />
-          <div style={{ flex: 1 }}>
-            <p>Enter your current password to confirm changes:</p>
-            <Password
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Current Password"
-              feedback={false}
-              toggleMask
-              style={{ marginTop: '10px', width: '100%' }}
+        </Dialog>
+
+        <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+          <a
+            className="inline-block mb-4 text-sm text-[var(--primary-color)] cursor-pointer hover:underline"
+            onClick={() => router.back()}
+          >
+            &larr; Back
+          </a>
+
+          <h2 className="text-center text-2xl font-semibold text-[var(--primary-color)] mb-4">
+            Profile Settings
+          </h2>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            <Controller
+              name="username"
+              control={control}
+              render={({ field }) => (
+                <InputText
+                  {...field}
+                  placeholder="Enter your username"
+                  className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                />
+              )}
             />
-          </div>
+
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <InputText
+                  {...field}
+                  placeholder="Enter your email"
+                  className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                />
+              )}
+            />
+
+            <div className="flex items-center gap-3">
+              <label className="text-[var(--text-color)] font-medium">
+                Change Password
+              </label>
+              <InputSwitch
+                checked={enablePasswordChange}
+                onChange={(e) => setEnablePasswordChange(e.value)}
+              />
+            </div>
+
+            {enablePasswordChange && (
+              <>
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <Password
+                      {...field}
+                      placeholder="Enter new password"
+                      feedback
+                      toggleMask
+                      className="w-full"
+                    />
+                  )}
+                />
+                <Controller
+                  name="confirmPassword"
+                  control={control}
+                  render={({ field }) => (
+                    <Password
+                      {...field}
+                      placeholder="Confirm new password"
+                      feedback={false}
+                      toggleMask
+                      className="w-full"
+                    />
+                  )}
+                />
+              </>
+            )}
+
+            <Button
+              label="Save Changes"
+              type="submit"
+              className="w-full p-3 rounded-lg bg-[var(--primary-color)] text-white"
+            />
+          </form>
         </div>
-      </Dialog>
-
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '600px',
-          backgroundColor: '#fff',
-          borderRadius: '12px',
-          padding: '24px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <a
-          style={{
-            display: 'inline-block',
-            marginBottom: '16px',
-            fontSize: '0.875rem',
-            color: 'var(--primary-color)',
-            cursor: 'pointer',
-            textDecoration: 'none',
-          }}
-          onClick={() => router.back()}
-        >
-          &larr; Back
-        </a>
-
-        <h2
-          style={{
-            textAlign: 'center',
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            color: 'var(--primary-color)',
-            marginBottom: '16px',
-          }}
-        >
-          Profile Settings
-        </h2>
-
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          style={{ display: 'grid', gap: '16px' }}
-        >
-          <Controller
-            name="username"
-            control={control}
-            render={({ field }) => (
-              <InputText
-                {...field}
-                placeholder="Enter your username"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--neutral-color, #ccc)',
-                }}
-              />
-            )}
-          />
-
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <InputText
-                {...field}
-                placeholder="Enter your email"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--neutral-color, #ccc)',
-                }}
-              />
-            )}
-          />
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <label style={{ color: 'var(--text-color)', fontWeight: '500' }}>
-              Change Password
-            </label>
-            <InputSwitch
-              checked={enablePasswordChange}
-              onChange={(e) => setEnablePasswordChange(e.value)}
-            />
-          </div>
-
-          {enablePasswordChange && (
-            <>
-              <Controller
-                name="password"
-                control={control}
-                render={({ field }) => (
-                  <Password
-                    {...field}
-                    placeholder="Enter new password"
-                    feedback
-                    toggleMask
-                  />
-                )}
-              />
-              <Controller
-                name="confirmPassword"
-                control={control}
-                render={({ field }) => (
-                  <Password
-                    {...field}
-                    placeholder="Confirm new password"
-                    feedback={false}
-                    toggleMask
-                  />
-                )}
-              />
-            </>
-          )}
-
-          <Button
-            label="Save Changes"
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--primary-color)',
-              color: '#fff',
-            }}
-          />
-        </form>
       </div>
+      <div className="flex-grow"></div>
     </div>
   );
 };

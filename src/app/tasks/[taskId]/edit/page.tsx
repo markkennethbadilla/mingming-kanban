@@ -144,31 +144,10 @@ const EditTaskPage: React.FC = () => {
 
   if (error) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '87vh',
-          textAlign: 'center',
-        }}
-      >
-        <p style={{ color: 'var(--secondary-color)', fontSize: '1rem' }}>
-          {error}
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-[87vh] text-center">
+        <p className="text-[var(--secondary-color)] text-lg">{error}</p>
         <button
-          style={{
-            marginTop: '16px',
-            padding: '10px 16px',
-            backgroundColor: 'var(--primary-color)',
-            color: '#fff',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            border: 'none',
-            transition: 'background-color 0.2s',
-          }}
+          className="mt-4 px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg cursor-pointer text-lg border-none transition-colors duration-200"
           onClick={() => router.back()}
           onMouseEnter={(e) =>
             (e.currentTarget.style.backgroundColor =
@@ -185,57 +164,18 @@ const EditTaskPage: React.FC = () => {
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'var(--background-color)',
-        padding: '24px 0',
-        height: '87vh',
-      }}
-    >
+    <div className="flex items-center justify-center bg-[var(--background-color)] lg:h-[87vh]">
       <Toast ref={toast} />
       {initialData ? (
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '800px',
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            padding: '24px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-          }}
-        >
+        <div className="w-full max-w-2xl bg-white rounded-lg p-6 shadow-md">
           <a
-            style={{
-              display: 'inline-block',
-              marginBottom: '16px',
-              fontSize: '0.875rem',
-              color: 'var(--primary-color)',
-              cursor: 'pointer',
-              textDecoration: 'none',
-            }}
+            className="inline-block text-sm text-[var(--primary-color)] cursor-pointer hover:underline"
             onClick={() => router.back()}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.textDecoration = 'underline')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.textDecoration = 'none')
-            }
           >
             &larr; Back
           </a>
           {/* Page Header */}
-          <h2
-            style={{
-              textAlign: 'center',
-              color: 'var(--primary-color)',
-              fontSize: '1.5rem',
-              fontWeight: '600',
-              marginBottom: '32px',
-            }}
-          >
+          <h2 className="text-center text-[var(--primary-color)] text-2xl font-semibold">
             Edit Task
           </h2>
           {/* Task Form */}

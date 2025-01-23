@@ -207,9 +207,9 @@ const CalendarPage: React.FC = () => {
             Task Calendar
           </h1>
 
-          <div className="flex w-full max-w-6xl gap-6">
+          <div className="flex flex-col lg:flex-row w-full max-w-6xl gap-6">
             {/* Calendar Container */}
-            <div className="bg-white rounded-lg shadow p-4 h-fit">
+            <div className="bg-white rounded-lg shadow p-4 h-fit w-full lg:w-auto">
               <Calendar
                 inline
                 value={selectedDate}
@@ -224,14 +224,14 @@ const CalendarPage: React.FC = () => {
             </div>
 
             {/* Task List Container */}
-            <div className="flex flex-col bg-white rounded-lg shadow p-4 w-96 h-[75vh] overflow-y-auto">
+            <div className="flex flex-col bg-white rounded-lg shadow p-4 w-full lg:w-96 lg:h-[75vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <Button
                   icon="pi pi-chevron-left"
                   className="p-button-text"
                   onClick={() => handleDateChange(-1)}
                 />
-                <h2 className="text-xl font-semibold">
+                <h2 className="text-xl font-semibold text-center">
                   {normalizeToLocalMidnight(selectedDate).toLocaleDateString(
                     'en-US',
                     {

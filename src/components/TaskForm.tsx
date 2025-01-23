@@ -74,27 +74,16 @@ const TaskForm: React.FC<TaskFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
+      className="grid gap-4 p-6 bg-[var(--background-color)] rounded-lg"
       style={{
-        display: 'grid',
-        gap: '16px',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        alignItems: 'center',
-        backgroundColor: 'var(--background-color)',
-        padding: '24px',
-        borderRadius: '12px',
       }}
     >
       {/* Title Field */}
-      <div>
+      <div className="col-span-full sm:col-span-1">
         <label
           htmlFor="title"
-          style={{
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            marginBottom: '4px',
-            display: 'block',
-            color: 'var(--text-color)',
-          }}
+          className="block text-sm font-medium text-[var(--text-color)]"
         >
           Title
         </label>
@@ -105,33 +94,30 @@ const TaskForm: React.FC<TaskFormProps> = ({
             <InputText
               {...field}
               id="title"
-              style={{
-                width: '100%',
-                borderRadius: '6px',
-                border: `1px solid ${
-                  errors.title
-                    ? 'var(--secondary-color)'
-                    : 'var(--neutral-color)'
-                }`,
-                padding: '8px',
-                fontSize: '0.9rem',
-              }}
+              className={`w-full p-2 text-sm rounded-md border ${
+                errors.title
+                  ? 'border-[var(--secondary-color)]'
+                  : 'border-[var(--neutral-color)]'
+              }`}
               placeholder="Task title"
             />
           )}
         />
         {errors.title && (
-          <small
-            style={{ color: 'var(--secondary-color)', fontSize: '0.8rem' }}
-          >
+          <small className="text-[var(--secondary-color)] text-xs">
             {errors.title.message}
           </small>
         )}
       </div>
 
       {/* Due Date Field */}
-      <div className="taskform-calendar-wrapper">
-        <label htmlFor="dueDate">Due Date</label>
+      <div className="col-span-full sm:col-span-1">
+        <label
+          htmlFor="dueDate"
+          className="block text-sm font-medium text-[var(--text-color)]"
+        >
+          Due Date
+        </label>
         <Controller
           name="dueDate"
           control={control}
@@ -141,33 +127,24 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="dueDate"
               dateFormat="yy-mm-dd"
               showIcon
-              inputStyle={{
-                width: '100%',
-                borderRadius: '6px',
-              }}
+              inputClassName="w-full p-2 text-sm rounded-l-md border border-[var(--neutral-color)]"
               placeholder="Select date"
-              className="taskform-calendar"
+              className="w-full"
             />
           )}
         />
         {errors.dueDate && (
-          <small style={{ color: 'var(--secondary-color)' }}>
+          <small className="text-[var(--secondary-color)] text-xs">
             {errors.dueDate.message}
           </small>
         )}
       </div>
 
       {/* Priority Field */}
-      <div>
+      <div className="col-span-full sm:col-span-1">
         <label
           htmlFor="priority"
-          style={{
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            marginBottom: '4px',
-            display: 'block',
-            color: 'var(--text-color)',
-          }}
+          className="block text-sm font-medium text-[var(--text-color)]"
         >
           Priority
         </label>
@@ -180,28 +157,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="priority"
               options={priorityOptions}
               placeholder="Priority"
-              style={{
-                width: '100%',
-                borderRadius: '6px',
-                border: `1px solid var(--neutral-color)`,
-                fontSize: '0.9rem',
-              }}
+              className="w-full p-2 text-sm rounded-md border border-[var(--neutral-color)]"
             />
           )}
         />
       </div>
 
       {/* Status Field */}
-      <div>
+      <div className="col-span-full sm:col-span-1">
         <label
           htmlFor="status"
-          style={{
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            marginBottom: '4px',
-            display: 'block',
-            color: 'var(--text-color)',
-          }}
+          className="block text-sm font-medium text-[var(--text-color)]"
         >
           Status
         </label>
@@ -214,28 +180,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="status"
               options={statusOptions}
               placeholder="Status"
-              style={{
-                width: '100%',
-                borderRadius: '6px',
-                border: `1px solid var(--neutral-color)`,
-                fontSize: '0.9rem',
-              }}
+              className="w-full p-2 text-sm rounded-md border border-[var(--neutral-color)]"
             />
           )}
         />
       </div>
 
       {/* Description Field */}
-      <div style={{ gridColumn: 'span 2' }}>
+      <div className="col-span-full">
         <label
           htmlFor="description"
-          style={{
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            marginBottom: '4px',
-            display: 'block',
-            color: 'var(--text-color)',
-          }}
+          className="block text-sm font-medium text-[var(--text-color)]"
         >
           Description
         </label>
@@ -247,13 +202,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               {...field}
               id="description"
               rows={3}
-              style={{
-                width: '100%',
-                borderRadius: '6px',
-                border: `1px solid var(--neutral-color)`,
-                padding: '8px',
-                fontSize: '0.9rem',
-              }}
+              className="w-full p-2 text-sm rounded-md border border-[var(--neutral-color)]"
               placeholder="Task description"
             />
           )}
@@ -261,26 +210,12 @@ const TaskForm: React.FC<TaskFormProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div
-        style={{
-          gridColumn: '1 / -1',
-          display: 'flex',
-          gap: '16px',
-          justifyContent: 'center',
-          marginTop: '16px',
-        }}
-      >
+      <div className="col-span-full flex flex-col sm:flex-row gap-4 justify-center mt-4">
         <Button
           type="submit"
           label="Save"
           icon="pi pi-save"
-          style={{
-            backgroundColor: 'var(--primary-color)',
-            color: '#fff',
-            fontWeight: '600',
-            padding: '10px 24px',
-            borderRadius: '8px',
-          }}
+          className="bg-[var(--primary-color)] text-white font-semibold py-2 px-6 rounded-lg"
         />
         {isEditMode && (
           <>
@@ -288,25 +223,15 @@ const TaskForm: React.FC<TaskFormProps> = ({
               type="button"
               label="Undo"
               icon="pi pi-undo"
-              className="p-button-secondary"
+              className="p-button-secondary font-semibold py-2 px-6 rounded-lg"
               onClick={() => reset()}
-              style={{
-                fontWeight: '600',
-                padding: '10px 24px',
-                borderRadius: '8px',
-              }}
             />
             <Button
               type="button"
               label="Delete"
               icon="pi pi-trash"
-              className="p-button-danger"
+              className="p-button-danger font-semibold py-2 px-6 rounded-lg"
               onClick={() => setShowConfirm(true)}
-              style={{
-                fontWeight: '600',
-                padding: '10px 24px',
-                borderRadius: '8px',
-              }}
             />
           </>
         )}

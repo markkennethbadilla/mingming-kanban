@@ -90,168 +90,88 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '87vh',
-        backgroundColor: 'var(--background-color)',
-        padding: '20px',
-      }}
-    >
-      <Toast ref={toast} />
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          padding: '24px',
-          borderRadius: '12px',
-          backgroundColor: '#fff',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <h2
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textAlign: 'center',
-            color: 'var(--primary-color)',
-            marginBottom: '24px',
-          }}
-        >
-          Log In
-        </h2>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          style={{ display: 'grid', gap: '16px' }}
-        >
-          {/* Email Field */}
-          <div>
-            <label
-              htmlFor="email"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color)',
-                fontWeight: '500',
-              }}
-            >
-              Email
-            </label>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  id="email"
-                  type="email"
-                  {...field}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color)',
-                  }}
-                />
-              )}
+    <div className="flex flex-col min-h-[87vh] bg-[var(--background-color,#f4f4f4)]">
+      <div className="flex-grow"></div>
+      <div className="flex justify-center items-center">
+        <Toast ref={toast} />
+        <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-center text-[var(--primary-color,#007bff)] mb-4">
+            Log In
+          </h2>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            {/* Email Field */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block mb-2 text-lg text-[var(--text-color,#333)]"
+              >
+                Email
+              </label>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <InputText
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    {...field}
+                    className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                  />
+                )}
+              />
+            </div>
+            {/* Password Field */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block mb-2 text-lg text-[var(--text-color,#333)]"
+              >
+                Password
+              </label>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <Password
+                    id="password"
+                    placeholder="Enter your password"
+                    {...field}
+                    feedback={false} // Disable strength meter
+                    toggleMask // Show/hide toggle for password
+                    inputClassName="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                    className="w-full"
+                  />
+                )}
+              />
+            </div>
+            {/* Submit Button */}
+            <Button
+              label="Log In"
+              type="submit"
+              className={`w-full p-3 bg-[var(--primary-color,#007bff)] text-white border-none rounded-lg font-semibold text-lg ${
+                formState.isSubmitting ? 'cursor-not-allowed' : 'cursor-pointer'
+              }`}
             />
-          </div>
-          {/* Password Field */}
-          <div>
-            <label
-              htmlFor="password"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color)',
-                fontWeight: '500',
-              }}
+          </form>
+          {/* Forgot Password and No Account Links */}
+          <div className="mt-4 flex justify-between text-sm text-[var(--neutral-color,#666)]">
+            <a
+              href="/forgot-password"
+              className="text-[var(--primary-color,#007bff)] hover:underline"
             >
-              Password
-            </label>
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <Password
-                  id="password"
-                  {...field}
-                  feedback={false} // Disable strength meter
-                  toggleMask // Show/hide toggle for password
-                  inputStyle={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color)',
-                    boxShadow: 'none',
-                  }}
-                  style={{
-                    width: '100%',
-                  }}
-                />
-              )}
-            />
+              Forgot Password?
+            </a>
+            <a
+              href="/register"
+              className="text-[var(--primary-color,#007bff)] hover:underline"
+            >
+              Don’t have an account?
+            </a>
           </div>
-          {/* Submit Button */}
-          <Button
-            label="Log In"
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--primary-color)',
-              color: '#fff',
-              fontWeight: '600',
-              fontSize: '1rem',
-            }}
-          />
-        </form>
-        {/* Forgot Password and No Account Links */}
-        <div
-          style={{
-            marginTop: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: '0.9rem',
-            color: 'var(--neutral-color)',
-          }}
-        >
-          <a
-            href="/forgot-password"
-            style={{
-              color: 'var(--primary-color)',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.textDecoration = 'underline')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.textDecoration = 'none')
-            }
-          >
-            Forgot Password?
-          </a>
-          <a
-            href="/register"
-            style={{
-              color: 'var(--primary-color)',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.textDecoration = 'underline')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.textDecoration = 'none')
-            }
-          >
-            Don’t have an account?
-          </a>
         </div>
       </div>
+      <div className="flex-grow"></div>
     </div>
   );
 };

@@ -109,12 +109,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
       onMouseLeave={handleMouseLeave}
       style={{
         padding: isHovered ? '0px 12px 12px 12px' : '8px',
+        margin: '10px',
         borderRadius: '8px',
         boxShadow: isHovered
           ? '0 6px 12px rgba(0, 0, 0, 0.15)'
           : '0 1px 3px rgba(0, 0, 0, 0.1)',
         transition: 'box-shadow 0.3s, padding 0.2s',
-        marginBottom: '8px',
         cursor: 'default',
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isMissed
@@ -124,6 +124,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         position: 'relative',
         overflow: 'hidden',
         minHeight: isHovered ? 'auto' : '48px',
+        width: '93%', // Ensure the width fits the container
       }}
     >
       {isHovered && (
@@ -209,7 +210,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               style={{
                 fontSize: '0.7rem',
                 color: 'var(--neutral-color)',
-                marginBottom: '30px',
+                marginBottom: '10px',
                 fontStyle: 'italic',
               }}
             >

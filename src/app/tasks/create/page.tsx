@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TaskForm from '@/components/TaskForm';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
+import Loader from '@/components/Loader';
 
 const CreateTaskPage: React.FC = () => {
   const toast = useRef<Toast>(null);
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -24,6 +26,7 @@ const CreateTaskPage: React.FC = () => {
         });
 
         if (response.data.success) {
+          setLoading(false);
         } else {
           throw new Error('Failed to fetch user session.');
         }
@@ -131,57 +134,24 @@ const CreateTaskPage: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'var(--background-color)',
-        padding: '24px 0',
-        height: '87vh',
-      }}
-    >
+    <div className="flex items-center justify-center bg-[var(--background-color)] lg:h-[87vh]">
       {/* Toast for notifications */}
       <Toast ref={toast} />
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '800px',
-          backgroundColor: '#fff',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-        }}
-      >
+      <div className="w-full max-w-2xl bg-white rounded-lg p-6 shadow-md">
         <a
-          style={{
-            display: 'inline-block',
-            marginBottom: '16px',
-            fontSize: '0.875rem',
-            color: 'var(--primary-color)',
-            cursor: 'pointer',
-            textDecoration: 'none',
-          }}
+          className="inline-block text-sm text-[var(--primary-color)] cursor-pointer hover:underline"
           onClick={() => router.back()}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.textDecoration = 'underline')
-          }
-          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
         >
           &larr; Back
         </a>
 
         {/* Page Header */}
-        <h2
-          style={{
-            textAlign: 'center',
-            color: 'var(--primary-color)',
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            marginBottom: '32px',
-          }}
-        >
+        <h2 className="text-center text-[var(--primary-color)] text-2xl font-semibold">
           Create Task
         </h2>
 

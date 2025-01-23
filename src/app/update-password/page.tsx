@@ -129,50 +129,18 @@ const UpdatePasswordForm: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: 'var(--background-color, #f4f4f4)',
-      }}
-    >
+    <div className="flex items-center justify-center bg-[var(--background-color,#f4f4f4)] py-6 min-h-[87vh]">
       <Toast ref={toast} />
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          backgroundColor: '#fff',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <h2
-          style={{
-            textAlign: 'center',
-            color: 'var(--primary-color, #007bff)',
-            marginBottom: '16px',
-          }}
-        >
+      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-center text-2xl font-semibold text-[var(--primary-color,#007bff)] mb-4">
           Reset Your Password
         </h2>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          style={{ display: 'grid', gap: '16px' }}
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           {/* New Password Field */}
           <div>
             <label
               htmlFor="password"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color, #333)',
-                fontWeight: '500',
-              }}
+              className="block mb-2 text-lg text-[var(--text-color,#333)] font-medium"
             >
               New Password
             </label>
@@ -185,11 +153,7 @@ const UpdatePasswordForm: React.FC = () => {
                   {...field}
                   feedback={true}
                   toggleMask
-                  style={{
-                    width: '100%',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color, #ccc)',
-                  }}
+                  className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
                 />
               )}
             />
@@ -199,13 +163,7 @@ const UpdatePasswordForm: React.FC = () => {
           <div>
             <label
               htmlFor="confirmPassword"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color, #333)',
-                fontWeight: '500',
-              }}
+              className="block mb-2 text-lg text-[var(--text-color,#333)] font-medium"
             >
               Confirm New Password
             </label>
@@ -218,11 +176,7 @@ const UpdatePasswordForm: React.FC = () => {
                   {...field}
                   feedback={false}
                   toggleMask
-                  style={{
-                    width: '100%',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color, #ccc)',
-                  }}
+                  className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
                 />
               )}
             />
@@ -233,17 +187,7 @@ const UpdatePasswordForm: React.FC = () => {
             label={formState.isSubmitting ? 'Updating...' : 'Reset Password'}
             type="submit"
             disabled={formState.isSubmitting}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: 'var(--primary-color, #007bff)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: '600',
-              fontSize: '1rem',
-              cursor: formState.isSubmitting ? 'not-allowed' : 'pointer',
-            }}
+            className="w-full p-3 bg-[var(--primary-color,#007bff)] text-white border-none rounded-lg font-semibold text-lg"
           />
         </form>
       </div>

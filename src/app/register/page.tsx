@@ -101,184 +101,104 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '87vh',
-        backgroundColor: 'var(--background-color)',
-        padding: '20px',
-      }}
-    >
-      <Toast ref={toast} />
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          padding: '24px',
-          borderRadius: '12px',
-          backgroundColor: '#fff',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <h2
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textAlign: 'center',
-            color: 'var(--secondary-color)',
-            marginBottom: '24px',
-          }}
-        >
-          Sign Up
-        </h2>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          style={{ display: 'grid', gap: '16px' }}
-        >
-          {/* Username Field */}
-          <div>
-            <label
-              htmlFor="username"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color)',
-                fontWeight: '500',
-              }}
-            >
-              Username
-            </label>
-            <Controller
-              name="username"
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  id="username"
-                  {...field}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color)',
-                  }}
-                />
-              )}
+    <div className="flex flex-col min-h-[87vh] bg-[var(--background-color,#f4f4f4)]">
+      <div className="flex-grow"></div>
+      <div className="flex justify-center items-center">
+        <Toast ref={toast} />
+        <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-center text-2xl font-semibold text-[var(--secondary-color)] mb-4">
+            Sign Up
+          </h2>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            {/* Username Field */}
+            <div>
+              <label
+                htmlFor="username"
+                className="block mb-2 text-lg text-[var(--text-color)] font-medium"
+              >
+                Username
+              </label>
+              <Controller
+                name="username"
+                control={control}
+                render={({ field }) => (
+                  <InputText
+                    id="username"
+                    {...field}
+                    placeholder="Enter your username"
+                    className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                  />
+                )}
+              />
+            </div>
+
+            {/* Email Field */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block mb-2 text-lg text-[var(--text-color)] font-medium"
+              >
+                Email
+              </label>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <InputText
+                    id="email"
+                    type="email"
+                    {...field}
+                    placeholder="Enter your email"
+                    className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                  />
+                )}
+              />
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block mb-2 text-lg text-[var(--text-color)] font-medium"
+              >
+                Password
+              </label>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <Password
+                    id="password"
+                    {...field}
+                    placeholder="Enter your password"
+                    toggleMask
+                    feedback={true}
+                    inputClassName="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
+                  />
+                )}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <Button
+              label="Sign Up"
+              type="submit"
+              className="w-full p-3 rounded-lg bg-[var(--secondary-color)] text-white font-semibold text-lg"
             />
-          </div>
+          </form>
 
-          {/* Email Field */}
-          <div>
-            <label
-              htmlFor="email"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color)',
-                fontWeight: '500',
-              }}
+          {/* Already Have Account Links */}
+          <div className="mt-4 flex justify-center text-sm text-[var(--neutral-color,#666)]">
+            <a
+              href="/login"
+              className="text-[var(--primary-color,#007bff)] hover:underline"
             >
-              Email
-            </label>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <InputText
-                  id="email"
-                  type="email"
-                  {...field}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color)',
-                  }}
-                />
-              )}
-            />
+              Already have an account?
+            </a>
           </div>
-
-          {/* Password Field */}
-          <div>
-            <label
-              htmlFor="password"
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '1rem',
-                color: 'var(--text-color)',
-                fontWeight: '500',
-              }}
-            >
-              Password
-            </label>
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <Password
-                  id="password"
-                  {...field}
-                  toggleMask
-                  feedback={true}
-                  inputStyle={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--neutral-color)',
-                  }}
-                />
-              )}
-            />
-          </div>
-
-          {/* Submit Button */}
-          <Button
-            label="Sign Up"
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--secondary-color)',
-              color: '#fff',
-              fontWeight: '600',
-              fontSize: '1rem',
-            }}
-          />
-        </form>
-
-        {/* Already Have Account Links */}
-        <div
-          style={{
-            marginTop: '16px',
-            display: 'flex',
-            justifyContent: 'center',
-            fontSize: '0.9rem',
-            color: 'var(--neutral-color)',
-          }}
-        >
-          <a
-            href="/login"
-            style={{
-              color: 'var(--primary-color)',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.textDecoration = 'underline')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.textDecoration = 'none')
-            }
-          >
-            Already have an account?
-          </a>
         </div>
       </div>
+      <div className="flex-grow"></div>
     </div>
   );
 };
