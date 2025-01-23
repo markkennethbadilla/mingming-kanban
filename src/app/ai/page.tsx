@@ -20,21 +20,34 @@ const ChatPage = () => {
   const [isValidSession, setIsValidSession] = useState(false);
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const authToken = localStorage.getItem('authToken');
 
   useEffect(() => {
-    const storedMessages = localStorage.getItem(`chatMessages_${authToken}`);
-    if (storedMessages) setMessages(JSON.parse(storedMessages));
-  }, [authToken]);
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      const storedMessages = localStorage.getItem(`chatMessages_${authToken}`);
+      if (storedMessages) setMessages(JSON.parse(storedMessages));
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem(`chatMessages_${authToken}`, JSON.stringify(messages));
-    scrollToBottom();
-  }, [messages, authToken]);
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      localStorage.setItem(
+        `chatMessages_${authToken}`,
+        JSON.stringify(messages)
+      );
+      scrollToBottom();
+    }
+  }, [messages]);
 
   useEffect(() => {
     const validateSession = async () => {
       try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+          router.push('/');
+          return;
+        }
         const response = await fetch('/api/session', {
           method: 'GET',
           headers: {
@@ -53,7 +66,7 @@ const ChatPage = () => {
       }
     };
     validateSession();
-  }, [router, authToken]);
+  }, [router]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -99,7 +112,10 @@ const ChatPage = () => {
 
   const clearChat = () => {
     setMessages([]);
-    localStorage.removeItem(`chatMessages_${authToken}`);
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      localStorage.removeItem(`chatMessages_${authToken}`);
+    }
   };
 
   const handleTaskDelete = (taskId: number) => {
@@ -139,7 +155,6 @@ const ChatPage = () => {
   if (!isValidSession) {
     return <Loader />;
   }
-
   return (
     <DndProvider backend={HTML5Backend}>
       <ToastProvider>
