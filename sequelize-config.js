@@ -1,21 +1,33 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
-const config = require('./sequelize-config.json');
+require('dotenv').config();
+
+// Safe import that won't crash if file doesn't exist
+let config = {};
+try {
+  config = require('./sequelize-config.json');
+} catch (error) {
+  console.log('sequelize-config.json not found, using default config');
+}
 
 module.exports = {
   development: {
-    username: config.development.username,
-    password: config.development.password,
-    database: config.development.database,
-    host: config.development.host,
-    dialect: config.development.dialect,
-    port: parseInt(config.development.port, 10),
-    dialectOptions: {
-      ssl: {
-        require: true,
-        ca: fs.readFileSync(path.resolve(__dirname, 'ca.pem')).toString(),
-      },
-    },
+    dialect: 'sqlite',
+    storage:
+      process.env.DB_STORAGE || path.resolve(__dirname, 'database.sqlite'),
+    logging: false,
   },
-  // Add other environments if needed
+  test: {
+    dialect: 'sqlite',
+    storage: ':memory:',
+    logging: false,
+  },
+  production: {
+    dialect: 'sqlite',
+    storage:
+      process.env.DB_STORAGE || path.resolve(__dirname, 'database.sqlite'),
+    logging: false,
+  },
 };

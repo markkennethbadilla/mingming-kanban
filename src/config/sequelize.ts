@@ -1,29 +1,15 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
-// Load the TLS certificate if available
-const sslOptions = process.env.DB_SSL
-  ? {
-      require: true,
-      ca: process.env.DB_SSL_CERT,
-    }
-  : undefined;
-
-const sequelize = new Sequelize(
-  process.env.DB_DATABASE as string,
-  process.env.DB_USERNAME as string,
-  process.env.DB_PASSWORD as string,
-  {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    dialect: 'postgres',
-    dialectModule: (await import('pg')).default,
-    dialectOptions: {
-      ssl: sslOptions,
-    },
-  }
-);
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage:
+    process.env.DB_STORAGE ||
+    path.join(__dirname, '..', '..', 'database.sqlite'),
+  logging: false, // Set to console.log to see SQL queries
+});
 
 export default sequelize;
