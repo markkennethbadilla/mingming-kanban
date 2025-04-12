@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build && npx sequelize-cli db:migrate",
-    "start": "next start",
+    "build": "next build",
+    "start": "next start && npx sequelize-cli db:migrate",
     "lint": "next lint",
     "clean": "rimraf .next",
     "format": "prettier --write .",
