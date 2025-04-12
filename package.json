@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && npx sequelize-cli db:migrate",
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf .next",
     "format": "prettier --write .",
-    "postinstall": "npm install pg"
+    "postinstall": "npm install pg",
+    "migrate": "npx sequelize-cli db:migrate"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
