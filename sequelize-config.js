@@ -4,6 +4,12 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+// Ensure data directory exists
+const dataDir = path.resolve(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
 // Safe import that won't crash if file doesn't exist
 let config = {};
 try {
@@ -15,8 +21,7 @@ try {
 module.exports = {
   development: {
     dialect: 'sqlite',
-    storage:
-      process.env.DB_STORAGE || path.resolve(__dirname, 'database.sqlite'),
+    storage: process.env.DB_STORAGE || path.resolve(dataDir, 'database.sqlite'),
     logging: false,
   },
   test: {
@@ -26,8 +31,7 @@ module.exports = {
   },
   production: {
     dialect: 'sqlite',
-    storage:
-      process.env.DB_STORAGE || path.resolve(__dirname, 'database.sqlite'),
+    storage: process.env.DB_STORAGE || path.resolve(dataDir, 'database.sqlite'),
     logging: false,
   },
 };
