@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start && npx sequelize-cli db:migrate",
+    "start": "npx sequelize-cli db:migrate && next start ",
     "lint": "next lint",
     "clean": "rimraf .next",
     "format": "prettier --write .",
