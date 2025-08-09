@@ -1,15 +1,5 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
 class Task extends Model {
-  public id!: number;
-  public title!: string;
-  public description!: string | null;
-  public dueDate!: Date;
-  public priority!: 'LOW' | 'MEDIUM' | 'HIGH';
-  public status!: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
-  public userId!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-
   static initModel(sequelize: Sequelize): void {
     Task.init(
       {

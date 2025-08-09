@@ -14,4 +14,14 @@ const sequelize = new Sequelize(
   }
 );
 
+// Add this block to sync models with the database
+sequelize
+  .sync()
+  .then(() => {
+    console.log('Database & tables synced');
+  })
+  .catch((err) => {
+    console.error('Failed to sync database:', err);
+  });
+
 export default sequelize;
