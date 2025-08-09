@@ -1,17 +1,26 @@
 {
   "development": {
-    "dialect": "sqlite",
-    "storage": "./database.sqlite",
+    "dialect": "mysql",
+    "host": "localhost",
+    "username": "root",
+    "password": "",
+    "database": "ai_task_manager_dev",
     "logging": false
   },
   "test": {
-    "dialect": "sqlite",
-    "storage": ":memory:",
+    "dialect": "mysql",
+    "host": "localhost",
+    "username": "root",
+    "password": "",
+    "database": "ai_task_manager_test",
     "logging": false
   },
   "production": {
-    "dialect": "sqlite",
-    "storage": "/data/database.sqlite",
+    "dialect": "mysql",
+    "host": "localhost",
+    "username": "root",
+    "password": "",
+    "database": "ai_task_manager_prod",
     "logging": false
   }
 }

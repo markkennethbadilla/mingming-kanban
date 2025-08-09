@@ -1,34 +1,31 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const fs = require('fs');
-const path = require('path');
 require('dotenv').config();
 
 const appEnv = process.env.APP_ENV || 'development';
 
-const dataDir = path.join(__dirname, 'data');
-if (appEnv !== 'production' && !fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-const dbStorage =
-  process.env.DB_STORAGE || path.join(dataDir, 'database.sqlite');
-
 const config = {
   development: {
-    dialect: 'sqlite',
-    storage: dbStorage,
+    dialect: 'mysql',
+    host: process.env.DB_HOST || 'localhost',
+    username: process.env.DB_USERNAME || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'ai_task_manager_dev',
     logging: false,
   },
   test: {
-    dialect: 'sqlite',
-    storage: ':memory:',
+    dialect: 'mysql',
+    host: process.env.DB_HOST || 'localhost',
+    username: process.env.DB_USERNAME || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'ai_task_manager_test',
     logging: false,
   },
   production: {
-    dialect: process.env.DB_DIALECT || 'mysql',
-    host: process.env.DB_HOST,
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    dialect: 'mysql',
+    host: process.env.DB_HOST || 'localhost',
+    username: process.env.DB_USERNAME || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'ai_task_manager_prod',
     logging: false,
   },
 };
