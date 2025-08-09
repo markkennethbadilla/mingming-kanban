@@ -1,9 +1,9 @@
 {
   "development": {
     "dialect": "mysql",
-    "host": "localhost",
-    "username": "root",
-    "password": "",
+    "host": "13.215.254.2",
+    "username": "iammkb2002",
+    "password": "mkb02468",
     "database": "ai_task_manager_dev",
     "logging": false
   },
