@@ -3,23 +3,16 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-// Determine environment
-const isProduction = process.env.NODE_ENV === 'production';
+const appEnv = process.env.APP_ENV || 'development';
 
-// For production (Railway), use absolute /data path
-// For development, use local path within project
-const dataDir = isProduction ? '/data' : path.join(__dirname, 'data');
-
-// Ensure data directory exists (only for local development)
-if (!isProduction && !fs.existsSync(dataDir)) {
+const dataDir = path.join(__dirname, 'data');
+if (appEnv !== 'production' && !fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
-
-// DB storage path based on environment
 const dbStorage =
   process.env.DB_STORAGE || path.join(dataDir, 'database.sqlite');
 
-module.exports = {
+const config = {
   development: {
     dialect: 'sqlite',
     storage: dbStorage,
@@ -31,8 +24,13 @@ module.exports = {
     logging: false,
   },
   production: {
-    dialect: 'sqlite',
-    storage: dbStorage,
+    dialect: process.env.DB_DIALECT || 'mysql',
+    host: process.env.DB_HOST,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     logging: false,
   },
 };
+
+module.exports = config[appEnv];

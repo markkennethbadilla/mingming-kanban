@@ -5,27 +5,34 @@ import fs from 'fs';
 
 dotenv.config();
 
-// Determine environment
-const isProduction = process.env.NODE_ENV === 'production';
+const appEnv = process.env.APP_ENV || 'development';
 
-// For production (Railway), use absolute /data path
-// For development, use local path within project
-const dataDir = isProduction
-  ? '/data'
-  : path.join(__dirname, '..', '..', 'data');
+let sequelize: Sequelize;
 
-// Ensure data directory exists (only for local development)
-if (!isProduction && !fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+if (appEnv === 'production') {
+  sequelize = new Sequelize(
+    process.env.DB_NAME as string,
+    process.env.DB_USERNAME as string,
+    process.env.DB_PASSWORD as string,
+    {
+      host: process.env.DB_HOST,
+      dialect: process.env.DB_DIALECT as any,
+      logging: false,
+    }
+  );
+} else {
+  // Development: SQLite
+  const dataDir = path.join(__dirname, '..', '..', 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  const dbStorage =
+    process.env.DB_STORAGE || path.join(dataDir, 'database.sqlite');
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: dbStorage,
+    logging: false,
+  });
 }
-
-const dbStorage =
-  process.env.DB_STORAGE || path.join(dataDir, 'database.sqlite');
-
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: dbStorage,
-  logging: false, // Set to console.log to see SQL queries
-});
 
 export default sequelize;
