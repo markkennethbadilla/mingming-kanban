@@ -10,6 +10,8 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: 'mysql',
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    dialectModule: require('mysql2'),
     logging: false,
   }
 );
