@@ -9,7 +9,6 @@
     "lint": "next lint",
     "clean": "rimraf .next",
     "format": "prettier --write .",
-    "postinstall": "npm install pg",
     "migrate": "npx sequelize-cli db:migrate"
   },
   "dependencies": {
