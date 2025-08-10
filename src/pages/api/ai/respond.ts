@@ -120,8 +120,14 @@ export default async function handler(
 
       if (intent === 'CREATE_TASK') {
         const createdTasks = [];
+        const seen = new Set();
         for (const task of payload.tasks) {
           const { title, description, dueDate, priority, status } = task;
+
+          // Create a unique key for the task to prevent duplicates
+          const uniqueKey = `${title}|${description}|${dueDate}|${userId}`;
+          if (seen.has(uniqueKey)) continue;
+          seen.add(uniqueKey);
 
           if (!title || !description || !dueDate || !priority || !status) {
             throw new Error(
@@ -160,28 +166,38 @@ export default async function handler(
           tasks: payload.tasks,
         });
       } else if (intent === 'UPDATE_TASK') {
-        const { id, fieldsToUpdate } = payload;
+        // Support single or multiple IDs, deduplicate
+        const ids = Array.isArray(payload.id) ? payload.id : [payload.id];
+        const uniqueIds = [...new Set(ids)];
+        const { fieldsToUpdate } = payload;
 
-        if (!id || !fieldsToUpdate) {
+        if (!uniqueIds.length || !fieldsToUpdate) {
           throw new Error(
             'Missing required fields for UPDATE_TASK in the AI response.'
           );
         }
 
-        const existingTask = await Task.findOne({ where: { id, userId } });
+        let updatedAny = false;
+        for (const id of uniqueIds) {
+          const existingTask = await Task.findOne({ where: { id, userId } });
 
-        if (!existingTask) {
-          return res.status(404).json({
-            success: false,
-            message: `Task with ID ${id} not found.`,
-          });
+          if (!existingTask) {
+            continue;
+          }
+
+          const changes = Object.entries(fieldsToUpdate).filter(
+            ([key, value]) => existingTask[key] !== value
+          );
+
+          if (changes.length === 0) {
+            continue;
+          }
+
+          await Task.update(fieldsToUpdate, { where: { id } });
+          updatedAny = true;
         }
 
-        const changes = Object.entries(fieldsToUpdate).filter(
-          ([key, value]) => existingTask[key] !== value
-        );
-
-        if (changes.length === 0) {
+        if (!updatedAny) {
           return res.status(200).json({
             success: true,
             message: 'No changes detected in the update request.',
@@ -189,20 +205,20 @@ export default async function handler(
           });
         }
 
-        await Task.update(fieldsToUpdate, { where: { id } });
-
         return res.status(200).json({
           success: true,
           message: payload.message,
           tasks: payload.tasks,
         });
       } else if (intent === 'DELETE_TASK') {
+        // Support single or multiple IDs, deduplicate
         const idsToDelete = Array.isArray(payload.id)
           ? payload.id
           : [payload.id];
+        const uniqueIdsToDelete = [...new Set(idsToDelete)];
 
         const deletedCount = await Task.destroy({
-          where: { id: idsToDelete, userId },
+          where: { id: uniqueIdsToDelete, userId },
         });
 
         if (deletedCount === 0) {
