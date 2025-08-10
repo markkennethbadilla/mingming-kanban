@@ -67,29 +67,42 @@ const Navbar: React.FC = () => {
 
   return (
     <nav
-      className="w-full flex flex-wrap items-center px-2 sm:px-8 py-2 bg-white shadow-sm"
+      id="navbar-root"
+      className="w-full flex items-center px-2 sm:px-8 py-2 bg-white shadow-sm"
       style={{ zIndex: 10 }}
     >
       {/* Logo and Title Section */}
       <div
+        id="navbar-logo-title"
         onClick={() => router.push(isLoggedIn ? '/dashboard' : '/')}
-        className="flex items-center gap-2 cursor-pointer min-w-0 flex flex-row flex-grow"
+        className="flex items-center gap-2 cursor-pointer"
+        style={{ minWidth: 0, maxWidth: '350px', flexShrink: 0 }}
       >
         <Image
+          id="navbar-logo"
           src="/logo.svg"
           alt="Logo"
           width={40}
           height={40}
           style={{ borderRadius: '8px' }}
         />
-        <span className="font-bold text-[var(--primary-color)] min-w-0 flex-grow break-words whitespace-normal text-base sm:text-lg md:text-xl">
+        <span
+          id="navbar-title"
+          className="font-bold text-[var(--primary-color)] min-w-0 break-words whitespace-normal text-base sm:text-lg md:text-xl"
+          style={{ flexGrow: 1 }}
+        >
           Mingming Task Manager
         </span>
       </div>
 
       {/* Menubar Items */}
-      <div className="flex-1 flex flex-wrap justify-end items-center min-w-0">
+      <div
+        id="navbar-menubar-container"
+        className="flex flex-1 flex-wrap justify-end items-center min-w-0"
+        style={{ marginLeft: '32px' }}
+      >
         <Menubar
+          id="navbar-menubar"
           model={items}
           className="w-full sm:w-auto"
           style={{

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
@@ -18,6 +18,7 @@ const ChatPage = () => {
   const [input, setInput] = useState('');
   const [userId, setUserId] = useState<number | null>(null);
   const [isValidSession, setIsValidSession] = useState(false);
+  const [navbarHeight, setNavbarHeight] = useState(64); // default fallback
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -67,6 +68,20 @@ const ChatPage = () => {
     };
     validateSession();
   }, [router]);
+
+  useLayoutEffect(() => {
+    const navbar = document.getElementById('navbar-root');
+    if (navbar) {
+      setNavbarHeight(navbar.offsetHeight);
+    }
+    // Listen for resize events to update height dynamically
+    const handleResize = () => {
+      const navbar = document.getElementById('navbar-root');
+      if (navbar) setNavbarHeight(navbar.offsetHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -159,37 +174,55 @@ const ChatPage = () => {
     <DndProvider backend={HTML5Backend}>
       <ToastProvider>
         <div
-          className="flex justify-center items-center min-h-[87vh] bg-cover bg-center bg-no-repeat w-full"
+          id="ai-chat-bg"
+          className="flex justify-center items-center bg-cover bg-center bg-no-repeat w-full"
           style={{
             backgroundImage: "url('/background-image.png')",
+            minHeight: `calc(98vh - ${navbarHeight}px)`,
+            height: `calc(98vh - ${navbarHeight}px)`,
           }}
         >
           <div
+            id="ai-chat-container"
             className="w-full max-w-xs sm:max-w-4xl mx-auto p-1 sm:p-2"
             style={{
               backgroundColor: 'var(--card-background)',
               borderRadius: '0.5rem',
               display: 'flex',
               flexDirection: 'column',
-              height: '100%',
-              maxHeight: '87vh',
+              height: '90%',
+              maxHeight: '90%',
+              overflow: 'hidden',
             }}
           >
-            <div className="text-center mb-1 sm:mb-2">
-              <h1
-                className="text-xl sm:text-3xl font-bold"
-                style={{ color: 'var(--text-color)' }}
-              >
-                Chat with Mingming
-              </h1>
+            <div
+              id="ai-chat-header"
+              className="text-center"
+              style={{
+                margin: 0,
+                padding: 0,
+                height: '30px', // or use minHeight: '20px'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <p
+                id="ai-chat-subtitle"
                 className="text-xs sm:text-base"
-                style={{ color: 'var(--neutral-color)' }}
+                style={{
+                  color: 'var(--neutral-color)',
+                  margin: 0,
+                  padding: 0,
+                  fontSize: '0.85rem', // smaller font
+                  lineHeight: '1.1', // tighter line height
+                }}
               >
                 Mingming is your AI assistant for task management
               </p>
             </div>
             <div
+              id="ai-chat-main"
               className="flex flex-col flex-1 border"
               style={{
                 borderColor: 'var(--neutral-color)',
@@ -198,9 +231,12 @@ const ChatPage = () => {
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column-reverse',
+                height: '100%',
+                maxHeight: '100%',
               }}
             >
               <div
+                id="ai-chat-input-bar"
                 className="p-1 sm:p-2 border-t"
                 style={{
                   borderColor: 'var(--neutral-color)',
@@ -209,6 +245,7 @@ const ChatPage = () => {
               >
                 <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <InputTextarea
+                    id="ai-chat-input"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     rows={2}
@@ -221,8 +258,12 @@ const ChatPage = () => {
                       minWidth: 0,
                     }}
                   />
-                  <div className="flex flex-row gap-1 sm:gap-2 w-full sm:w-auto">
+                  <div
+                    id="ai-chat-buttons"
+                    className="flex flex-row gap-1 sm:gap-2 w-full sm:w-auto"
+                  >
                     <Button
+                      id="ai-chat-send-btn"
                       label="Send"
                       icon="pi pi-send"
                       onClick={sendMessage}
@@ -233,6 +274,7 @@ const ChatPage = () => {
                       }}
                     />
                     <Button
+                      id="ai-chat-clear-btn"
                       label="Clear"
                       icon="pi pi-trash"
                       onClick={clearChat}
@@ -245,16 +287,24 @@ const ChatPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-1 sm:p-2 space-y-2">
+              <div
+                id="ai-chat-messages"
+                className="flex-1 overflow-y-auto p-1 sm:p-2 space-y-2"
+                style={{
+                  maxHeight: `calc(100vh - ${navbarHeight}px - 80px)`, // 80px for header/input bar
+                  minHeight: 0,
+                }}
+              >
                 {messages.map((msg, i) => (
                   <div
                     key={i}
+                    id={`ai-chat-msg-${i}`}
                     className={`flex items-start space-x-2 ${
                       msg.type === 'user' ? 'justify-end' : 'justify-start'
                     }`}
                   >
                     {msg.type === 'ai' && (
-                      <div>
+                      <div id={`ai-chat-msg-ai-avatar-${i}`}>
                         <Image
                           src="/logo.svg"
                           alt="AI"
@@ -265,6 +315,7 @@ const ChatPage = () => {
                       </div>
                     )}
                     <div
+                      id={`ai-chat-msg-bubble-${i}`}
                       className={`rounded-lg p-2 text-xs sm:text-base ${
                         msg.type === 'user' ? 'self-end' : 'self-start'
                       }`}
@@ -276,13 +327,20 @@ const ChatPage = () => {
                         color: 'white',
                         maxWidth: '90vw',
                         wordBreak: 'break-word',
+                        maxHeight: `calc(100vh - ${navbarHeight}px - 120px)`, // card max height
+                        overflowY: 'auto',
                       }}
                     >
                       {msg.text}
                       {msg.tasks && (
                         <div
+                          id={`ai-chat-msg-tasks-${i}`}
                           className="grid grid-cols-1 sm:grid-cols-2 mt-2 gap-2"
-                          style={{ backgroundColor: 'white' }}
+                          style={{
+                            backgroundColor: 'white',
+                            maxHeight: `calc(100vh - ${navbarHeight}px - 160px)`,
+                            overflowY: 'auto',
+                          }}
                         >
                           {msg.tasks.map((task) => (
                             <div key={task.id} className="flex flex-col">
@@ -305,7 +363,7 @@ const ChatPage = () => {
                     </div>
                   </div>
                 ))}
-                <div ref={messagesEndRef} />
+                <div id="ai-chat-end" ref={messagesEndRef} />
               </div>
             </div>
           </div>
