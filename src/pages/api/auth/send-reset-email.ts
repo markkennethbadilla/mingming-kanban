@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 
     // Send email
     await transporter.sendMail({
-      from: `"Mingming Task Manager" <${process.env.GMAIL_USER}>`,
+      from: `"Mingming Kanban" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: 'Password Reset',
       html: `

@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
           className="font-bold text-[var(--primary-color)] min-w-0 break-words whitespace-normal text-base sm:text-lg md:text-xl"
           style={{ flexGrow: 1 }}
         >
-          Mingming Task Manager
+          Mingming Kanban
         </span>
       </div>
 

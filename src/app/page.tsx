@@ -66,7 +66,7 @@ const LandingPage = () => {
           Discover Your Productivity
         </h1>
         <p className="text-xs sm:text-sm md:text-base text-[var(--text-color)] mb-1 leading-relaxed">
-          Welcome to <strong>Mingming Task Manager</strong>, your personal
+          Welcome to <strong>Mingming Kanban</strong>, your personal
           companion for staying organized and motivated. Break down your goals
           into manageable tasks, and let us help you achieve greatness.
         </p>
