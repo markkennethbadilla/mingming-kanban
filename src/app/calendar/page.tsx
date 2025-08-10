@@ -223,46 +223,50 @@ const CalendarPage: React.FC = () => {
               />
             </div>
 
-            {/* Task List Container */}
-            <div className="flex flex-col bg-white rounded-lg shadow p-4 w-full lg:w-96 lg:h-[75vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <Button
-                  icon="pi pi-chevron-left"
-                  className="p-button-text"
-                  onClick={() => handleDateChange(-1)}
-                />
-                <h2 className="text-xl font-semibold text-center">
-                  {normalizeToLocalMidnight(selectedDate).toLocaleDateString(
-                    'en-US',
-                    {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    }
+            {/* Task List Section */}
+            <div className="w-full lg:w-96">
+              <div className="bg-white rounded-lg shadow p-4">
+                {/* Date and Arrows at the top */}
+                <div className="flex justify-between items-center mb-4">
+                  <Button
+                    icon="pi pi-chevron-left"
+                    className="p-button-text"
+                    onClick={() => handleDateChange(-1)}
+                  />
+                  <h2 className="text-xl font-semibold text-center">
+                    {normalizeToLocalMidnight(selectedDate).toLocaleDateString(
+                      'en-US',
+                      {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      }
+                    )}
+                  </h2>
+                  <Button
+                    icon="pi pi-chevron-right"
+                    className="p-button-text"
+                    onClick={() => handleDateChange(1)}
+                  />
+                </div>
+                {/* Task List */}
+                <div className="flex flex-col">
+                  {tasksForSelectedDate && tasksForSelectedDate.length > 0 ? (
+                    tasksForSelectedDate.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        {...task}
+                        onDelete={handleTaskDelete}
+                        onStatusChange={handleStatusChange}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic text-center">
+                      No tasks for this date.
+                    </p>
                   )}
-                </h2>
-                <Button
-                  icon="pi pi-chevron-right"
-                  className="p-button-text"
-                  onClick={() => handleDateChange(1)}
-                />
-              </div>
-              <div className="flex flex-col">
-                {tasksForSelectedDate && tasksForSelectedDate.length > 0 ? (
-                  tasksForSelectedDate.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      {...task}
-                      onDelete={handleTaskDelete}
-                      onStatusChange={handleStatusChange}
-                    />
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic text-center">
-                    No tasks for this date.
-                  </p>
-                )}
+                </div>
               </div>
             </div>
           </div>

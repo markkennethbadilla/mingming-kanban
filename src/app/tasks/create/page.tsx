@@ -139,7 +139,7 @@ const CreateTaskPage: React.FC = () => {
   }
 
   return (
-    <div className="flex items-center justify-center bg-[var(--background-color)] lg:h-[87vh]">
+    <div className="flex items-center justify-center bg-[var(--background-color)]">
       {/* Toast for notifications */}
       <Toast ref={toast} />
       <div className="w-full max-w-2xl bg-white rounded-lg p-6 shadow-md">
