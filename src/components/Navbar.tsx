@@ -66,49 +66,42 @@ const Navbar: React.FC = () => {
       ];
 
   return (
-    <div
-      style={{ padding: '0.5rem 2rem', display: 'flex', alignItems: 'center' }}
+    <nav
+      className="w-full flex flex-wrap items-center px-2 sm:px-8 py-2 bg-white shadow-sm"
+      style={{ zIndex: 10 }}
     >
       {/* Logo and Title Section */}
       <div
         onClick={() => router.push(isLoggedIn ? '/dashboard' : '/')}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          cursor: 'pointer',
-          flex: '1',
-        }}
+        className="flex items-center gap-2 cursor-pointer min-w-0 flex flex-row flex-grow"
       >
         <Image
-          src="/logo.svg" // Replace with the path to your logo
+          src="/logo.svg"
           alt="Logo"
           width={40}
           height={40}
           style={{ borderRadius: '8px' }}
         />
-        <span
-          style={{
-            fontSize: '1.25rem',
-            fontWeight: 'bold',
-            color: 'var(--primary-color)',
-          }}
-        >
+        <span className="font-bold text-[var(--primary-color)] min-w-0 flex-grow break-words whitespace-normal text-base sm:text-lg md:text-xl">
           Mingming Task Manager
         </span>
       </div>
 
       {/* Menubar Items */}
-      <Menubar
-        model={items}
-        style={{
-          background: 'transparent',
-          border: 'none',
-          flex: '2',
-          justifyContent: 'flex-end',
-        }}
-      />
-    </div>
+      <div className="flex-1 flex flex-wrap justify-end items-center min-w-0">
+        <Menubar
+          model={items}
+          className="w-full sm:w-auto"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            minWidth: 0,
+          }}
+        />
+      </div>
+    </nav>
   );
 };
 

@@ -1,75 +1,77 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Button } from 'primereact/button';
+import { cookies } from 'next/headers';
 
-const LandingPage: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+async function getSessionStatus() {
+  // Try to get the auth token from cookies
+  const cookieStore = await cookies();
+  const token = cookieStore.get('authToken')?.value;
+  if (!token) return false;
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        if (!token) return; // No token, user needs to log in
+  // Optionally, validate token with your API
+  try {
+    const res = await fetch(`${process.env.URL || ''}/api/session`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.success;
+  } catch {
+    return false;
+  }
+}
 
-        const response = await fetch('/api/session', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          setIsLoggedIn(true); // Show the dashboard button if session is valid
-        }
-      } catch {
-        localStorage.removeItem('authToken');
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkSession();
-  }, []);
+export default async function LandingPage() {
+  const isLoggedIn = await getSessionStatus();
 
   return (
     <div
-      className="flex items-center justify-center min-h-[87vh] bg-[var(--background-color)] bg-cover bg-center bg-no-repeat text-center p-5"
+      className="min-h-screen flex items-center justify-center bg-[var(--background-color)] bg-cover bg-center bg-no-repeat text-center p-2"
       style={{ backgroundImage: "url('/background-image.png')" }}
     >
-      <div className="max-w-lg p-8 bg-white bg-opacity-90 rounded-lg shadow-lg w-full mt-16 sm:mt-0">
-        <h1 className="text-4xl font-extrabold text-[var(--primary-color)] mb-4">
+      <div
+        className="container mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md p-2 sm:p-4 md:p-6 bg-white bg-opacity-90 rounded-lg shadow-lg mt-2 sm:mt-8 md:mt-16 flex flex-col gap-2 sm:gap-4 md:gap-6 overflow-y-auto h-full"
+        style={{ maxHeight: '95vh' }}
+      >
+        <h1 className="text-base sm:text-lg md:text-2xl font-extrabold text-[var(--primary-color)] mb-1 sm:mb-2 md:mb-4">
           Discover Your Productivity
         </h1>
-        <p className="text-lg text-[var(--text-color)] mb-8 leading-relaxed">
+        <p className="text-xs sm:text-sm md:text-base text-[var(--text-color)] mb-1 sm:mb-2 md:mb-4 leading-relaxed">
           Welcome to <strong>Mingming Task Manager</strong>, your personal
           companion for staying organized and motivated. Break down your goals
           into manageable tasks, and let us help you achieve greatness.
         </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4 flex-wrap mb-8">
+        <div className="flex flex-col sm:flex-row justify-center gap-1 sm:gap-2 md:gap-4 flex-wrap mb-1 sm:mb-2 md:mb-4 w-full">
           {isLoggedIn ? (
-            <Button
-              label="Go to Dashboard"
-              className="p-3 rounded-lg bg-[var(--primary-color)] text-white font-bold text-lg w-full sm:w-auto"
-              onClick={() => (window.location.href = '/dashboard')}
-            />
+            <form action="/dashboard" method="get" className="w-full">
+              <Button
+                label="Go to Dashboard"
+                className="p-2 sm:p-3 md:p-4 rounded-lg bg-[var(--primary-color)] text-white font-bold text-xs sm:text-sm md:text-lg w-full"
+                type="submit"
+              />
+            </form>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
-              <Button
-                label="Log In"
-                className="p-3 rounded-lg bg-[var(--primary-color)] text-white font-bold text-lg w-full sm:w-1/2"
-                onClick={() => (window.location.href = '/login')}
-              />
-              <Button
-                label="Sign Up"
-                className="p-3 rounded-lg bg-[var(--secondary-color)] text-white font-bold text-lg w-full sm:w-1/2"
-                onClick={() => (window.location.href = '/register')}
-              />
+            <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 md:gap-4 w-full">
+              <form action="/login" method="get" className="w-full sm:w-1/2">
+                <Button
+                  label="Log In"
+                  className="p-2 sm:p-3 md:p-4 rounded-lg bg-[var(--primary-color)] text-white font-bold text-xs sm:text-sm md:text-lg w-full"
+                  type="submit"
+                />
+              </form>
+              <form action="/register" method="get" className="w-full sm:w-1/2">
+                <Button
+                  label="Sign Up"
+                  className="p-2 sm:p-3 md:p-4 rounded-lg bg-[var(--secondary-color)] text-white font-bold text-xs sm:text-sm md:text-lg w-full"
+                  type="submit"
+                />
+              </form>
             </div>
           )}
         </div>
       </div>
     </div>
   );
-};
-
-export default LandingPage;
+}

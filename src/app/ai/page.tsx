@@ -159,37 +159,33 @@ const ChatPage = () => {
     <DndProvider backend={HTML5Backend}>
       <ToastProvider>
         <div
+          className="flex justify-center items-center min-h-[87vh] bg-cover bg-center bg-no-repeat w-full"
           style={{
-            paddingTop: '2rem',
-            paddingBottom: '2rem',
-            height: '87vh',
             backgroundImage: "url('/background-image.png')",
-            backgroundSize: 'cover',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
           }}
         >
           <div
-            className="max-w-4xl mx-auto p-2"
+            className="w-full max-w-xs sm:max-w-4xl mx-auto p-1 sm:p-2"
             style={{
               backgroundColor: 'var(--card-background)',
               borderRadius: '0.5rem',
               display: 'flex',
               flexDirection: 'column',
               height: '100%',
-              width: '100%',
               maxHeight: '87vh',
             }}
           >
-            <div className="text-center mb-2">
+            <div className="text-center mb-1 sm:mb-2">
               <h1
-                className="text-3xl font-bold"
+                className="text-xl sm:text-3xl font-bold"
                 style={{ color: 'var(--text-color)' }}
               >
                 Chat with Mingming
               </h1>
-              <p style={{ color: 'var(--neutral-color)' }}>
+              <p
+                className="text-xs sm:text-base"
+                style={{ color: 'var(--neutral-color)' }}
+              >
                 Mingming is your AI assistant for task management
               </p>
             </div>
@@ -205,103 +201,112 @@ const ChatPage = () => {
               }}
             >
               <div
-                className="p-2 border-t"
+                className="p-1 sm:p-2 border-t"
                 style={{
                   borderColor: 'var(--neutral-color)',
                   backgroundColor: 'var(--card-background)',
                 }}
               >
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <InputTextarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     rows={2}
                     placeholder="Type your message..."
                     onKeyDown={handleKeyPress}
-                    className="flex-1 border rounded-md p-2"
+                    className="flex-1 border rounded-md p-2 text-xs sm:text-base"
                     style={{
                       borderColor: 'var(--neutral-color)',
                       color: 'var(--text-color)',
+                      minWidth: 0,
                     }}
                   />
-                  <Button
-                    label="Send"
-                    icon="pi pi-send"
-                    onClick={sendMessage}
-                    className="font-semibold px-4 py-2 rounded-md shadow-md"
-                    style={{
-                      backgroundColor: 'var(--primary-color)',
-                      color: 'white',
-                    }}
-                  />
-                  <Button
-                    label="Clear"
-                    icon="pi pi-trash"
-                    onClick={clearChat}
-                    className="font-semibold px-4 py-2 rounded-md shadow-md"
-                    style={{
-                      backgroundColor: 'var(--secondary-color)',
-                      color: 'white',
-                    }}
-                  />
+                  <div className="flex flex-row gap-1 sm:gap-2 w-full sm:w-auto">
+                    <Button
+                      label="Send"
+                      icon="pi pi-send"
+                      onClick={sendMessage}
+                      className="font-semibold px-2 sm:px-4 py-2 rounded-md shadow-md w-full sm:w-auto text-xs sm:text-base"
+                      style={{
+                        backgroundColor: 'var(--primary-color)',
+                        color: 'white',
+                      }}
+                    />
+                    <Button
+                      label="Clear"
+                      icon="pi pi-trash"
+                      onClick={clearChat}
+                      className="font-semibold px-2 sm:px-4 py-2 rounded-md shadow-md w-full sm:w-auto text-xs sm:text-base"
+                      style={{
+                        backgroundColor: 'var(--secondary-color)',
+                        color: 'white',
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-                <div className="flex-1 overflow-y-auto p-2 space-y-2">
+              <div className="flex-1 overflow-y-auto p-1 sm:p-2 space-y-2">
                 {messages.map((msg, i) => (
                   <div
-                  key={i}
-                  className={`flex items-start space-x-2 ${
-                  msg.type === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
+                    key={i}
+                    className={`flex items-start space-x-2 ${
+                      msg.type === 'user' ? 'justify-end' : 'justify-start'
+                    }`}
                   >
-                  {msg.type === 'ai' && (
-                  <div>
-                  <Image
-                    src="/logo.svg"
-                    alt="AI"
-                    width={32}
-                    height={32}
-                  />
-                  </div>
-                  )}
-                  <div
-                  className={`rounded-lg p-2 ${
-                  msg.type === 'user' ? 'self-end' : 'self-start'
-                  }`}
-                  style={{
-                  backgroundColor:
-                    msg.type === 'user'
-                    ? 'var(--primary-color)'
-                    : 'var(--secondary-color)',
-                  color: 'white',
-                  }}
-                  >
-                  {msg.text}
-                  {msg.tasks && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 mt-2" style={{ backgroundColor: 'white' }}>
-                    {msg.tasks.map((task) => (
-                    <div key={task.id} className="flex flex-col">
-                    <TaskCard
-                    id={task.id}
-                    title={task.title}
-                    description={task.description}
-                    dueDate={task.dueDate}
-                    priority={task.priority}
-                    status={task.status}
-                    onDelete={handleTaskDelete}
-                    onStatusChange={(id, newStatus) =>
-                      handleTaskUpdate(id, { status: newStatus })
-                    }
-                    />
+                    {msg.type === 'ai' && (
+                      <div>
+                        <Image
+                          src="/logo.svg"
+                          alt="AI"
+                          width={24}
+                          height={24}
+                          className="sm:w-8 sm:h-8"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className={`rounded-lg p-2 text-xs sm:text-base ${
+                        msg.type === 'user' ? 'self-end' : 'self-start'
+                      }`}
+                      style={{
+                        backgroundColor:
+                          msg.type === 'user'
+                            ? 'var(--primary-color)'
+                            : 'var(--secondary-color)',
+                        color: 'white',
+                        maxWidth: '90vw',
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {msg.text}
+                      {msg.tasks && (
+                        <div
+                          className="grid grid-cols-1 sm:grid-cols-2 mt-2 gap-2"
+                          style={{ backgroundColor: 'white' }}
+                        >
+                          {msg.tasks.map((task) => (
+                            <div key={task.id} className="flex flex-col">
+                              <TaskCard
+                                id={task.id}
+                                title={task.title}
+                                description={task.description}
+                                dueDate={task.dueDate}
+                                priority={task.priority}
+                                status={task.status}
+                                onDelete={handleTaskDelete}
+                                onStatusChange={(id, newStatus) =>
+                                  handleTaskUpdate(id, { status: newStatus })
+                                }
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    ))}
-                    </div>
-                  )}
-                  </div>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
-                </div>
+              </div>
             </div>
           </div>
         </div>
