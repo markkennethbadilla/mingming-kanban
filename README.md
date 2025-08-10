@@ -35,17 +35,6 @@ Mingming Kanban uses an integrated conversational AI to:
 - **Authentication & Session Management**
 - **AI Integration**
 
-## Getting Started
-
-To run locally:
-
-```bash
-npm install
-npm run dev
-```
-
-Visit [http://localhost:3000](http://localhost:3000).
-
 ## Learn More
 
 Explore these resources to deepen your understanding of the stack:
