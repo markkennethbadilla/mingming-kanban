@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mingming Kanban
+
+[Mingming Kanban](https://mingming-kanban.vercel.app) is a productivity app built with [Next.js](https://nextjs.org), featuring a Kanban board for task management and seamless AI integration.
+
+## Live Demo
+
+Try it now: [mingming-kanban.vercel.app](https://mingming-kanban.vercel.app)
+
+## Features
+
+- **Kanban Task Management:** Organize tasks by status and priority with drag-and-drop.
+- **AI Assistant:** Mingming, a cheerful AI cat, helps you create, update, and manage tasks through natural conversation. The AI interprets your intent, fills in missing details, and keeps you motivated.
+- **Calendar View:** Visualize tasks by due date.
+- **User Authentication:** Secure login, registration, and profile management.
+- **Responsive Design:** Works on desktop and mobile.
+
+## AI Integration
+
+Mingming Kanban uses an integrated conversational AI to:
+
+- Understand user requests and generate structured task actions.
+- Fill in missing task details intelligently or prompt for clarification.
+- Respond in a friendly, motivating tone.
+- Support task creation, updates, deletion, and viewing—all via chat.
+
+## Technologies Used
+
+- **TypeScript**
+- **React & React Hooks**
+- **Zod Validation**
+- **PrimeReact UI Components**
+- **Drag-and-Drop (react-dnd)**
+- **Custom Contexts & Hooks**
+- **RESTful API Design**
+- **Authentication & Session Management**
+- **AI Integration**
 
 ## Getting Started
 
-First, run the development server:
+To run locally:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Visit [http://localhost:3000](http://localhost:3000).
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+Explore these resources to deepen your understanding of the stack:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Learn Next.js](https://nextjs.org/learn)
+- [PrimeReact](https://primereact.org/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
