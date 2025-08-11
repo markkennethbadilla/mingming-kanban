@@ -1,24 +1,24 @@
 {
   "development": {
-    "dialect": "mysql",
-    "host": "13.215.254.2",
-    "username": "iammkb2002",
-    "password": "mkb02468",
+    "dialect": "postgres",
+    "host": "localhost",
+    "username": "postgres",
+    "password": "",
     "database": "ai_task_manager_dev",
     "logging": false
   },
   "test": {
-    "dialect": "mysql",
+    "dialect": "postgres",
     "host": "localhost",
-    "username": "root",
+    "username": "postgres",
     "password": "",
     "database": "ai_task_manager_test",
     "logging": false
   },
   "production": {
-    "dialect": "mysql",
+    "dialect": "postgres",
     "host": "localhost",
-    "username": "root",
+    "username": "postgres",
     "password": "",
     "database": "ai_task_manager_prod",
     "logging": false

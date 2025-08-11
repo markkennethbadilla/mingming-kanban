@@ -9,8 +9,7 @@
     "lint": "next lint",
     "clean": "rimraf .next",
     "format": "prettier --write .",
-    "migrate": "npx sequelize-cli db:migrate",
-    "postinstall": "npm install mysql2"
+    "migrate": "npx sequelize-cli db:migrate"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -25,7 +24,6 @@
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
-    "mysql2": "^3.14.3",
     "next": "^15.3.0",
     "nodemailer": "^6.9.16",
     "pg": "^8.16.3",

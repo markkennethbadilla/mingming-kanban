@@ -9,9 +9,7 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD as string,
   {
     host: process.env.DB_HOST,
-    dialect: 'mysql',
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    dialectModule: require('mysql2'),
+    dialect: 'postgres',
     logging: false,
   }
 );
