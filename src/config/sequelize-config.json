@@ -5,7 +5,14 @@
     "username": "${DB_USERNAME}",
     "password": "${DB_PASSWORD}",
     "database": "${DB_NAME}",
-    "logging": false
+    "logging": false,
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   },
   "test": {
     "dialect": "${DB_DIALECT}",
@@ -13,7 +20,14 @@
     "username": "${DB_USERNAME}",
     "password": "${DB_PASSWORD}",
     "database": "${DB_NAME}",
-    "logging": false
+    "logging": false,
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   },
   "production": {
     "dialect": "${DB_DIALECT}",
@@ -21,6 +35,13 @@
     "username": "${DB_USERNAME}",
     "password": "${DB_PASSWORD}",
     "database": "${DB_NAME}",
-    "logging": false
+    "logging": false,
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   }
 }

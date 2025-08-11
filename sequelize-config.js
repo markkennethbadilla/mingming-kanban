@@ -3,6 +3,16 @@ require('dotenv').config();
 
 const appEnv = process.env.APP_ENV || 'development';
 
+const sslConfig = {
+  ssl: true,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+};
+
 const config = {
   development: {
     dialect: process.env.DB_DIALECT,
@@ -11,6 +21,7 @@ const config = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     logging: false,
+    ...sslConfig,
   },
   test: {
     dialect: process.env.DB_DIALECT,
@@ -19,6 +30,7 @@ const config = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     logging: false,
+    ...sslConfig,
   },
   production: {
     dialect: process.env.DB_DIALECT,
@@ -27,6 +39,7 @@ const config = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     logging: false,
+    ...sslConfig,
   },
 };
 
