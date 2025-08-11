@@ -1,5 +1,7 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pg = require('pg');
 
 dotenv.config();
 
@@ -18,6 +20,7 @@ const sequelize = new Sequelize(
         rejectUnauthorized: false,
       },
     },
+    dialectModule: pg,
   }
 );
 

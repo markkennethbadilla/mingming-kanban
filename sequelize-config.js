@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 require('dotenv').config();
 
+const pg = require('pg');
+
 const appEnv = process.env.APP_ENV || 'development';
 
 const sslConfig = {
@@ -11,6 +13,7 @@ const sslConfig = {
       rejectUnauthorized: false,
     },
   },
+  dialectModule: pg,
 };
 
 const config = {
