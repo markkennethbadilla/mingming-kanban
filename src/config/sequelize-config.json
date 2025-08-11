@@ -1,26 +1,26 @@
 {
   "development": {
-    "dialect": "postgres",
-    "host": "localhost",
-    "username": "postgres",
-    "password": "",
-    "database": "ai_task_manager_dev",
+    "dialect": "${DB_DIALECT}",
+    "host": "${DB_HOST}",
+    "username": "${DB_USERNAME}",
+    "password": "${DB_PASSWORD}",
+    "database": "${DB_NAME}",
     "logging": false
   },
   "test": {
-    "dialect": "postgres",
-    "host": "localhost",
-    "username": "postgres",
-    "password": "",
-    "database": "ai_task_manager_test",
+    "dialect": "${DB_DIALECT}",
+    "host": "${DB_HOST}",
+    "username": "${DB_USERNAME}",
+    "password": "${DB_PASSWORD}",
+    "database": "${DB_NAME}",
     "logging": false
   },
   "production": {
-    "dialect": "postgres",
-    "host": "localhost",
-    "username": "postgres",
-    "password": "",
-    "database": "ai_task_manager_prod",
+    "dialect": "${DB_DIALECT}",
+    "host": "${DB_HOST}",
+    "username": "${DB_USERNAME}",
+    "password": "${DB_PASSWORD}",
+    "database": "${DB_NAME}",
     "logging": false
   }
 }
