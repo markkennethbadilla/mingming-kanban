@@ -1,0 +1,37 @@
+@import 'primereact/resources/themes/saga-blue/theme.css';
+@import 'primereact/resources/primereact.min.css';
+@import 'primeicons/primeicons.css';
+@import 'primeflex/primeflex.css';
+
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #3cb4ac;
+  --secondary-color: #f98a8a;
+  --background-color: #faf8f5;
+  --text-color: #3d3d3d;
+  --highlight-color: #e6c84e;
+  --neutral-color: #727272;
+  --card-background: #f3f4f6; /* bg-gray-100 */
+}
+
+body main {
+  background-color: var(--background-color);
+}
+
+/* password field */
+/* Ensure the p-password container spans the full width */
+.p-password.p-component {
+  width: 100%;
+  display: block; /* Ensures it behaves like a block-level input */
+}
+
+/* Ensure the password input itself also spans the full width */
+.p-password-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--neutral-color, #ccc);
+  box-sizing: border-box; /* Prevents padding from affecting width */
+}

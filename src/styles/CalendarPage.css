@@ -1,0 +1,23 @@
+/* Scoped Calendar Styling */
+.custom-calendar {
+  width: 500px;
+  height: 500px;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: relative; /* Relative positioning for absolute child */
+}
+
+.task-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--secondary-color);
+  border-radius: 50%;
+  position: absolute; /* Absolute positioning */
+  bottom: 2px; /* Position it 5px from the bottom of the parent */
+}
