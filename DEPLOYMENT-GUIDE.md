@@ -26,6 +26,7 @@ You must set these in your Vercel Project Settings:
 |----------|-------|
 | `APP_ENV` | `production` |
 | `GEMINI_API_KEY` | *(Your Google Gemini API Key)* |
+| `SECRET_KEY` | *(A random string for JWT encryption, e.g., `my-super-secret-key-123`)* |
 
 **Note:** The code has been updated to automatically detect Vercel/Neon variables (`POSTGRES_HOST`, `POSTGRES_USER`, etc.). You do **not** need to manually set `DB_HOST` etc. if you are using the Vercel Postgres integration.
 
