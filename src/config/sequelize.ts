@@ -6,11 +6,11 @@ const pg = require('pg');
 dotenv.config();
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME as string,
-  process.env.DB_USERNAME as string,
-  process.env.DB_PASSWORD as string,
+  (process.env.DB_NAME || process.env.POSTGRES_DATABASE) as string,
+  (process.env.DB_USERNAME || process.env.POSTGRES_USER) as string,
+  (process.env.DB_PASSWORD || process.env.POSTGRES_PASSWORD) as string,
   {
-    host: process.env.DB_HOST,
+    host: process.env.DB_HOST || process.env.POSTGRES_HOST,
     dialect: 'postgres',
     logging: false,
     ssl: true,
