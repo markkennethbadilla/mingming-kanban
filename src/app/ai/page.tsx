@@ -141,15 +141,10 @@ const ChatPage = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <ToastProvider>
-        <div className="flex items-center justify-center min-h-[calc(100vh-64px)] p-3 sm:p-4" style={{ backgroundColor: 'var(--background)' }} data-page="ai-chat">
-          <div className="w-full max-w-2xl card-cozy flex flex-col" style={{ height: 'calc(100vh - 88px)' }}>
-            {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b-2 border-[var(--border)]">
-              <div className="cat-wiggle"><PixelCatType size={28} /></div>
-              <div className="flex-1">
-                <h2 className="text-sm font-extrabold text-[var(--text)]">Chat with MingMing</h2>
-                <p className="text-xs text-[var(--text-muted)] font-semibold">Type or use voice &mdash; I&apos;m all ears!</p>
-              </div>
+        <div className="flex items-center justify-center min-h-[calc(100dvh-64px)] p-3 sm:p-4" style={{ backgroundColor: 'var(--background)' }} data-page="ai-chat">
+          <div className="w-full max-w-2xl card-cozy flex flex-col" style={{ height: 'calc(100dvh - 88px)' }}>
+            {/* Minimal header — just Clear button */}
+            <div className="flex items-center justify-end px-3 py-1.5 border-b-2 border-[var(--border)]">
               <button onClick={clearChat} className="text-xs text-[var(--text-muted)] hover:text-[var(--danger)] flex items-center gap-1 transition-colors font-bold" data-action="clear-chat">
                 <Trash2 size={14} /> Clear
               </button>
@@ -213,7 +208,7 @@ const ChatPage = () => {
             </div>
 
             {/* Input + Voice */}
-            <div className="border-t-2 border-[var(--border)] p-3" data-region="chat-input">
+            <div className="border-t-2 border-[var(--border)] p-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }} data-region="chat-input">
               <div className="flex gap-2 items-end">
                 <button
                   onClick={toggleVoice}

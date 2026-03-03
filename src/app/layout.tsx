@@ -3,6 +3,14 @@ import { ThemeProvider } from 'next-themes';
 import Navbar from '../components/Navbar';
 import '@/styles/global.css';
 
+import type { Viewport } from 'next';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
 export const metadata = {
   title: 'MingMing Kanban',
   description: 'AI-powered Kanban board with MingMing, your cheerful cat productivity assistant.',

@@ -168,8 +168,8 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Controls */}
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-2">
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2">
                 <PawPrint size={14} className="text-[var(--paw-pink)]" />
                 <span className="text-sm font-bold text-[var(--text)]">Your Tasks</span>
                 <span className="text-xs bg-[var(--surface-alt)] text-[var(--text-muted)] px-2 py-0.5 rounded-full font-bold">

@@ -64,16 +64,16 @@ const RegisterForm: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="register">
           <div>
             <label htmlFor="username" className="block text-sm font-bold text-[var(--text)] mb-1">Username</label>
-            <input id="username" type="text" placeholder="Enter your username" {...register('username')} className={inputClass} />
+            <input id="username" type="text" autoComplete="username" placeholder="Enter your username" {...register('username')} className={inputClass} />
           </div>
           <div>
             <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email</label>
-            <input id="email" type="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
+            <input id="email" type="email" autoComplete="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
           </div>
           <div>
             <label htmlFor="password" className="block text-sm font-bold text-[var(--text)] mb-1">Password</label>
             <div className="relative">
-              <input id="password" type={showPw ? 'text' : 'password'} placeholder="Enter your password" {...register('password')} className={inputClass} />
+              <input id="password" type={showPw ? 'text' : 'password'} autoComplete="new-password" placeholder="Enter your password" {...register('password')} className={inputClass} />
               <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
                 {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
