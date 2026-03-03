@@ -6,7 +6,7 @@ import { ToastProvider, useToast } from '@/context/ToastContext';
 import Loader from '@/components/Loader';
 import { User, Lock, Trash2, Save, Eye, EyeOff } from 'lucide-react';
 
-const inputClass = 'w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
+const inputClass = 'w-full rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
 const btnPrimary = 'inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition-colors disabled:opacity-50';
 const btnDanger = 'inline-flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-50';
 
@@ -127,7 +127,7 @@ const ProfileInner: React.FC = () => {
         <h1 className="text-2xl font-bold text-[var(--text)]">Profile Settings</h1>
 
         {/* Account Info */}
-        <div className="bg-white rounded-xl border border-[var(--border)] shadow-card p-5 space-y-4" data-section="account-info">
+        <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-5 space-y-4" data-section="account-info">
           <div className="flex items-center gap-2 text-[var(--text)]">
             <User size={18} />
             <h2 className="text-base font-semibold">Account Information</h2>
@@ -143,7 +143,7 @@ const ProfileInner: React.FC = () => {
         </div>
 
         {/* Password Section */}
-        <div className="bg-white rounded-xl border border-[var(--border)] shadow-card p-5 space-y-4" data-section="password">
+        <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-5 space-y-4" data-section="password">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[var(--text)]">
               <Lock size={18} />
@@ -183,7 +183,7 @@ const ProfileInner: React.FC = () => {
         </button>
 
         {/* Danger Zone */}
-        <div className="bg-red-50 rounded-xl border border-red-200 p-5 space-y-3" data-section="danger-zone">
+        <div className="bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-200 dark:border-red-800 p-5 space-y-3" data-section="danger-zone">
           <h2 className="text-base font-semibold text-red-700">Danger Zone</h2>
           <p className="text-sm text-red-600">Deleting your account is permanent and cannot be undone.</p>
           <button onClick={() => setShowDeleteConfirm(true)} className={btnDanger} data-action="delete-account">
@@ -195,11 +195,11 @@ const ProfileInner: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" data-modal="delete-account">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 animate-fade-in">
+          <div className="bg-[var(--card-bg)] rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 animate-fade-in">
             <h3 className="text-lg font-bold text-[var(--text)] mb-2">Delete Account?</h3>
             <p className="text-sm text-[var(--text-muted)] mb-4">This action is irreversible. All your tasks and data will be permanently deleted.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 text-sm rounded-lg border border-[var(--border)] hover:bg-gray-50 transition-colors">
+              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 text-sm rounded-lg border border-[var(--border)] hover:bg-[var(--border)]/40 transition-colors">
                 Cancel
               </button>
               <button onClick={handleDeleteAccount} className={btnDanger}>

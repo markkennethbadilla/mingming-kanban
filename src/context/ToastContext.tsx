@@ -24,11 +24,11 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 const severityStyles: Record<Severity, { bg: string; border: string; icon: React.ReactNode }> = {
-  success: { bg: 'bg-emerald-50', border: 'border-emerald-400', icon: <CheckCircle2 size={18} className="text-emerald-500" /> },
-  info: { bg: 'bg-blue-50', border: 'border-blue-400', icon: <Info size={18} className="text-blue-500" /> },
-  warn: { bg: 'bg-amber-50', border: 'border-amber-400', icon: <AlertTriangle size={18} className="text-amber-500" /> },
-  error: { bg: 'bg-red-50', border: 'border-red-400', icon: <AlertCircle size={18} className="text-red-500" /> },
-  secondary: { bg: 'bg-gray-50', border: 'border-gray-400', icon: <Info size={18} className="text-gray-500" /> },
+  success: { bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-400', icon: <CheckCircle2 size={18} className="text-emerald-500" /> },
+  info: { bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-400', icon: <Info size={18} className="text-blue-500" /> },
+  warn: { bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-400', icon: <AlertTriangle size={18} className="text-amber-500" /> },
+  error: { bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-400', icon: <AlertCircle size={18} className="text-red-500" /> },
+  secondary: { bg: 'bg-[var(--surface)] dark:bg-[var(--surface)]', border: 'border-[var(--border)]', icon: <Info size={18} className="text-[var(--text-muted)]" /> },
   contrast: { bg: 'bg-slate-800', border: 'border-slate-600', icon: <Info size={18} className="text-white" /> },
 };
 

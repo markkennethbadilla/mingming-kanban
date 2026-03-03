@@ -14,7 +14,7 @@ const schema = z.object({
 });
 type RegisterData = z.infer<typeof schema>;
 
-const inputClass = 'w-full px-4 py-3 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
+const inputClass = 'w-full px-4 py-3 text-sm rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
 
 const RegisterForm: React.FC = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterData>({
@@ -54,7 +54,7 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4" data-page="register">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl border border-[var(--border)] shadow-card">
+      <div className="w-full max-w-md bg-[var(--card-bg)] p-8 rounded-xl border border-[var(--border)] shadow-card">
         <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-6">Sign Up</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="register">
           <div>

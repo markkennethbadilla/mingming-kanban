@@ -158,7 +158,7 @@ const DashboardPage: React.FC = () => {
                     id="filter"
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value)}
-                    className="px-3 py-1.5 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="px-3 py-1.5 text-sm rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30"
                     data-action="filter-tasks"
                   >
                     <option value="date">By Date</option>
@@ -184,7 +184,7 @@ const DashboardPage: React.FC = () => {
                   <div key={status} className="flex flex-col">
                     <div className="flex items-center gap-2 mb-3">
                       <h3 className={`text-base font-semibold ${meta.color}`}>{meta.label}</h3>
-                      <span className="text-xs bg-gray-100 text-[var(--text-muted)] px-2 py-0.5 rounded-full font-medium">
+                      <span className="text-xs bg-[var(--border)]/50 text-[var(--text-muted)] px-2 py-0.5 rounded-full font-medium">
                         {columnTasks.length}
                       </span>
                     </div>

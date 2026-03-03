@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeProvider } from 'next-themes';
 import Navbar from '../components/Navbar';
 import '@/styles/global.css';
 
@@ -14,10 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-background text-[var(--text)] flex flex-col antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-[var(--background)] text-[var(--text)] flex flex-col antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

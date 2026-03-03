@@ -19,6 +19,23 @@
   --warning: #f59e0b;
 }
 
+.dark {
+  --primary: #4ecdc4;
+  --primary-dark: #3cb4ac;
+  --secondary: #f98a8a;
+  --secondary-dark: #e67373;
+  --background: #0f172a;
+  --surface: #1e293b;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --highlight: #e6c84e;
+  --border: #334155;
+  --card-bg: #1e293b;
+  --danger: #f87171;
+  --success: #4ade80;
+  --warning: #fbbf24;
+}
+
 * {
   box-sizing: border-box;
 }

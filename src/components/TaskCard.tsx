@@ -71,7 +71,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         ref={cardRef}
         data-row-id={`task-${id}`}
         onClick={() => setExpanded(!expanded)}
-        className={`group relative bg-white rounded-xl border border-[var(--border)] shadow-card hover:shadow-card-hover transition-all cursor-pointer ${
+        className={`group relative bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card hover:shadow-card-hover transition-all cursor-pointer ${
           isDragging ? 'opacity-40' : ''
         }`}
         style={{ borderLeft: `3px solid ${pConfig.color === 'bg-slate-400' ? '#94a3b8' : pConfig.color === 'bg-amber-400' ? '#fbbf24' : '#f87171'}` }}
@@ -109,7 +109,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   className={`text-xs font-medium px-2.5 py-1 rounded-md transition-colors ${
                     status === s
                       ? 'bg-primary/10 text-primary cursor-default'
-                      : 'text-[var(--text-muted)] hover:bg-gray-100 hover:text-[var(--text)]'
+                      : 'text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text)]'
                   }`}
                 >
                   {statusLabels[s]}
@@ -141,7 +141,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       {/* Delete confirmation modal */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" data-dialog="confirm-delete">
-          <div className="bg-white rounded-xl shadow-elevated p-6 max-w-sm w-full mx-4 animate-slide-up">
+          <div className="bg-[var(--card-bg)] rounded-xl shadow-elevated p-6 max-w-sm w-full mx-4 animate-slide-up">
             <h3 className="font-semibold text-lg text-[var(--text)] mb-2">Delete task?</h3>
             <p className="text-sm text-[var(--text-muted)] mb-5">
               &quot;{title}&quot; will be permanently deleted. This cannot be undone.
@@ -149,7 +149,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-[var(--text-muted)] hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--border)]/40 rounded-lg transition-colors"
               >
                 Cancel
               </button>

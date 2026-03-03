@@ -115,14 +115,14 @@ function CalendarInner() {
         <h1 className="text-2xl font-bold text-[var(--text)] mb-6">Task Calendar</h1>
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Calendar grid */}
-          <div className="bg-white rounded-xl border border-[var(--border)] shadow-card p-4 lg:flex-1">
+          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-4 lg:flex-1">
             {/* Month navigation */}
             <div className="flex items-center justify-between mb-4">
-              <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" data-action="prev-month">
+              <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1.5 hover:bg-[var(--border)]/40 rounded-lg transition-colors" data-action="prev-month">
                 <ChevronLeft size={20} className="text-[var(--text-muted)]" />
               </button>
               <h2 className="text-lg font-semibold text-[var(--text)]">{format(currentMonth, 'MMMM yyyy')}</h2>
-              <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" data-action="next-month">
+              <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1.5 hover:bg-[var(--border)]/40 rounded-lg transition-colors" data-action="next-month">
                 <ChevronRight size={20} className="text-[var(--text-muted)]" />
               </button>
             </div>
@@ -149,7 +149,7 @@ function CalendarInner() {
                     className={`relative flex flex-col items-center justify-center py-2 rounded-lg text-sm transition-colors ${
                       isSelected ? 'bg-primary text-white' :
                       isToday ? 'bg-primary/10 text-primary font-semibold' :
-                      isCurrentMonth ? 'text-[var(--text)] hover:bg-gray-50' :
+                      isCurrentMonth ? 'text-[var(--text)] hover:bg-[var(--border)]/30' :
                       'text-gray-300'
                     }`}
                     data-day={format(d, 'yyyy-MM-dd')}
@@ -166,13 +166,13 @@ function CalendarInner() {
 
           {/* Selected date tasks */}
           <div className="lg:w-96">
-            <div className="bg-white rounded-xl border border-[var(--border)] shadow-card p-4">
+            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-4">
               <div className="flex items-center justify-between mb-4">
-                <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1 hover:bg-[var(--border)]/40 rounded-lg transition-colors">
                   <ChevronLeft size={18} className="text-[var(--text-muted)]" />
                 </button>
                 <h3 className="text-sm font-semibold text-[var(--text)]">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
-                <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1 hover:bg-[var(--border)]/40 rounded-lg transition-colors">
                   <ChevronRight size={18} className="text-[var(--text-muted)]" />
                 </button>
               </div>

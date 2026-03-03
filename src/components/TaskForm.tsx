@@ -23,7 +23,7 @@ const taskSchema = z.object({
 
 type TaskFormData = z.infer<typeof taskSchema>;
 
-const inputClass = 'w-full px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
+const inputClass = 'w-full px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
 const labelClass = 'block text-sm font-medium text-[var(--text)] mb-1';
 const errorClass = 'text-red-500 text-xs mt-1';
 
@@ -44,7 +44,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
     <>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 bg-white rounded-xl border border-[var(--border)] shadow-card"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card"
         data-form="task"
       >
         {/* Title */}
@@ -137,7 +137,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
               <button
                 type="button"
                 onClick={() => reset()}
-                className="inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-[var(--text)] font-semibold py-2 px-6 rounded-lg transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-[var(--border)]/50 hover:bg-[var(--border)]/70 text-[var(--text)] font-semibold py-2 px-6 rounded-lg transition-colors"
                 data-action="undo-task"
               >
                 <Undo2 size={16} /> Undo
@@ -145,7 +145,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
               <button
                 type="button"
                 onClick={() => setShowConfirm(true)}
-                className="inline-flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-6 rounded-lg transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 text-red-600 font-semibold py-2 px-6 rounded-lg transition-colors"
                 data-action="delete-task"
               >
                 <Trash2 size={16} /> Delete
@@ -158,13 +158,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onDelete }) 
       {/* Delete confirmation */}
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" data-dialog="confirm-delete">
-          <div className="bg-white rounded-xl shadow-elevated p-6 max-w-sm w-full mx-4 animate-slide-up">
+          <div className="bg-[var(--card-bg)] rounded-xl shadow-elevated p-6 max-w-sm w-full mx-4 animate-slide-up">
             <h3 className="font-semibold text-lg text-[var(--text)] mb-2">Delete task?</h3>
             <p className="text-sm text-[var(--text-muted)] mb-5">This action cannot be undone.</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-[var(--text-muted)] hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--border)]/40 rounded-lg transition-colors"
               >
                 Cancel
               </button>

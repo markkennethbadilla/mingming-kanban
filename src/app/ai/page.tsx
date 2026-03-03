@@ -104,7 +104,7 @@ const ChatPage = () => {
     <DndProvider backend={HTML5Backend}>
       <ToastProvider>
         <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] p-4" data-page="ai-chat">
-          <div className="w-full max-w-3xl bg-white rounded-xl border border-[var(--border)] shadow-card flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
+          <div className="w-full max-w-3xl bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
             {/* Header */}
             <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)]">
               <Cat size={20} className="text-primary" />
@@ -136,11 +136,11 @@ const ChatPage = () => {
                   <div className={`max-w-[80%] rounded-xl px-3.5 py-2.5 text-sm ${
                     msg.type === 'user'
                       ? 'bg-primary text-white rounded-br-sm'
-                      : 'bg-gray-100 text-[var(--text)] rounded-bl-sm'
+                      : 'bg-[var(--border)]/30 text-[var(--text)] rounded-bl-sm'
                   }`}>
                     <span className="whitespace-pre-wrap break-words">{msg.text}</span>
                     {msg.tasks && msg.tasks.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 bg-white rounded-lg p-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 bg-[var(--card-bg)] rounded-lg p-2">
                         {msg.tasks.map((task) => (
                           <TaskCard
                             key={task.id}
@@ -166,7 +166,7 @@ const ChatPage = () => {
                   onKeyDown={handleKeyDown}
                   rows={2}
                   placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                   data-input="chat-message"
                 />
                 <button

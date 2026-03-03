@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -15,6 +16,8 @@ import {
   LogOut,
   Menu,
   X,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 const Navbar: React.FC = () => {
@@ -23,6 +26,9 @@ const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -69,7 +75,7 @@ const Navbar: React.FC = () => {
     <nav
       id="navbar-root"
       data-nav="main"
-      className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-[var(--border)] px-4 sm:px-6"
+      className="sticky top-0 z-50 w-full bg-[var(--card-bg)]/80 backdrop-blur-md border-b border-[var(--border)] px-4 sm:px-6"
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between h-14">
         {/* Logo */}
@@ -96,7 +102,7 @@ const Navbar: React.FC = () => {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-primary/10 text-primary'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-gray-100'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--border)]/40'
                 }`}
               >
                 <item.icon size={16} />
@@ -108,18 +114,26 @@ const Navbar: React.FC = () => {
             <button
               onClick={handleLogout}
               data-action="logout"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 transition-all ml-1"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all ml-1"
             >
               <LogOut size={16} />
               Logout
             </button>
           )}
+          <button
+            onClick={toggleTheme}
+            data-action="toggle-theme"
+            className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--border)]/40 transition-all ml-1"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
         </div>
 
         {/* Mobile menu button */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="md:hidden p-2 rounded-lg hover:bg-[var(--border)]/40 transition-colors"
           data-action="toggle-menu"
         >
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -139,7 +153,7 @@ const Navbar: React.FC = () => {
                 className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-primary/10 text-primary'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-gray-50'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--border)]/40'
                 }`}
               >
                 <item.icon size={18} />
@@ -150,12 +164,19 @@ const Navbar: React.FC = () => {
           {isLoggedIn && (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 w-full text-left transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 w-full text-left transition-all"
             >
               <LogOut size={18} />
               Logout
             </button>
           )}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--border)]/40 w-full text-left transition-all"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </button>
         </div>
       )}
     </nav>

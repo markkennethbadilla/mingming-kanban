@@ -81,7 +81,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/login"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-white text-[var(--text)] font-semibold rounded-xl border border-[var(--border)] hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-[var(--card-bg)] text-[var(--text)] font-semibold rounded-xl border border-[var(--border)] hover:bg-[var(--border)]/30 transition-colors"
                 >
                   Log In
                 </Link>
@@ -101,7 +101,7 @@ export default function LandingPage() {
             {features.map((f) => (
               <div
                 key={f.title}
-                className="bg-white rounded-xl p-6 shadow-card hover:shadow-card-hover transition-shadow border border-[var(--border)]"
+                className="bg-[var(--card-bg)] rounded-xl p-6 shadow-card hover:shadow-card-hover transition-shadow border border-[var(--border)]"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
                   <f.icon size={20} className="text-primary" />
