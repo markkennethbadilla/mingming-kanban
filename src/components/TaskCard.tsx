@@ -1,10 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useDrag } from 'react-dnd';
-import { Dialog } from 'primereact/dialog';
-import { Tooltip } from 'primereact/tooltip';
-import { FaTrash, FaPencilAlt } from 'react-icons/fa';
-import { Button } from 'primereact/button';
+import { Trash2, Pencil } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { format, isPast } from 'date-fns';
 
 interface TaskCardProps {
   id: number;
@@ -17,55 +15,37 @@ interface TaskCardProps {
   onDelete: (id: number) => void;
 }
 
+const priorityConfig = {
+  LOW: { color: 'bg-slate-400', text: 'text-slate-600', label: 'Low' },
+  MEDIUM: { color: 'bg-amber-400', text: 'text-amber-600', label: 'Medium' },
+  HIGH: { color: 'bg-red-400', text: 'text-red-600', label: 'High' },
+};
+
+const statusLabels: Record<string, string> = {
+  TO_DO: 'To Do',
+  IN_PROGRESS: 'In Progress',
+  DONE: 'Done',
+};
+
 const TaskCard: React.FC<TaskCardProps> = ({
-  id,
-  title,
-  description,
-  dueDate,
-  priority,
-  status,
-  onStatusChange,
-  onDelete,
+  id, title, description, dueDate, priority, status, onStatusChange, onDelete,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
+  const [expanded, setExpanded] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'TASK',
     item: { id, status },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
+    collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
   }));
-  const [isHovered, setIsHovered] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
-  // To handle delayed collapse
-  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const taskDate = new Date(dueDate);
+  const isMissed = status === 'TO_DO' && isPast(taskDate);
+  const pConfig = priorityConfig[priority];
 
-  const handleMouseEnter = () => {
-    if (hoverTimeout.current) {
-      clearTimeout(hoverTimeout.current); // Clear any pending timeout
-      hoverTimeout.current = null;
-    }
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    hoverTimeout.current = setTimeout(() => {
-      setIsHovered(false);
-    }, 1000); // Delay of 1 second
-  };
-
-  const currentYear = new Date().getFullYear();
-  const taskDate = new Date(typeof dueDate === 'string' ? dueDate : dueDate);
-  const isMissed = status === 'TO_DO' && taskDate < new Date();
-  const priorityColors = {
-    LOW: 'var(--neutral-color)',
-    MEDIUM: 'var(--highlight-color)',
-    HIGH: 'var(--secondary-color)',
-  };
-
-  const handleDeleteClick = (e: React.MouseEvent) => {
+  const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowConfirm(true);
   };
@@ -73,293 +53,119 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const confirmDelete = () => {
     setShowConfirm(false);
     onDelete(id);
-    showToast({
-      severity: 'success',
-      summary: 'Task Deleted',
-      detail: `Task "${title}" has been deleted.`,
-      life: 3000,
-    });
+    showToast({ severity: 'success', summary: 'Deleted', detail: `"${title}" removed.`, life: 3000 });
   };
 
   const handleStatusChange = (newStatus: string) => {
     if (onStatusChange && status !== newStatus) {
       onStatusChange(id, newStatus);
-      showToast({
-        severity: 'info',
-        summary: 'Status Updated',
-        detail: `Task "${title}" status updated to ${newStatus.replace(
-          '_',
-          ' '
-        )}.`,
-        life: 3000,
-      });
+      showToast({ severity: 'info', summary: 'Updated', detail: `"${title}" moved to ${statusLabels[newStatus]}.`, life: 3000 });
     }
-  };
-
-  const handleEditClick = () => {
-    window.location.href = `/tasks/${id}/edit`;
   };
 
   drag(cardRef);
 
   return (
-    <div
-      ref={cardRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        padding: isHovered ? '0px 12px 12px 12px' : '8px',
-        margin: '10px',
-        borderRadius: '8px',
-        boxShadow: isHovered
-          ? '0 6px 12px rgba(0, 0, 0, 0.15)'
-          : '0 1px 3px rgba(0, 0, 0, 0.1)',
-        transition: 'box-shadow 0.3s, padding 0.2s',
-        cursor: 'default',
-        opacity: isDragging ? 0.5 : 1,
-        backgroundColor: 'var(--card-background)',
-        borderLeft: `4px solid ${priorityColors[priority]}`,
-        position: 'relative',
-        overflow: 'hidden',
-        minHeight: isHovered ? 'auto' : '48px',
-        width: '93%', // Ensure the width fits the container
-      }}
-    >
-      {isHovered && (
-        <span
-          style={{
-            position: 'absolute',
-            top: '8px',
-            right: '12px',
-            padding: '4px 8px',
-            borderRadius: '12px',
-            fontSize: '0.75rem',
-            fontWeight: '600',
-            backgroundColor: priorityColors[priority],
-            color: 'white',
-          }}
-        >
-          {priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()}
-        </span>
-      )}
-
-      {!isHovered && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h3
-            style={{
-              fontSize: '1rem',
-              fontWeight: '500',
-              color: 'var(--text-color)',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {title}
-          </h3>
-          <p
-            style={{
-              fontSize: '0.65rem',
-              color: isMissed
-                ? 'var(--secondary-color)'
-                : 'var(--neutral-color)',
-            }}
-          >
-            {taskDate.toLocaleDateString(undefined, {
-              day: 'numeric',
-              month: 'short',
-              year:
-                taskDate.getFullYear() !== currentYear ? 'numeric' : undefined,
-            })}
-          </p>
+    <>
+      <div
+        ref={cardRef}
+        data-row-id={`task-${id}`}
+        onClick={() => setExpanded(!expanded)}
+        className={`group relative bg-white rounded-xl border border-[var(--border)] shadow-card hover:shadow-card-hover transition-all cursor-pointer ${
+          isDragging ? 'opacity-40' : ''
+        }`}
+        style={{ borderLeft: `3px solid ${pConfig.color === 'bg-slate-400' ? '#94a3b8' : pConfig.color === 'bg-amber-400' ? '#fbbf24' : '#f87171'}` }}
+      >
+        {/* Collapsed view */}
+        <div className="flex items-center justify-between p-3 gap-2">
+          <h3 className="text-sm font-medium text-[var(--text)] truncate flex-1">{title}</h3>
+          <span className={`text-xs ${isMissed ? 'text-red-500 font-medium' : 'text-[var(--text-muted)]'}`}>
+            {format(taskDate, 'MMM d')}
+          </span>
         </div>
-      )}
 
-      {isHovered && (
-        <>
-          <div style={{ marginBottom: '12px' }}>
-            <h3
-              style={{
-                fontSize: '1.2rem',
-                fontWeight: '500',
-                color: 'var(--text-color)',
-                marginBottom: '4px',
-                wordWrap: 'break-word',
-              }}
-            >
-              {title}
-            </h3>
-            <p
-              style={{
-                fontSize: '0.8rem',
-                color: 'grey',
-                whiteSpace: 'normal',
-              }}
-            >
-              {description}
-            </p>
-            <p
-              style={{
-                fontSize: '0.7rem',
-                color: 'var(--neutral-color)',
-                marginBottom: '10px',
-                fontStyle: 'italic',
-              }}
-            >
-              Due on{' '}
-              {taskDate.toLocaleDateString(undefined, {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </p>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              fontSize: '0.75rem',
-              color: 'var(--neutral-color)',
-            }}
-          >
-            <span
-              className="p-overlay-badge"
-              data-pr-tooltip="Edit Task"
-              data-pr-position="top"
-              style={{
-                cursor: 'pointer',
-                color: 'var(--primary-color)',
-                fontSize: '0.875rem',
-                transition: 'transform 0.2s ease, color 0.2s ease',
-              }}
-              onClick={handleEditClick}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'scale(1.1)';
-                (e.currentTarget as HTMLElement).style.color =
-                  'var(--primary-color)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-                (e.currentTarget as HTMLElement).style.color =
-                  'var(--primary-color)';
-              }}
-            >
-              <FaPencilAlt />
+        {/* Expanded view */}
+        {expanded && (
+          <div className="px-3 pb-3 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            {/* Priority badge */}
+            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${pConfig.color} text-white mb-2`}>
+              {pConfig.label}
             </span>
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              {['TO_DO', 'IN_PROGRESS', 'DONE'].map((statusKey) => (
-                <span
-                  key={statusKey}
-                  className={`${status === statusKey ? 'active-status' : ''}`}
-                  data-pr-tooltip={statusKey.replace('_', ' ')}
-                  data-pr-position="top"
-                  onClick={() => handleStatusChange(statusKey)}
-                  style={{
-                    cursor: status === statusKey ? 'not-allowed' : 'pointer',
-                    fontSize: '0.7rem',
-                    fontWeight: '600',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    backgroundColor:
-                      status === statusKey
-                        ? '#d3d3d3' // lighter grey
-                        : 'transparent',
-                    color: 'var(--neutral-color)',
-                    transition: 'transform 0.2s ease, color 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform =
-                      'scale(1.1)';
-                    (e.currentTarget as HTMLElement).style.color =
-                      'var(--primary-color)';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.transform =
-                      'scale(1)';
-                    (e.currentTarget as HTMLElement).style.color =
-                      'var(--neutral-color)';
-                  }}
+            {description && (
+              <p className="text-sm text-[var(--text-muted)] mb-2 leading-relaxed">{description}</p>
+            )}
+            <p className="text-xs text-[var(--text-muted)] italic mb-3">
+              Due {format(taskDate, 'EEEE, MMMM d, yyyy')}
+            </p>
+
+            {/* Status toggle */}
+            <div className="flex items-center gap-1 mb-3">
+              {(['TO_DO', 'IN_PROGRESS', 'DONE'] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => handleStatusChange(s)}
+                  disabled={status === s}
+                  className={`text-xs font-medium px-2.5 py-1 rounded-md transition-colors ${
+                    status === s
+                      ? 'bg-primary/10 text-primary cursor-default'
+                      : 'text-[var(--text-muted)] hover:bg-gray-100 hover:text-[var(--text)]'
+                  }`}
                 >
-                  {statusKey
-                    .replace('_', ' ')
-                    .toLowerCase()
-                    .replace(/^\w/, (c) => c.toUpperCase())}
-                </span>
+                  {statusLabels[s]}
+                </button>
               ))}
             </div>
 
-            <span
-              className="p-overlay-badge"
-              data-pr-tooltip="Delete Task"
-              data-pr-position="top"
-              onClick={handleDeleteClick}
-              style={{
-                cursor: 'pointer',
-                color: 'var(--secondary-color)',
-                fontSize: '0.875rem',
-                transition: 'transform 0.2s ease, color 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'scale(1.1)';
-                (e.currentTarget as HTMLElement).style.color =
-                  'var(--primary-color)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-                (e.currentTarget as HTMLElement).style.color =
-                  'var(--secondary-color)';
-              }}
-            >
-              <FaTrash />
-            </span>
+            {/* Actions */}
+            <div className="flex items-center gap-2 border-t border-[var(--border)] pt-2">
+              <a
+                href={`/tasks/${id}/edit`}
+                className="flex items-center gap-1 text-xs text-primary hover:text-primary-dark transition-colors"
+                data-action="edit-task"
+              >
+                <Pencil size={13} /> Edit
+              </a>
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors ml-auto"
+                data-action="delete-task"
+              >
+                <Trash2 size={13} /> Delete
+              </button>
+            </div>
           </div>
-        </>
-      )}
+        )}
+      </div>
 
-      <Dialog
-        visible={showConfirm}
-        onHide={() => setShowConfirm(false)}
-        header="Confirm Deletion"
-        footer={
-          <div>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              className="p-button-text"
-              onClick={() => setShowConfirm(false)}
-            />
-            <Button
-              label="Delete"
-              icon="pi pi-check"
-              className="p-button-danger"
-              onClick={confirmDelete}
-            />
+      {/* Delete confirmation modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" data-dialog="confirm-delete">
+          <div className="bg-white rounded-xl shadow-elevated p-6 max-w-sm w-full mx-4 animate-slide-up">
+            <h3 className="font-semibold text-lg text-[var(--text)] mb-2">Delete task?</h3>
+            <p className="text-sm text-[var(--text-muted)] mb-5">
+              &quot;{title}&quot; will be permanently deleted. This cannot be undone.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 text-sm font-medium text-[var(--text-muted)] hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            </div>
           </div>
-        }
-      >
-        <p>
-          Are you sure you want to delete this task? This action cannot be
-          undone.
-        </p>
-      </Dialog>
-      <Tooltip target=".p-overlay-badge" />
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
 export default TaskCard;
+

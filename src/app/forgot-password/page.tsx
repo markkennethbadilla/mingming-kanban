@@ -1,150 +1,73 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
+import { ToastProvider, useToast } from '@/context/ToastContext';
+import { Mail } from 'lucide-react';
 
-// Validation schema using zod
-const validationSchema = z.object({
-  email: z.string().email('Invalid email format'),
-});
+const schema = z.object({ email: z.string().email('Invalid email format') });
+type ForgotData = z.infer<typeof schema>;
 
-type ForgotPasswordFormData = z.infer<typeof validationSchema>;
+const inputClass = 'w-full px-4 py-3 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
 
-const ForgotPasswordPage: React.FC = () => {
-  const { control, handleSubmit, formState } = useForm<ForgotPasswordFormData>({
-    resolver: zodResolver(validationSchema),
-    defaultValues: {
-      email: '',
-    },
+const ForgotForm: React.FC = () => {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ForgotData>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '' },
   });
-
-  const toast = useRef<any>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-
-        const response = await fetch('/api/session', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          window.location.href = '/dashboard'; // Redirect to dashboard if session is valid
-        }
-      } catch {}
+    const check = async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) window.location.href = '/dashboard';
     };
-
-    checkSession();
+    check();
   }, []);
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
+  const onSubmit = async (data: ForgotData) => {
     try {
-      const response = await fetch('/api/auth/send-reset-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          result.message || 'Failed to send password reset email.'
-        );
-      }
-
-      toast.current.show({
-        severity: 'success',
-        summary: 'Email Sent',
-        detail:
-          'If the email exists in our system, a password reset link has been sent. Please check your email (including spam/junk folders).',
-        life: 5000,
-      });
-    } catch (error: any) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Something went wrong. Please try again.',
-        life: 5000,
-      });
+      const res = await fetch('/api/auth/send-reset-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || 'Failed to send reset email.');
+      showToast({ severity: 'success', summary: 'Email Sent', detail: 'Check your inbox (and spam) for the reset link.', life: 5000 });
+    } catch (err: unknown) {
+      showToast({ severity: 'error', summary: 'Error', detail: err instanceof Error ? err.message : 'Something went wrong.', life: 5000 });
     }
   };
 
-  // Show validation errors as Toast messages
   useEffect(() => {
-    if (formState.errors) {
-      Object.values(formState.errors).forEach((error) => {
-        toast.current.show({
-          severity: 'warn',
-          summary: 'Validation Error',
-          detail: error.message,
-          life: 3000,
-        });
-      });
-    }
-  }, [formState.errors]);
+    Object.values(errors).forEach((e) => {
+      if (e?.message) showToast({ severity: 'warn', summary: 'Validation', detail: e.message, life: 3000 });
+    });
+  }, [errors, showToast]);
 
   return (
-    <>
-      <div className="flex flex-col min-h-[87vh] bg-[var(--background-color,#f4f4f4)]">
-        <div className="flex-grow"></div>
-        <div className="flex justify-center items-center">
-          <Toast ref={toast} />
-          <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-center text-[var(--primary-color,#007bff)] mb-4">
-              Forgot Password
-            </h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-lg text-[var(--text-color,#333)]"
-                >
-                  Enter your email address:
-                </label>
-                <Controller
-                  name="email"
-                  control={control}
-                  render={({ field }) => (
-                    <InputText
-                      id="email"
-                      {...field}
-                      placeholder="example@domain.com"
-                      className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
-                    />
-                  )}
-                />
-              </div>
-
-              <Button
-                label="Send Reset Link"
-                type="submit"
-                disabled={formState.isSubmitting}
-                className={`w-full p-3 bg-[var(--primary-color,#007bff)] text-white border-none rounded-lg font-semibold text-lg ${
-                  formState.isSubmitting
-                    ? 'cursor-not-allowed'
-                    : 'cursor-pointer'
-                }`}
-              />
-            </form>
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4" data-page="forgot-password">
+      <div className="w-full max-w-md bg-white p-8 rounded-xl border border-[var(--border)] shadow-card">
+        <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-6">Forgot Password</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="forgot-password">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-[var(--text)] mb-1">Email address</label>
+            <input id="email" type="email" placeholder="example@domain.com" {...register('email')} className={inputClass} />
           </div>
+          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2" data-action="send-reset">
+            <Mail size={18} /> {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+          </button>
+        </form>
+        <div className="mt-4 flex justify-center text-sm">
+          <a href="/login" className="text-primary hover:underline">Back to Login</a>
         </div>
-        <div className="flex-grow"></div>
       </div>
-    </>
+    </div>
   );
 };
 
+const ForgotPasswordPage: React.FC = () => (
+  <ToastProvider><ForgotForm /></ToastProvider>
+);
 export default ForgotPasswordPage;

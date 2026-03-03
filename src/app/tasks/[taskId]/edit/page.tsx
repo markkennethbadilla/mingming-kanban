@@ -1,189 +1,95 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import TaskForm from '@/components/TaskForm';
-import { Toast } from 'primereact/toast';
+import { ToastProvider, useToast } from '@/context/ToastContext';
 import Loader from '@/components/Loader';
+import { ArrowLeft } from 'lucide-react';
 
-const EditTaskPage: React.FC = () => {
+const EditTaskInner: React.FC = () => {
   const [initialData, setInitialData] = useState(null);
   const [error, setError] = useState('');
-  const toast = useRef<Toast>(null);
+  const { showToast } = useToast();
   const params = useParams();
   const router = useRouter();
   const taskId = params.taskId;
 
-  const fetchUser = async () => {
+  const checkSession = async (): Promise<boolean> => {
     try {
-      const response = await fetch('/api/session', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        let errorMessage = 'Failed to fetch user session.';
-        if (response.status === 401) {
-          errorMessage =
-            errorData.message || 'Unauthorized. Please log in again.';
-        } else if (response.status === 404) {
-          errorMessage = errorData.message || 'User not found.';
-        }
-        throw new Error(errorMessage);
-      }
-      return true; // User session is valid
-    } catch (error: any) {
-      console.error('Error fetching user session:', error);
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to fetch user session.',
-        life: 5000,
-      });
-      window.location.href = '/'; // Redirect to home page
-    }
+      const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` } });
+      if (!res.ok) { window.location.href = '/'; return false; }
+      return true;
+    } catch { window.location.href = '/'; return false; }
   };
 
   useEffect(() => {
     const fetchTask = async () => {
-      const userSessionValid = await fetchUser(); // Check session before fetching task
-      if (!userSessionValid) return; // If session is invalid, do not proceed
-
+      const valid = await checkSession();
+      if (!valid) return;
       try {
-        const response = await fetch(`/api/tasks/${taskId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-          },
-        });
-        if (!response.ok) {
-          if (response.status === 404) {
-            setError('Task not found.');
-          } else {
-            throw new Error('Failed to fetch task data.');
-          }
-          return;
+        const res = await fetch(`/api/tasks/${taskId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` } });
+        if (!res.ok) {
+          if (res.status === 404) { setError('Task not found.'); return; }
+          throw new Error('Failed to fetch task.');
         }
-        const data = await response.json();
+        const data = await res.json();
         setInitialData(data.task);
-      } catch (error) {
-        console.error(error);
-        setError(error.message || 'Something went wrong.');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.');
       }
     };
     fetchTask();
   }, [taskId]);
 
-  const handleTaskDelete = async () => {
-    const userSessionValid = await fetchUser(); // Check session before deleting task
-    if (!userSessionValid) return; // If session is invalid, do not proceed
-
+  const handleSubmit = async (data: Record<string, unknown>) => {
+    const valid = await checkSession();
+    if (!valid) return;
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('authToken')}` },
+        body: JSON.stringify(data),
       });
-      if (!response.ok) {
-        throw new Error('Failed to delete task.');
-      }
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Task deleted successfully.',
-        life: 3000,
-      });
-      setTimeout(() => router.push(document.referrer), 3000);
-    } catch (error) {
-      console.error(error);
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to delete task.',
-        life: 3000,
-      });
+      if (!res.ok) throw new Error('Failed to update task.');
+      showToast({ severity: 'success', summary: 'Updated', detail: 'Task updated successfully.', life: 3000 });
+      setTimeout(() => router.push('/dashboard'), 1500);
+    } catch (err: unknown) {
+      showToast({ severity: 'error', summary: 'Error', detail: err instanceof Error ? err.message : 'Failed to update.', life: 3000 });
     }
   };
 
-  const handleTaskSubmit = async (data: any) => {
-    const userSessionValid = await fetchUser(); // Check session before submitting task
-    if (!userSessionValid) return; // If session is invalid, do not proceed
-
+  const handleDelete = async () => {
+    const valid = await checkSession();
+    if (!valid) return;
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update task.');
-      }
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Task updated successfully.',
-        life: 3000,
-      });
-      setTimeout(() => router.push(document.referrer), 3000);
-    } catch (error) {
-      console.error(error);
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to update task.',
-        life: 3000,
-      });
+      const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` } });
+      if (!res.ok) throw new Error('Failed to delete task.');
+      showToast({ severity: 'success', summary: 'Deleted', detail: 'Task deleted successfully.', life: 3000 });
+      setTimeout(() => router.push('/dashboard'), 1500);
+    } catch (err: unknown) {
+      showToast({ severity: 'error', summary: 'Error', detail: err instanceof Error ? err.message : 'Failed to delete.', life: 3000 });
     }
   };
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[87vh] text-center">
-        <p className="text-[var(--secondary-color)] text-lg">{error}</p>
-        <button
-          className="mt-4 px-4 py-2 bg-[var(--primary-color)] text-white rounded-lg cursor-pointer text-lg border-none transition-colors duration-200"
-          onClick={() => router.back()}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              'var(--primary-color-light)')
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = 'var(--primary-color)')
-          }
-        >
-          Back
-        </button>
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] text-center" data-page="edit-task-error">
+        <p className="text-red-500 text-lg mb-4">{error}</p>
+        <button onClick={() => router.back()} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">Back</button>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center bg-[var(--background-color)]">
-      <Toast ref={toast} />
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4 py-6" data-page="edit-task">
       {initialData ? (
-        <div className="w-full max-w-2xl bg-white rounded-lg p-6 shadow-md">
-          <a
-            className="inline-block text-sm text-[var(--primary-color)] cursor-pointer hover:underline"
-            onClick={() => router.back()}
-          >
-            &larr; Back
-          </a>
-          {/* Page Header */}
-          <h2 className="text-center text-[var(--primary-color)] text-2xl font-semibold">
-            Edit Task
-          </h2>
-          {/* Task Form */}
-          <TaskForm
-            onSubmit={handleTaskSubmit}
-            onDelete={handleTaskDelete}
-            initialData={initialData}
-          />
+        <div className="w-full max-w-2xl">
+          <button onClick={() => router.back()} className="inline-flex items-center gap-1 text-sm text-primary hover:underline mb-4" data-action="go-back">
+            <ArrowLeft size={16} /> Back
+          </button>
+          <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-4">Edit Task</h2>
+          <TaskForm onSubmit={handleSubmit} onDelete={handleDelete} initialData={initialData} />
         </div>
       ) : (
         <Loader />
@@ -192,4 +98,7 @@ const EditTaskPage: React.FC = () => {
   );
 };
 
+const EditTaskPage: React.FC = () => (
+  <ToastProvider><EditTaskInner /></ToastProvider>
+);
 export default EditTaskPage;

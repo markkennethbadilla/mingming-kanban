@@ -1,9 +1,20 @@
-import React, { createContext, useContext, useRef } from 'react';
-import { Toast } from 'primereact/toast';
+'use client';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { X, CheckCircle2, Info, AlertTriangle, AlertCircle } from 'lucide-react';
+
+type Severity = 'success' | 'info' | 'warn' | 'error' | 'secondary' | 'contrast';
+
+interface ToastMessage {
+  id: number;
+  severity: Severity;
+  summary: string;
+  detail: string;
+  life: number;
+}
 
 interface ToastContextType {
   showToast: (options: {
-    severity: 'success' | 'info' | 'warn' | 'error' | 'secondary' | 'contrast';
+    severity: Severity;
     summary: string;
     detail: string;
     life?: number;
@@ -12,24 +23,54 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const toastRef = useRef<Toast>(null);
+const severityStyles: Record<Severity, { bg: string; border: string; icon: React.ReactNode }> = {
+  success: { bg: 'bg-emerald-50', border: 'border-emerald-400', icon: <CheckCircle2 size={18} className="text-emerald-500" /> },
+  info: { bg: 'bg-blue-50', border: 'border-blue-400', icon: <Info size={18} className="text-blue-500" /> },
+  warn: { bg: 'bg-amber-50', border: 'border-amber-400', icon: <AlertTriangle size={18} className="text-amber-500" /> },
+  error: { bg: 'bg-red-50', border: 'border-red-400', icon: <AlertCircle size={18} className="text-red-500" /> },
+  secondary: { bg: 'bg-gray-50', border: 'border-gray-400', icon: <Info size={18} className="text-gray-500" /> },
+  contrast: { bg: 'bg-slate-800', border: 'border-slate-600', icon: <Info size={18} className="text-white" /> },
+};
 
-  const showToast = (options: {
-    severity: 'success' | 'info' | 'warn' | 'error' | 'secondary' | 'contrast';
-    summary: string;
-    detail: string;
-    life?: number;
-  }) => {
-    toastRef.current?.show(options);
-  };
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const idRef = useRef(0);
+
+  const removeToast = useCallback((id: number) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const showToast = useCallback((options: { severity: Severity; summary: string; detail: string; life?: number }) => {
+    const id = ++idRef.current;
+    const life = options.life ?? 3000;
+    setToasts((prev) => [...prev, { ...options, id, life }]);
+    setTimeout(() => removeToast(id), life);
+  }, [removeToast]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
-      <Toast ref={toastRef} position="top-right" />
       {children}
+      {/* Toast container */}
+      <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none" data-region="toast-container">
+        {toasts.map((toast) => {
+          const style = severityStyles[toast.severity];
+          return (
+            <div
+              key={toast.id}
+              className={`pointer-events-auto flex items-start gap-3 p-3 rounded-lg border ${style.border} ${style.bg} shadow-elevated animate-slide-up`}
+            >
+              <div className="shrink-0 mt-0.5">{style.icon}</div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-semibold ${toast.severity === 'contrast' ? 'text-white' : 'text-[var(--text)]'}`}>{toast.summary}</p>
+                <p className={`text-xs mt-0.5 ${toast.severity === 'contrast' ? 'text-gray-300' : 'text-[var(--text-muted)]'}`}>{toast.detail}</p>
+              </div>
+              <button onClick={() => removeToast(toast.id)} className="shrink-0 p-0.5 hover:bg-black/5 rounded">
+                <X size={14} className={toast.severity === 'contrast' ? 'text-gray-300' : 'text-gray-400'} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </ToastContext.Provider>
   );
 };

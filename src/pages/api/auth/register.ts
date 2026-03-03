@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { User } from '../../../models';
 
 export default async function handler(

@@ -1,369 +1,182 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Button } from 'primereact/button';
 import TaskCard from '@/components/TaskCard';
-import Image from 'next/image';
 import { ToastProvider } from '@/context/ToastContext';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Loader from '@/components/Loader';
+import { Send, Trash2, Cat } from 'lucide-react';
+
+interface ChatMessage {
+  type: 'user' | 'ai';
+  text: string;
+  tasks?: Array<{ id: number; title: string; description: string; dueDate: string; priority: 'LOW' | 'MEDIUM' | 'HIGH'; status: 'TO_DO' | 'IN_PROGRESS' | 'DONE' }>;
+}
 
 const ChatPage = () => {
-  const [messages, setMessages] = useState<
-    { type: string; text: string; tasks?: any[] }[]
-  >([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [userId, setUserId] = useState<number | null>(null);
-  const [isValidSession, setIsValidSession] = useState(false);
-  const [navbarHeight, setNavbarHeight] = useState(64); // default fallback
+  const [isValid, setIsValid] = useState(false);
+  const [sending, setSending] = useState(false);
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Load persisted messages
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      const storedMessages = localStorage.getItem(`chatMessages_${authToken}`);
-      if (storedMessages) setMessages(JSON.parse(storedMessages));
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const stored = localStorage.getItem(`chatMessages_${token}`);
+      if (stored) setMessages(JSON.parse(stored));
     }
   }, []);
 
+  // Persist messages
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      localStorage.setItem(
-        `chatMessages_${authToken}`,
-        JSON.stringify(messages)
-      );
-      scrollToBottom();
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      localStorage.setItem(`chatMessages_${token}`, JSON.stringify(messages));
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
+  // Validate session
   useEffect(() => {
-    const validateSession = async () => {
+    const validate = async () => {
       try {
-        const authToken = localStorage.getItem('authToken');
-        if (!authToken) {
-          router.push('/');
-          return;
-        }
-        const response = await fetch('/api/session', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-        const data = await response.json();
-        if (data.success) {
-          setUserId(data.user.id);
-          setIsValidSession(true);
-        } else {
-          router.push('/');
-        }
-      } catch {
-        router.push('/');
-      }
+        const token = localStorage.getItem('authToken');
+        if (!token) { router.push('/'); return; }
+        const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) { setUserId(data.user.id); setIsValid(true); }
+        else router.push('/');
+      } catch { router.push('/'); }
     };
-    validateSession();
+    validate();
   }, [router]);
 
-  useLayoutEffect(() => {
-    const navbar = document.getElementById('navbar-root');
-    if (navbar) {
-      setNavbarHeight(navbar.offsetHeight);
-    }
-    // Listen for resize events to update height dynamically
-    const handleResize = () => {
-      const navbar = document.getElementById('navbar-root');
-      if (navbar) setNavbarHeight(navbar.offsetHeight);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   const sendMessage = async () => {
-    if (!input.trim()) return;
-
-    const userMessage = { type: 'user', text: input };
-    const updatedMessages = [...messages, userMessage];
+    if (!input.trim() || sending) return;
+    const userMsg: ChatMessage = { type: 'user', text: input };
+    const updated = [...messages, userMsg];
     setInput('');
-    setMessages(updatedMessages);
+    setMessages(updated);
+    setSending(true);
 
-    const conversationHistory = updatedMessages.map(
-      (msg) => `${msg.type === 'user' ? 'User' : 'AI'}: ${msg.text}`
-    );
-
+    const history = updated.map((m) => `${m.type === 'user' ? 'User' : 'AI'}: ${m.text}`);
     try {
-      const response = await fetch('/api/ai/respond', {
+      const res = await fetch('/api/ai/respond', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: input, userId, conversationHistory }),
+        body: JSON.stringify({ prompt: input, userId, conversationHistory: history }),
       });
-
-      const data = await response.json();
-
+      const data = await res.json();
       if (data.success && data.message) {
-        const aiMessage = {
-          type: 'ai',
-          text: data.message,
-          tasks: data.tasks || [],
-        };
-
-        setMessages((prev) => [...prev, aiMessage]);
+        setMessages((prev) => [...prev, { type: 'ai', text: data.message, tasks: data.tasks || [] }]);
       }
-    } catch {
-      console.error('Failed to send message to AI.');
-    }
+    } catch { console.error('AI request failed.'); }
+    finally { setSending(false); }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
 
   const clearChat = () => {
     setMessages([]);
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      localStorage.removeItem(`chatMessages_${authToken}`);
-    }
+    const token = localStorage.getItem('authToken');
+    if (token) localStorage.removeItem(`chatMessages_${token}`);
   };
 
   const handleTaskDelete = (taskId: number) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) => {
-        if (msg.tasks) {
-          return {
-            ...msg,
-            tasks: msg.tasks.filter((task) => task.id !== taskId),
-          };
-        }
-        return msg;
-      })
-    );
+    setMessages((prev) => prev.map((m) => m.tasks ? { ...m, tasks: m.tasks.filter((t) => t.id !== taskId) } : m));
   };
 
-  const handleTaskUpdate = (taskId: number, updatedFields: any) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) => {
-        if (msg.tasks) {
-          return {
-            ...msg,
-            tasks: msg.tasks.map((task) =>
-              task.id === taskId ? { ...task, ...updatedFields } : task
-            ),
-          };
-        }
-        return msg;
-      })
-    );
+  const handleTaskUpdate = (taskId: number, fields: Record<string, unknown>) => {
+    setMessages((prev) => prev.map((m) => m.tasks ? { ...m, tasks: m.tasks.map((t) => t.id === taskId ? { ...t, ...fields } : t) } : m));
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  if (!isValid) return <Loader />;
 
-  if (!isValidSession) {
-    return <Loader />;
-  }
   return (
     <DndProvider backend={HTML5Backend}>
       <ToastProvider>
-        <div
-          id="ai-chat-bg"
-          className="flex justify-center items-center bg-cover bg-center bg-no-repeat w-full"
-          style={{
-            backgroundImage: "url('/background-image.png')",
-            minHeight: `calc(98vh - ${navbarHeight}px)`,
-            height: `calc(98vh - ${navbarHeight}px)`,
-          }}
-        >
-          <div
-            id="ai-chat-container"
-            className="w-full max-w-xs sm:max-w-4xl mx-auto p-1 sm:p-2"
-            style={{
-              backgroundColor: 'var(--card-background)',
-              borderRadius: '0.5rem',
-              display: 'flex',
-              flexDirection: 'column',
-              height: '90%',
-              maxHeight: '90%',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              id="ai-chat-header"
-              className="text-center"
-              style={{
-                margin: 0,
-                padding: 0,
-                height: '30px', // or use minHeight: '20px'
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <p
-                id="ai-chat-subtitle"
-                className="text-xs sm:text-base"
-                style={{
-                  color: 'var(--neutral-color)',
-                  margin: 0,
-                  padding: 0,
-                  fontSize: '0.85rem', // smaller font
-                  lineHeight: '1.1', // tighter line height
-                }}
-              >
-                Mingming is your AI assistant for task management
-              </p>
-            </div>
-            <div
-              id="ai-chat-main"
-              className="flex flex-col flex-1 border"
-              style={{
-                borderColor: 'var(--neutral-color)',
-                borderRadius: '0.5rem',
-                backgroundColor: 'white',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column-reverse',
-                height: '100%',
-                maxHeight: '100%',
-              }}
-            >
-              <div
-                id="ai-chat-input-bar"
-                className="p-1 sm:p-2 border-t"
-                style={{
-                  borderColor: 'var(--neutral-color)',
-                  backgroundColor: 'var(--card-background)',
-                }}
-              >
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                  <InputTextarea
-                    id="ai-chat-input"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    rows={2}
-                    placeholder="Type your message..."
-                    onKeyDown={handleKeyPress}
-                    className="flex-1 border rounded-md p-2 text-xs sm:text-base"
-                    style={{
-                      borderColor: 'var(--neutral-color)',
-                      color: 'var(--text-color)',
-                      minWidth: 0,
-                    }}
-                  />
-                  <div
-                    id="ai-chat-buttons"
-                    className="flex flex-row gap-1 sm:gap-2 w-full sm:w-auto"
-                  >
-                    <Button
-                      id="ai-chat-send-btn"
-                      label="Send"
-                      icon="pi pi-send"
-                      onClick={sendMessage}
-                      className="font-semibold px-2 sm:px-4 py-2 rounded-md shadow-md w-full sm:w-auto text-xs sm:text-base"
-                      style={{
-                        backgroundColor: 'var(--primary-color)',
-                        color: 'white',
-                      }}
-                    />
-                    <Button
-                      id="ai-chat-clear-btn"
-                      label="Clear"
-                      icon="pi pi-trash"
-                      onClick={clearChat}
-                      className="font-semibold px-2 sm:px-4 py-2 rounded-md shadow-md w-full sm:w-auto text-xs sm:text-base"
-                      style={{
-                        backgroundColor: 'var(--secondary-color)',
-                        color: 'white',
-                      }}
-                    />
-                  </div>
-                </div>
+        <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] p-4" data-page="ai-chat">
+          <div className="w-full max-w-3xl bg-white rounded-xl border border-[var(--border)] shadow-card flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
+            {/* Header */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)]">
+              <Cat size={20} className="text-primary" />
+              <div>
+                <h2 className="text-sm font-semibold text-[var(--text)]">MingMing AI</h2>
+                <p className="text-xs text-[var(--text-muted)]">Your AI-powered task assistant</p>
               </div>
-              <div
-                id="ai-chat-messages"
-                className="flex-1 overflow-y-auto p-1 sm:p-2 space-y-2"
-                style={{
-                  maxHeight: `calc(100vh - ${navbarHeight}px - 80px)`, // 80px for header/input bar
-                  minHeight: 0,
-                }}
-              >
-                {messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    id={`ai-chat-msg-${i}`}
-                    className={`flex items-start space-x-2 ${
-                      msg.type === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    {msg.type === 'ai' && (
-                      <div id={`ai-chat-msg-ai-avatar-${i}`}>
-                        <Image
-                          src="/logo.svg"
-                          alt="AI"
-                          width={24}
-                          height={24}
-                          className="sm:w-8 sm:h-8"
-                        />
+              <button onClick={clearChat} className="ml-auto text-xs text-[var(--text-muted)] hover:text-red-500 flex items-center gap-1 transition-colors" data-action="clear-chat">
+                <Trash2 size={14} /> Clear
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin" data-region="chat-messages">
+              {messages.length === 0 && (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <Cat size={48} className="text-primary/30 mb-3" />
+                  <p className="text-[var(--text-muted)] text-sm">Start a conversation with MingMing!</p>
+                  <p className="text-[var(--text-muted)] text-xs mt-1">Ask about your tasks, get suggestions, or just say hi.</p>
+                </div>
+              )}
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex items-start gap-2 ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {msg.type === 'ai' && (
+                    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Cat size={16} className="text-primary" />
+                    </div>
+                  )}
+                  <div className={`max-w-[80%] rounded-xl px-3.5 py-2.5 text-sm ${
+                    msg.type === 'user'
+                      ? 'bg-primary text-white rounded-br-sm'
+                      : 'bg-gray-100 text-[var(--text)] rounded-bl-sm'
+                  }`}>
+                    <span className="whitespace-pre-wrap break-words">{msg.text}</span>
+                    {msg.tasks && msg.tasks.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 bg-white rounded-lg p-2">
+                        {msg.tasks.map((task) => (
+                          <TaskCard
+                            key={task.id}
+                            {...task}
+                            onDelete={handleTaskDelete}
+                            onStatusChange={(id, s) => handleTaskUpdate(id, { status: s })}
+                          />
+                        ))}
                       </div>
                     )}
-                    <div
-                      id={`ai-chat-msg-bubble-${i}`}
-                      className={`rounded-lg p-2 text-xs sm:text-base ${
-                        msg.type === 'user' ? 'self-end' : 'self-start'
-                      }`}
-                      style={{
-                        backgroundColor:
-                          msg.type === 'user'
-                            ? 'var(--primary-color)'
-                            : 'var(--secondary-color)',
-                        color: 'white',
-                        maxWidth: '90vw',
-                        wordBreak: 'break-word',
-                        maxHeight: `calc(100vh - ${navbarHeight}px - 120px)`, // card max height
-                        overflowY: 'auto',
-                      }}
-                    >
-                      {msg.text}
-                      {msg.tasks && (
-                        <div
-                          id={`ai-chat-msg-tasks-${i}`}
-                          className="grid grid-cols-1 sm:grid-cols-2 mt-2 gap-2"
-                          style={{
-                            backgroundColor: 'white',
-                            maxHeight: `calc(100vh - ${navbarHeight}px - 160px)`,
-                            overflowY: 'auto',
-                          }}
-                        >
-                          {msg.tasks.map((task) => (
-                            <div key={task.id} className="flex flex-col">
-                              <TaskCard
-                                id={task.id}
-                                title={task.title}
-                                description={task.description}
-                                dueDate={task.dueDate}
-                                priority={task.priority}
-                                status={task.status}
-                                onDelete={handleTaskDelete}
-                                onStatusChange={(id, newStatus) =>
-                                  handleTaskUpdate(id, { status: newStatus })
-                                }
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
                   </div>
-                ))}
-                <div id="ai-chat-end" ref={messagesEndRef} />
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="border-t border-[var(--border)] p-3" data-region="chat-input">
+              <div className="flex gap-2">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  rows={2}
+                  placeholder="Type your message..."
+                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                  data-input="chat-message"
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={sending || !input.trim()}
+                  className="self-end px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-1.5 text-sm font-medium"
+                  data-action="send-message"
+                >
+                  <Send size={16} /> {sending ? '...' : 'Send'}
+                </button>
               </div>
             </div>
           </div>

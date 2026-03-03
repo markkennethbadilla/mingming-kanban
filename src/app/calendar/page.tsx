@@ -1,279 +1,204 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, CalendarDateTemplateEvent } from 'primereact/calendar';
-import { Toast } from 'primereact/toast';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import TaskCard from '../../components/TaskCard';
-import { Task } from '@/types/task';
-import { ToastProvider } from '@/context/ToastContext';
-import { Button } from 'primereact/button';
-
-import '@/styles/CalendarPage.css';
+import { ToastProvider, useToast } from '@/context/ToastContext';
+import TaskCard from '@/components/TaskCard';
 import Loader from '@/components/Loader';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 
-const CalendarPage: React.FC = () => {
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: Date;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  status: 'TO_DO' | 'IN_PROGRESS' | 'DONE';
+}
+
+/* eslint-disable react-hooks/rules-of-hooks */
+function CalendarInner() {
   const router = useRouter();
-  const toast = useRef<Toast>(null);
+  const { showToast } = useToast();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [loading, setLoading] = useState(true);
 
-  const normalizeToLocalMidnight = (date: Date): Date => {
-    const localMidnight = new Date(date);
-    localMidnight.setHours(0, 0, 0, 0);
-    return localMidnight;
-  };
-
+  // Fetch session
   useEffect(() => {
-    const fetchUserId = async () => {
+    const fetchSession = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        if (!token) {
-          router.push('/login');
-          return;
-        }
-
-        const response = await axios.get('/api/session', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.data.success) {
-          setUserId(response.data.user.id);
-        } else {
-          throw new Error('Failed to fetch user session.');
-        }
-      } catch (error) {
-        console.error('Error fetching user session:', error);
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Session Error',
-          detail: 'Unable to fetch user session. Please log in again.',
-          life: 3000,
-        });
+        if (!token) { router.push('/login'); return; }
+        const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) setUserId(data.user.id);
+        else throw new Error('Session invalid');
+      } catch {
         localStorage.removeItem('authToken');
         router.push('/');
       }
     };
-
-    fetchUserId();
+    fetchSession();
   }, [router]);
 
+  // Fetch tasks
   useEffect(() => {
+    if (!userId) return;
     const fetchTasks = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        if (!token || !userId) return;
-
-        const response = await axios.get(`/api/tasks`, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { userId },
-        });
-
-        if (response.data.success) {
-          const normalizedTasks = response.data.tasks.map((task: Task) => ({
-            ...task,
-            dueDate: normalizeToLocalMidnight(new Date(task.dueDate)),
-          }));
-
-          setTasks(normalizedTasks);
-
-          // Set today's date after loading tasks
-          setSelectedDate(normalizeToLocalMidnight(new Date()));
-
-          setLoading(false);
-        } else {
-          throw new Error('Failed to fetch tasks.');
+        if (!token) return;
+        const res = await fetch(`/api/tasks?userId=${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) {
+          setTasks(data.tasks.map((t: Task) => ({ ...t, dueDate: new Date(t.dueDate) })));
         }
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to fetch tasks.',
-          life: 3000,
-        });
+      } catch (err) {
+        console.error('Failed to fetch tasks:', err);
+        showToast({ severity: 'error', summary: 'Error', detail: 'Failed to fetch tasks.', life: 3000 });
+      } finally {
         setLoading(false);
       }
     };
+    fetchTasks();
+  }, [userId, showToast]);
 
-    if (userId) fetchTasks();
-  }, [userId]);
-
-  const handleDateChange = (days: number) => {
-    if (selectedDate) {
-      setSelectedDate((prevDate) => {
-        const newDate = new Date(prevDate!);
-        newDate.setDate(newDate.getDate() + days);
-        return normalizeToLocalMidnight(newDate);
-      });
-    }
-  };
-
-  const tasksForSelectedDate =
-    selectedDate &&
-    tasks.filter((task) => {
-      const taskDateLocal = normalizeToLocalMidnight(task.dueDate);
-      const selectedDateLocal = normalizeToLocalMidnight(selectedDate);
-      return taskDateLocal.getTime() === selectedDateLocal.getTime();
-    });
-
-  const dateTemplate = (event: CalendarDateTemplateEvent) => {
-    const { day, month, year } = event;
-    const reconstructedDate = new Date(year, month, day);
-    const dateKey = normalizeToLocalMidnight(reconstructedDate)
-      .toISOString()
-      .split('T')[0];
-    const hasTask = tasks.some(
-      (task) =>
-        normalizeToLocalMidnight(task.dueDate).toISOString().split('T')[0] ===
-        dateKey
-    );
-    return (
-      <div className="calendar-day">
-        <span className="day-number">{day}</span>
-        {hasTask && <div className="task-dot"></div>}
-      </div>
-    );
-  };
-
-  const handleTaskDelete = async (id: number) => {
+  const handleDelete = useCallback(async (id: number) => {
     try {
       const token = localStorage.getItem('authToken');
-      if (!token) throw new Error('User is not authenticated.');
+      if (!token) throw new Error('Not authenticated');
+      await fetch(`/api/tasks/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) { console.error('Delete failed:', err); }
+  }, []);
 
-      await axios.delete(`/api/tasks/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
-  };
-
-  const handleStatusChange = async (id: number, newStatus: string) => {
+  const handleStatusChange = useCallback(async (id: number, newStatus: string) => {
     try {
       const token = localStorage.getItem('authToken');
-      if (!token) throw new Error('User is not authenticated.');
-
-      await axios.put(
-        `/api/tasks/${id}`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === id
-            ? { ...task, status: newStatus as 'TO_DO' | 'IN_PROGRESS' | 'DONE' }
-            : task
-        )
-      );
-    } catch (error) {
-      console.error('Error updating task status:', error);
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to update task status.',
-        life: 3000,
+      if (!token) throw new Error('Not authenticated');
+      await fetch(`/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: newStatus }),
       });
+      setTasks((prev) => prev.map((t) => t.id === id ? { ...t, status: newStatus as Task['status'] } : t));
+    } catch (err) {
+      console.error('Status update failed:', err);
+      showToast({ severity: 'error', summary: 'Error', detail: 'Failed to update status.', life: 3000 });
     }
-  };
+  }, [showToast]);
 
-  if (loading || !selectedDate) {
-    return (
-      <>
-        <Loader />
-      </>
-    );
-  }
+  // Build calendar grid
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(monthStart);
+  const calStart = startOfWeek(monthStart);
+  const calEnd = endOfWeek(monthEnd);
+
+  const days: Date[] = [];
+  let day = calStart;
+  while (day <= calEnd) { days.push(day); day = addDays(day, 1); }
+
+  const hasTaskOnDay = (d: Date) => tasks.some((t) => isSameDay(t.dueDate, d));
+  const tasksForSelected = tasks.filter((t) => isSameDay(t.dueDate, selectedDate));
+
+  if (loading) return <Loader />;
 
   return (
-    <ToastProvider>
-      <DndProvider backend={HTML5Backend}>
-        <div className="flex flex-col items-center px-6">
-          <Toast ref={toast} />
-          <h1
-            className="text-3xl font-bold"
-            style={{ color: 'var(--primary-color)' }}
-          >
-            Task Calendar
-          </h1>
-
-          <div className="flex flex-col lg:flex-row w-full max-w-6xl gap-6">
-            {/* Calendar Container */}
-            <div className="bg-white rounded-lg shadow p-4 h-fit w-full lg:w-auto">
-              <Calendar
-                inline
-                value={selectedDate}
-                onSelect={(e) =>
-                  setSelectedDate(normalizeToLocalMidnight(e.value as Date))
-                }
-                dateTemplate={dateTemplate}
-                showWeek
-                numberOfMonths={1}
-                className="custom-calendar"
-              />
+    <div className="min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4 py-6" data-page="calendar">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold text-[var(--text)] mb-6">Task Calendar</h1>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Calendar grid */}
+          <div className="bg-white rounded-xl border border-[var(--border)] shadow-card p-4 lg:flex-1">
+            {/* Month navigation */}
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" data-action="prev-month">
+                <ChevronLeft size={20} className="text-[var(--text-muted)]" />
+              </button>
+              <h2 className="text-lg font-semibold text-[var(--text)]">{format(currentMonth, 'MMMM yyyy')}</h2>
+              <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" data-action="next-month">
+                <ChevronRight size={20} className="text-[var(--text-muted)]" />
+              </button>
             </div>
 
-            {/* Task List Section */}
-            <div className="w-full lg:w-96">
-              <div className="bg-white rounded-lg shadow p-4">
-                {/* Date and Arrows at the top */}
-                <div className="flex justify-between items-center mb-4">
-                  <Button
-                    icon="pi pi-chevron-left"
-                    className="p-button-text"
-                    onClick={() => handleDateChange(-1)}
-                  />
-                  <h2 className="text-xl font-semibold text-center">
-                    {normalizeToLocalMidnight(selectedDate).toLocaleDateString(
-                      'en-US',
-                      {
-                        weekday: 'long',
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      }
+            {/* Day headers */}
+            <div className="grid grid-cols-7 gap-1 mb-1">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                <div key={d} className="text-center text-xs font-medium text-[var(--text-muted)] py-1">{d}</div>
+              ))}
+            </div>
+
+            {/* Day cells */}
+            <div className="grid grid-cols-7 gap-1">
+              {days.map((d, i) => {
+                const isCurrentMonth = isSameMonth(d, currentMonth);
+                const isSelected = isSameDay(d, selectedDate);
+                const isToday = isSameDay(d, new Date());
+                const hasTask = hasTaskOnDay(d);
+
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedDate(d)}
+                    className={`relative flex flex-col items-center justify-center py-2 rounded-lg text-sm transition-colors ${
+                      isSelected ? 'bg-primary text-white' :
+                      isToday ? 'bg-primary/10 text-primary font-semibold' :
+                      isCurrentMonth ? 'text-[var(--text)] hover:bg-gray-50' :
+                      'text-gray-300'
+                    }`}
+                    data-day={format(d, 'yyyy-MM-dd')}
+                  >
+                    {format(d, 'd')}
+                    {hasTask && (
+                      <span className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-primary'}`} />
                     )}
-                  </h2>
-                  <Button
-                    icon="pi pi-chevron-right"
-                    className="p-button-text"
-                    onClick={() => handleDateChange(1)}
-                  />
-                </div>
-                {/* Task List */}
-                <div className="flex flex-col">
-                  {tasksForSelectedDate && tasksForSelectedDate.length > 0 ? (
-                    tasksForSelectedDate.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        {...task}
-                        onDelete={handleTaskDelete}
-                        onStatusChange={handleStatusChange}
-                      />
-                    ))
-                  ) : (
-                    <p className="text-gray-500 italic text-center">
-                      No tasks for this date.
-                    </p>
-                  )}
-                </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Selected date tasks */}
+          <div className="lg:w-96">
+            <div className="bg-white rounded-xl border border-[var(--border)] shadow-card p-4">
+              <div className="flex items-center justify-between mb-4">
+                <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                  <ChevronLeft size={18} className="text-[var(--text-muted)]" />
+                </button>
+                <h3 className="text-sm font-semibold text-[var(--text)]">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
+                <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                  <ChevronRight size={18} className="text-[var(--text-muted)]" />
+                </button>
+              </div>
+              <div className="flex flex-col gap-2" data-region="day-tasks">
+                {tasksForSelected.length > 0 ? (
+                  tasksForSelected.map((task) => (
+                    <TaskCard key={task.id} {...task} dueDate={task.dueDate.toISOString()} onDelete={handleDelete} onStatusChange={handleStatusChange} />
+                  ))
+                ) : (
+                  <p className="text-sm text-[var(--text-muted)] italic text-center py-8">No tasks for this date.</p>
+                )}
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CalendarPage() {
+  return (
+    <ToastProvider>
+      <DndProvider backend={HTML5Backend}>
+        <CalendarInner />
       </DndProvider>
     </ToastProvider>
   );
-};
-
-export default CalendarPage;
+}

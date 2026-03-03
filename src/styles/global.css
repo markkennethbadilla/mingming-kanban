@@ -1,37 +1,51 @@
-@import 'primereact/resources/themes/saga-blue/theme.css';
-@import 'primereact/resources/primereact.min.css';
-@import 'primeicons/primeicons.css';
-@import 'primeflex/primeflex.css';
-
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --primary-color: #3cb4ac;
-  --secondary-color: #f98a8a;
-  --background-color: #faf8f5;
-  --text-color: #3d3d3d;
-  --highlight-color: #e6c84e;
-  --neutral-color: #727272;
-  --card-background: #f3f4f6; /* bg-gray-100 */
+  --primary: #3cb4ac;
+  --primary-dark: #2d9a93;
+  --secondary: #f98a8a;
+  --secondary-dark: #e67373;
+  --background: #faf8f5;
+  --surface: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #64748b;
+  --highlight: #e6c84e;
+  --border: #e2e8f0;
+  --card-bg: #ffffff;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
 }
 
-body main {
-  background-color: var(--background-color);
+* {
+  box-sizing: border-box;
 }
 
-/* password field */
-/* Ensure the p-password container spans the full width */
-.p-password.p-component {
-  width: 100%;
-  display: block; /* Ensures it behaves like a block-level input */
+body {
+  background-color: var(--background);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Ensure the password input itself also spans the full width */
-.p-password-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--neutral-color, #ccc);
-  box-sizing: border-box; /* Prevents padding from affecting width */
+/* Focus ring utility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

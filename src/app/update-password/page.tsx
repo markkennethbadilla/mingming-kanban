@@ -1,198 +1,101 @@
 'use client';
 
-import React, { useRef, useEffect, Suspense } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
-import { Password } from 'primereact/password';
+import { ToastProvider, useToast } from '@/context/ToastContext';
+import { KeyRound, Eye, EyeOff } from 'lucide-react';
 
-// Validation schema using zod
-const validationSchema = z
-  .object({
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z
-      .string()
-      .min(6, 'Confirm Password must be at least 6 characters'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords must match',
-    path: ['confirmPassword'], // Path of the field causing the issue
-  });
+const schema = z.object({
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string().min(6, 'Confirm password must be at least 6 characters'),
+}).refine((d) => d.password === d.confirmPassword, { message: 'Passwords must match', path: ['confirmPassword'] });
+type UpdateData = z.infer<typeof schema>;
 
-type UpdatePasswordFormData = z.infer<typeof validationSchema>;
+const inputClass = 'w-full px-4 py-3 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
 
-const UpdatePasswordPage: React.FC = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <UpdatePasswordForm />
-    </Suspense>
-  );
-};
-
-const UpdatePasswordForm: React.FC = () => {
+const UpdateForm: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
+  const { showToast } = useToast();
+  const [showPw, setShowPw] = useState(false);
 
-  const toast = useRef<any>(null);
-
-  const { control, handleSubmit, formState } = useForm<UpdatePasswordFormData>({
-    resolver: zodResolver(validationSchema),
-    defaultValues: {
-      password: '',
-      confirmPassword: '',
-    },
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<UpdateData>({
+    resolver: zodResolver(schema),
+    defaultValues: { password: '', confirmPassword: '' },
   });
 
-  // Show validation errors as Toast messages
   useEffect(() => {
-    if (formState.errors) {
-      Object.values(formState.errors).forEach((error) => {
-        toast.current.show({
-          severity: 'warn',
-          summary: 'Validation Error',
-          detail: error.message,
-          life: 3000,
-        });
-      });
-    }
-  }, [formState.errors]);
+    Object.values(errors).forEach((e) => {
+      if (e?.message) showToast({ severity: 'warn', summary: 'Validation', detail: e.message, life: 3000 });
+    });
+  }, [errors, showToast]);
 
-  // Check if the user is already logged in
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const authToken = localStorage.getItem('authToken');
-        if (!authToken) return;
-
-        const response = await fetch('/api/session', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-
-        if (response.ok) {
-          router.push(document.referrer);
-        }
-      } catch {}
+    const check = async () => {
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) return;
+      const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${authToken}` } });
+      if (res.ok) router.back();
     };
-
-    checkSession();
+    check();
   }, [router]);
 
-  const onSubmit = async (data: UpdatePasswordFormData) => {
+  const onSubmit = async (data: UpdateData) => {
     if (!token) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Invalid or missing token.',
-        life: 3000,
-      });
+      showToast({ severity: 'error', summary: 'Error', detail: 'Invalid or missing token.', life: 3000 });
       return;
     }
-
     try {
-      const response = await fetch('/api/auth/update-password', {
+      const res = await fetch('/api/auth/update-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password: data.password }),
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to reset password.');
-      }
-
-      toast.current.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Password updated successfully. Redirecting to login...',
-        life: 3000,
-      });
-
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || 'Failed to reset password.');
+      showToast({ severity: 'success', summary: 'Success', detail: 'Password updated. Redirecting to login...', life: 3000 });
       setTimeout(() => router.push('/login'), 3000);
-    } catch (error: any) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Reset Failed',
-        detail: error.message || 'Something went wrong. Please try again.',
-        life: 3000,
-      });
+    } catch (err: unknown) {
+      showToast({ severity: 'error', summary: 'Reset Failed', detail: err instanceof Error ? err.message : 'Something went wrong.', life: 3000 });
     }
   };
 
   return (
-    <div className="flex items-center justify-center bg-[var(--background-color,#f4f4f4)] py-6 min-h-[87vh]">
-      <Toast ref={toast} />
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-center text-2xl font-semibold text-[var(--primary-color,#007bff)] mb-4">
-          Reset Your Password
-        </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-          {/* New Password Field */}
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4" data-page="update-password">
+      <div className="w-full max-w-md bg-white p-8 rounded-xl border border-[var(--border)] shadow-card">
+        <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-6">Reset Your Password</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="update-password">
           <div>
-            <label
-              htmlFor="password"
-              className="block mb-2 text-lg text-[var(--text-color,#333)] font-medium"
-            >
-              New Password
-            </label>
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <Password
-                  id="password"
-                  {...field}
-                  feedback={true}
-                  toggleMask
-                  className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
-                />
-              )}
-            />
+            <label htmlFor="password" className="block text-sm font-medium text-[var(--text)] mb-1">New Password</label>
+            <div className="relative">
+              <input id="password" type={showPw ? 'text' : 'password'} placeholder="New password" {...register('password')} className={inputClass} />
+              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
+                {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
-
-          {/* Confirm Password Field */}
           <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block mb-2 text-lg text-[var(--text-color,#333)] font-medium"
-            >
-              Confirm New Password
-            </label>
-            <Controller
-              name="confirmPassword"
-              control={control}
-              render={({ field }) => (
-                <Password
-                  id="confirmPassword"
-                  {...field}
-                  feedback={false}
-                  toggleMask
-                  className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
-                />
-              )}
-            />
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--text)] mb-1">Confirm Password</label>
+            <input id="confirmPassword" type={showPw ? 'text' : 'password'} placeholder="Confirm password" {...register('confirmPassword')} className={inputClass} />
           </div>
-
-          {/* Submit Button */}
-          <Button
-            label={formState.isSubmitting ? 'Updating...' : 'Reset Password'}
-            type="submit"
-            disabled={formState.isSubmitting}
-            className="w-full p-3 bg-[var(--primary-color,#007bff)] text-white border-none rounded-lg font-semibold text-lg"
-          />
+          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2" data-action="reset-password">
+            <KeyRound size={18} /> {isSubmitting ? 'Updating...' : 'Reset Password'}
+          </button>
         </form>
       </div>
     </div>
   );
 };
 
+const UpdatePasswordPage: React.FC = () => (
+  <ToastProvider>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen text-[var(--text-muted)]">Loading...</div>}>
+      <UpdateForm />
+    </Suspense>
+  </ToastProvider>
+);
 export default UpdatePasswordPage;

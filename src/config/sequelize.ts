@@ -5,21 +5,22 @@ const pg = require('pg');
 
 dotenv.config();
 
+const useSSL = process.env.DB_SSL === 'true';
+
 const sequelize = new Sequelize(
   (process.env.DB_NAME || process.env.POSTGRES_DATABASE) as string,
   (process.env.DB_USERNAME || process.env.POSTGRES_USER) as string,
   (process.env.DB_PASSWORD || process.env.POSTGRES_PASSWORD) as string,
   {
-    host: process.env.DB_HOST || process.env.POSTGRES_HOST,
+    host: process.env.DB_HOST || process.env.POSTGRES_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
     dialect: 'postgres',
     logging: false,
-    ssl: true,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
+    ...(useSSL && {
+      dialectOptions: {
+        ssl: { require: true, rejectUnauthorized: false },
       },
-    },
+    }),
     dialectModule: pg,
   }
 );

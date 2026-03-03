@@ -1,206 +1,92 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
-import { Password } from 'primereact/password';
+import { ToastProvider, useToast } from '@/context/ToastContext';
+import { UserPlus, Eye, EyeOff } from 'lucide-react';
 
-// Validation schema using zod
-const validationSchema = z.object({
+const schema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
   email: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
+type RegisterData = z.infer<typeof schema>;
 
-type RegisterFormData = z.infer<typeof validationSchema>;
+const inputClass = 'w-full px-4 py-3 text-sm rounded-lg border border-[var(--border)] bg-white text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
 
-const RegisterPage: React.FC = () => {
-  const { control, handleSubmit, formState } = useForm<RegisterFormData>({
-    resolver: zodResolver(validationSchema),
-    defaultValues: {
-      username: '',
-      email: '',
-      password: '',
-    },
+const RegisterForm: React.FC = () => {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterData>({
+    resolver: zodResolver(schema),
+    defaultValues: { username: '', email: '', password: '' },
   });
+  const { showToast } = useToast();
+  const [showPw, setShowPw] = useState(false);
 
-  const toast = useRef<any>(null);
-
-  // Show validation errors as Toast messages
   useEffect(() => {
-    if (formState.errors) {
-      Object.values(formState.errors).forEach((error) => {
-        toast.current.show({
-          severity: 'warn',
-          summary: 'Validation Error',
-          detail: error.message,
-          life: 3000,
-        });
-      });
-    }
-  }, [formState.errors]);
-
-  // Check if the user is already logged in
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-
-        const response = await fetch('/api/session', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          window.location.href = '/'; // Redirect if session is valid
-        }
-      } catch {}
+    const check = async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) window.location.href = '/';
     };
-
-    checkSession();
+    check();
   }, []);
 
-  const onSubmit = async (data: RegisterFormData) => {
+  useEffect(() => {
+    Object.values(errors).forEach((e) => {
+      if (e?.message) showToast({ severity: 'warn', summary: 'Validation', detail: e.message, life: 3000 });
+    });
+  }, [errors, showToast]);
+
+  const onSubmit = async (data: RegisterData) => {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.message || 'Registration failed');
-      }
-
-      toast.current.show({
-        severity: 'success',
-        summary: 'Registration Successful',
-        detail: 'Your account has been created.',
-        life: 3000,
-      });
-
-      window.location.href = '/login'; // Redirect to login on successful registration
-    } catch (error: any) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Registration Failed',
-        detail: error.message || 'An error occurred. Please try again.',
-        life: 3000,
-      });
+      const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || 'Registration failed');
+      showToast({ severity: 'success', summary: 'Success', detail: 'Account created! Redirecting to login...', life: 3000 });
+      setTimeout(() => { window.location.href = '/login'; }, 2000);
+    } catch (err: unknown) {
+      showToast({ severity: 'error', summary: 'Registration Failed', detail: err instanceof Error ? err.message : 'An error occurred.', life: 3000 });
     }
   };
 
   return (
-    <div className="flex flex-col min-h-[87vh] bg-[var(--background-color,#f4f4f4)]">
-      <div className="flex-grow"></div>
-      <div className="flex justify-center items-center">
-        <Toast ref={toast} />
-        <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-center text-2xl font-semibold text-[var(--secondary-color)] mb-4">
-            Sign Up
-          </h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-            {/* Username Field */}
-            <div>
-              <label
-                htmlFor="username"
-                className="block mb-2 text-lg text-[var(--text-color)] font-medium"
-              >
-                Username
-              </label>
-              <Controller
-                name="username"
-                control={control}
-                render={({ field }) => (
-                  <InputText
-                    id="username"
-                    {...field}
-                    placeholder="Enter your username"
-                    className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
-                  />
-                )}
-              />
-            </div>
-
-            {/* Email Field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block mb-2 text-lg text-[var(--text-color)] font-medium"
-              >
-                Email
-              </label>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) => (
-                  <InputText
-                    id="email"
-                    type="email"
-                    {...field}
-                    placeholder="Enter your email"
-                    className="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
-                  />
-                )}
-              />
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block mb-2 text-lg text-[var(--text-color)] font-medium"
-              >
-                Password
-              </label>
-              <Controller
-                name="password"
-                control={control}
-                render={({ field }) => (
-                  <Password
-                    id="password"
-                    {...field}
-                    placeholder="Enter your password"
-                    toggleMask
-                    feedback={true}
-                    inputClassName="w-full p-3 rounded-lg border border-[var(--neutral-color,#ccc)]"
-                  />
-                )}
-              />
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              label="Sign Up"
-              type="submit"
-              className="w-full p-3 rounded-lg bg-[var(--secondary-color)] text-white font-semibold text-lg"
-            />
-          </form>
-
-          {/* Already Have Account Links */}
-          <div className="mt-4 flex justify-center text-sm text-[var(--neutral-color,#666)]">
-            <a
-              href="/login"
-              className="text-[var(--primary-color,#007bff)] hover:underline"
-            >
-              Already have an account?
-            </a>
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4" data-page="register">
+      <div className="w-full max-w-md bg-white p-8 rounded-xl border border-[var(--border)] shadow-card">
+        <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-6">Sign Up</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="register">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-[var(--text)] mb-1">Username</label>
+            <input id="username" type="text" placeholder="Enter your username" {...register('username')} className={inputClass} />
           </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-[var(--text)] mb-1">Email</label>
+            <input id="email" type="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-[var(--text)] mb-1">Password</label>
+            <div className="relative">
+              <input id="password" type={showPw ? 'text' : 'password'} placeholder="Enter your password" {...register('password')} className={inputClass} />
+              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
+                {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2" data-action="register">
+            <UserPlus size={18} /> {isSubmitting ? 'Creating...' : 'Sign Up'}
+          </button>
+        </form>
+        <div className="mt-4 flex justify-center text-sm">
+          <a href="/login" className="text-primary hover:underline">Already have an account?</a>
         </div>
       </div>
-      <div className="flex-grow"></div>
     </div>
   );
 };
 
+const RegisterPage: React.FC = () => (
+  <ToastProvider><RegisterForm /></ToastProvider>
+);
 export default RegisterPage;
