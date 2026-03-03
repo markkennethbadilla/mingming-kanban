@@ -6,7 +6,14 @@ import '@/styles/global.css';
 export const metadata = {
   title: 'MingMing Kanban',
   description: 'AI-powered Kanban board with MingMing, your cheerful cat productivity assistant.',
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/logo.svg' },
+  openGraph: {
+    title: 'MingMing Kanban',
+    description: 'AI-powered Kanban board with MingMing, your cheerful cat productivity assistant.',
+    url: 'https://mingming-kanban.elunari.uk',
+    siteName: 'MingMing Kanban',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
