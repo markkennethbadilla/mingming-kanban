@@ -65,7 +65,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <p className={`text-xs mt-0.5 ${toast.severity === 'contrast' ? 'text-gray-300' : 'text-[var(--text-muted)]'}`}>{toast.detail}</p>
               </div>
               <button onClick={() => removeToast(toast.id)} className="shrink-0 p-0.5 hover:bg-black/5 rounded">
-                <X size={14} className={toast.severity === 'contrast' ? 'text-gray-300' : 'text-gray-400'} />
+                <X size={14} className={toast.severity === 'contrast' ? 'text-gray-300' : 'text-[var(--text-muted)]'} />
               </button>
             </div>
           );

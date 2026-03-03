@@ -150,7 +150,7 @@ function CalendarInner() {
                       isSelected ? 'bg-primary text-white' :
                       isToday ? 'bg-primary/10 text-primary font-semibold' :
                       isCurrentMonth ? 'text-[var(--text)] hover:bg-[var(--border)]/30' :
-                      'text-gray-300'
+                      'text-[var(--text-muted)] opacity-40'
                     }`}
                     data-day={format(d, 'yyyy-MM-dd')}
                   >
