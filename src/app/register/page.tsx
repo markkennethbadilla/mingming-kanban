@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ToastProvider, useToast } from '@/context/ToastContext';
+import { PixelCatHappy } from '@/components/pixel-cats';
 import { UserPlus, Eye, EyeOff } from 'lucide-react';
 
 const schema = z.object({
@@ -14,7 +15,7 @@ const schema = z.object({
 });
 type RegisterData = z.infer<typeof schema>;
 
-const inputClass = 'w-full px-4 py-3 text-sm rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
+const inputClass = 'w-full px-4 py-3 text-sm font-semibold rounded-xl border-2 border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:border-[var(--primary)] transition-colors';
 
 const RegisterForm: React.FC = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterData>({
@@ -53,20 +54,24 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4" data-page="register">
-      <div className="w-full max-w-md bg-[var(--card-bg)] p-8 rounded-xl border border-[var(--border)] shadow-card">
-        <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-6">Sign Up</h2>
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4" style={{ backgroundColor: 'var(--background)' }} data-page="register">
+      <div className="w-full max-w-md card-cozy p-8">
+        <div className="text-center mb-5">
+          <div className="cat-bounce inline-block mb-2"><PixelCatHappy size={48} /></div>
+          <h2 className="text-2xl font-extrabold text-[var(--text)]">Join MingMing!</h2>
+          <p className="text-sm text-[var(--text-muted)] font-semibold">Create your account</p>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="register">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-[var(--text)] mb-1">Username</label>
+            <label htmlFor="username" className="block text-sm font-bold text-[var(--text)] mb-1">Username</label>
             <input id="username" type="text" placeholder="Enter your username" {...register('username')} className={inputClass} />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-[var(--text)] mb-1">Email</label>
+            <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email</label>
             <input id="email" type="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-[var(--text)] mb-1">Password</label>
+            <label htmlFor="password" className="block text-sm font-bold text-[var(--text)] mb-1">Password</label>
             <div className="relative">
               <input id="password" type={showPw ? 'text' : 'password'} placeholder="Enter your password" {...register('password')} className={inputClass} />
               <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
@@ -74,12 +79,12 @@ const RegisterForm: React.FC = () => {
               </button>
             </div>
           </div>
-          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2" data-action="register">
+          <button type="submit" disabled={isSubmitting} className="btn-yarn w-full py-3 flex items-center justify-center gap-2 disabled:opacity-40" data-action="register">
             <UserPlus size={18} /> {isSubmitting ? 'Creating...' : 'Sign Up'}
           </button>
         </form>
         <div className="mt-4 flex justify-center text-sm">
-          <a href="/login" className="text-primary hover:underline">Already have an account?</a>
+          <a href="/login" className="text-[var(--secondary)] font-bold hover:underline">Already have an account? Log in</a>
         </div>
       </div>
     </div>

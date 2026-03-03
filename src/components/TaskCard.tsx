@@ -16,9 +16,9 @@ interface TaskCardProps {
 }
 
 const priorityConfig = {
-  LOW: { color: 'bg-slate-400', text: 'text-slate-600', label: 'Low' },
-  MEDIUM: { color: 'bg-amber-400', text: 'text-amber-600', label: 'Medium' },
-  HIGH: { color: 'bg-red-400', text: 'text-red-600', label: 'High' },
+  LOW: { color: 'bg-[var(--fish-blue)]', text: 'text-[var(--fish-blue)]', label: 'Low', border: 'var(--fish-blue)' },
+  MEDIUM: { color: 'bg-[var(--accent)]', text: 'text-[var(--accent-dark)]', label: 'Medium', border: 'var(--accent)' },
+  HIGH: { color: 'bg-[var(--yarn-red)]', text: 'text-[var(--yarn-red)]', label: 'High', border: 'var(--yarn-red)' },
 };
 
 const statusLabels: Record<string, string> = {
@@ -71,14 +71,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
         ref={cardRef}
         data-row-id={`task-${id}`}
         onClick={() => setExpanded(!expanded)}
-        className={`group relative bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card hover:shadow-card-hover transition-all cursor-pointer ${
+        className={`group relative card-cozy transition-all cursor-pointer ${
           isDragging ? 'opacity-40' : ''
         }`}
-        style={{ borderLeft: `3px solid ${pConfig.color === 'bg-slate-400' ? '#94a3b8' : pConfig.color === 'bg-amber-400' ? '#fbbf24' : '#f87171'}` }}
+        style={{ borderLeftWidth: '4px', borderLeftColor: pConfig.border }}
       >
         {/* Collapsed view */}
         <div className="flex items-center justify-between p-3 gap-2">
-          <h3 className="text-sm font-medium text-[var(--text)] truncate flex-1">{title}</h3>
+          <h3 className="text-sm font-bold text-[var(--text)] truncate flex-1">{title}</h3>
           <span className={`text-xs ${isMissed ? 'text-red-500 font-medium' : 'text-[var(--text-muted)]'}`}>
             {format(taskDate, 'MMM d')}
           </span>
@@ -88,7 +88,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         {expanded && (
           <div className="px-3 pb-3 animate-fade-in" onClick={(e) => e.stopPropagation()}>
             {/* Priority badge */}
-            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${pConfig.color} text-white mb-2`}>
+            <span className={`inline-block text-xs font-bold px-2 py-0.5 rounded-full ${pConfig.color} text-white mb-2`}>
               {pConfig.label}
             </span>
 
@@ -106,10 +106,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   key={s}
                   onClick={() => handleStatusChange(s)}
                   disabled={status === s}
-                  className={`text-xs font-medium px-2.5 py-1 rounded-md transition-colors ${
+                  className={`text-xs font-bold px-2.5 py-1 rounded-xl transition-colors ${
                     status === s
-                      ? 'bg-primary/10 text-primary cursor-default'
-                      : 'text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text)]'
+                      ? 'bg-[var(--primary)] text-white cursor-default'
+                      : 'text-[var(--text-muted)] hover:bg-[var(--surface-alt)] hover:text-[var(--text)]'
                   }`}
                 >
                   {statusLabels[s]}
@@ -118,17 +118,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-2 border-t border-[var(--border)] pt-2">
+            <div className="flex items-center gap-2 border-t-2 border-[var(--border)] pt-2">
               <a
                 href={`/tasks/${id}/edit`}
-                className="flex items-center gap-1 text-xs text-primary hover:text-primary-dark transition-colors"
+                className="flex items-center gap-1 text-xs font-bold text-[var(--primary)] hover:text-[var(--primary-dark)] transition-colors"
                 data-action="edit-task"
               >
                 <Pencil size={13} /> Edit
               </a>
               <button
                 onClick={handleDelete}
-                className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors ml-auto"
+                className="flex items-center gap-1 text-xs font-bold text-[var(--danger)] hover:opacity-80 transition-colors ml-auto"
                 data-action="delete-task"
               >
                 <Trash2 size={13} /> Delete
@@ -140,22 +140,22 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
       {/* Delete confirmation modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" data-dialog="confirm-delete">
-          <div className="bg-[var(--card-bg)] rounded-xl shadow-elevated p-6 max-w-sm w-full mx-4 animate-slide-up">
-            <h3 className="font-semibold text-lg text-[var(--text)] mb-2">Delete task?</h3>
-            <p className="text-sm text-[var(--text-muted)] mb-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in" data-dialog="confirm-delete">
+          <div className="card-cozy p-6 max-w-sm w-full mx-4 animate-slide-up">
+            <h3 className="font-extrabold text-lg text-[var(--text)] mb-2">Delete task?</h3>
+            <p className="text-sm text-[var(--text-muted)] mb-5 font-semibold">
               &quot;{title}&quot; will be permanently deleted. This cannot be undone.
             </p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--border)]/40 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-bold text-[var(--text-muted)] hover:bg-[var(--surface-alt)] rounded-xl transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+                className="btn-yarn text-sm" style={{ background: 'var(--danger)', borderColor: 'var(--danger)' }}
               >
                 Delete
               </button>

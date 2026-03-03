@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import TaskForm from '@/components/TaskForm';
 import { ToastProvider, useToast } from '@/context/ToastContext';
 import Loader from '@/components/Loader';
+import { PawPrint } from '@/components/pixel-cats';
 import { ArrowLeft } from 'lucide-react';
 
 const EditTaskInner: React.FC = () => {
@@ -75,20 +76,23 @@ const EditTaskInner: React.FC = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] text-center" data-page="edit-task-error">
-        <p className="text-red-500 text-lg mb-4">{error}</p>
-        <button onClick={() => router.back()} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">Back</button>
+        <p className="text-[var(--yarn-red)] text-lg font-bold mb-4">{error}</p>
+        <button onClick={() => router.back()} className="btn-yarn px-4 py-2">Back</button>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4 py-6" data-page="edit-task">
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-6" style={{ backgroundColor: 'var(--background)' }} data-page="edit-task">
       {initialData ? (
         <div className="w-full max-w-2xl">
-          <button onClick={() => router.back()} className="inline-flex items-center gap-1 text-sm text-primary hover:underline mb-4" data-action="go-back">
+          <button onClick={() => router.back()} className="inline-flex items-center gap-1 text-sm font-bold text-[var(--primary)] hover:underline mb-4" data-action="go-back">
             <ArrowLeft size={16} /> Back
           </button>
-          <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-4">Edit Task</h2>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <PawPrint size={20} />
+            <h2 className="text-2xl font-extrabold text-[var(--text)]">Edit Task</h2>
+          </div>
           <TaskForm onSubmit={handleSubmit} onDelete={handleDelete} initialData={initialData} />
         </div>
       ) : (

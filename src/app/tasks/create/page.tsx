@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import TaskForm from '@/components/TaskForm';
 import { ToastProvider, useToast } from '@/context/ToastContext';
 import Loader from '@/components/Loader';
+import { PawPrint } from '@/components/pixel-cats';
 import { ArrowLeft } from 'lucide-react';
 
 const CreateTaskInner: React.FC = () => {
@@ -56,12 +57,15 @@ const CreateTaskInner: React.FC = () => {
   if (loading) return <Loader />;
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4 py-6" data-page="create-task">
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-6" style={{ backgroundColor: 'var(--background)' }} data-page="create-task">
       <div className="w-full max-w-2xl">
-        <button onClick={() => router.back()} className="inline-flex items-center gap-1 text-sm text-primary hover:underline mb-4" data-action="go-back">
+        <button onClick={() => router.back()} className="inline-flex items-center gap-1 text-sm font-bold text-[var(--primary)] hover:underline mb-4" data-action="go-back">
           <ArrowLeft size={16} /> Back
         </button>
-        <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-4">Create Task</h2>
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <PawPrint size={20} />
+          <h2 className="text-2xl font-extrabold text-[var(--text)]">Create Task</h2>
+        </div>
         <TaskForm onSubmit={handleSubmit} />
       </div>
     </div>

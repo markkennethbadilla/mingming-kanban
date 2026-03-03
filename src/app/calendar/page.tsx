@@ -7,6 +7,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ToastProvider, useToast } from '@/context/ToastContext';
 import TaskCard from '@/components/TaskCard';
 import Loader from '@/components/Loader';
+import { PixelCatSleep, PawPrint } from '@/components/pixel-cats';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 
@@ -110,19 +111,22 @@ function CalendarInner() {
   if (loading) return <Loader />;
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4 py-6" data-page="calendar">
+    <div className="min-h-[calc(100vh-64px)] px-4 py-6" style={{ backgroundColor: 'var(--background)' }} data-page="calendar">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-[var(--text)] mb-6">Task Calendar</h1>
+        <div className="flex items-center gap-2 mb-6">
+          <PawPrint size={20} />
+          <h1 className="text-2xl font-extrabold text-[var(--text)]">Task Calendar</h1>
+        </div>
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Calendar grid */}
-          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-4 lg:flex-1">
+          <div className="card-cozy p-4 lg:flex-1">
             {/* Month navigation */}
             <div className="flex items-center justify-between mb-4">
-              <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1.5 hover:bg-[var(--border)]/40 rounded-lg transition-colors" data-action="prev-month">
+              <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-1.5 hover:bg-[var(--surface-alt)] rounded-xl transition-colors" data-action="prev-month">
                 <ChevronLeft size={20} className="text-[var(--text-muted)]" />
               </button>
-              <h2 className="text-lg font-semibold text-[var(--text)]">{format(currentMonth, 'MMMM yyyy')}</h2>
-              <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1.5 hover:bg-[var(--border)]/40 rounded-lg transition-colors" data-action="next-month">
+              <h2 className="text-lg font-extrabold text-[var(--text)]">{format(currentMonth, 'MMMM yyyy')}</h2>
+              <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-1.5 hover:bg-[var(--surface-alt)] rounded-xl transition-colors" data-action="next-month">
                 <ChevronRight size={20} className="text-[var(--text-muted)]" />
               </button>
             </div>
@@ -130,7 +134,7 @@ function CalendarInner() {
             {/* Day headers */}
             <div className="grid grid-cols-7 gap-1 mb-1">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-                <div key={d} className="text-center text-xs font-medium text-[var(--text-muted)] py-1">{d}</div>
+                <div key={d} className="text-center text-xs font-bold text-[var(--text-muted)] py-1">{d}</div>
               ))}
             </div>
 
@@ -146,17 +150,17 @@ function CalendarInner() {
                   <button
                     key={i}
                     onClick={() => setSelectedDate(d)}
-                    className={`relative flex flex-col items-center justify-center py-2 rounded-lg text-sm transition-colors ${
-                      isSelected ? 'bg-primary text-white' :
-                      isToday ? 'bg-primary/10 text-primary font-semibold' :
-                      isCurrentMonth ? 'text-[var(--text)] hover:bg-[var(--border)]/30' :
+                    className={`relative flex flex-col items-center justify-center py-2 rounded-xl text-sm font-semibold transition-colors ${
+                      isSelected ? 'bg-[var(--primary)] text-white' :
+                      isToday ? 'bg-[var(--primary)]/10 text-[var(--primary)] font-extrabold' :
+                      isCurrentMonth ? 'text-[var(--text)] hover:bg-[var(--surface-alt)]' :
                       'text-[var(--text-muted)] opacity-40'
                     }`}
                     data-day={format(d, 'yyyy-MM-dd')}
                   >
                     {format(d, 'd')}
                     {hasTask && (
-                      <span className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-primary'}`} />
+                      <span className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-[var(--primary)]'}`} />
                     )}
                   </button>
                 );
@@ -166,13 +170,13 @@ function CalendarInner() {
 
           {/* Selected date tasks */}
           <div className="lg:w-96">
-            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-4">
+            <div className="card-cozy p-4">
               <div className="flex items-center justify-between mb-4">
-                <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1 hover:bg-[var(--border)]/40 rounded-lg transition-colors">
+                <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1 hover:bg-[var(--surface-alt)] rounded-xl transition-colors">
                   <ChevronLeft size={18} className="text-[var(--text-muted)]" />
                 </button>
-                <h3 className="text-sm font-semibold text-[var(--text)]">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
-                <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1 hover:bg-[var(--border)]/40 rounded-lg transition-colors">
+                <h3 className="text-sm font-bold text-[var(--text)]">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</h3>
+                <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1 hover:bg-[var(--surface-alt)] rounded-xl transition-colors">
                   <ChevronRight size={18} className="text-[var(--text-muted)]" />
                 </button>
               </div>
@@ -182,7 +186,10 @@ function CalendarInner() {
                     <TaskCard key={task.id} {...task} dueDate={task.dueDate.toISOString()} onDelete={handleDelete} onStatusChange={handleStatusChange} />
                   ))
                 ) : (
-                  <p className="text-sm text-[var(--text-muted)] italic text-center py-8">No tasks for this date.</p>
+                  <p className="text-sm text-[var(--text-muted)] font-semibold text-center py-6">
+                    <span className="inline-block cat-wiggle mb-1"><PixelCatSleep size={32} /></span><br />
+                    No tasks for this date.
+                  </p>
                 )}
               </div>
             </div>

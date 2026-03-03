@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ToastProvider, useToast } from '@/context/ToastContext';
+import { PixelCatWave } from '@/components/pixel-cats';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
 
 const schema = z.object({
@@ -13,7 +14,7 @@ const schema = z.object({
 });
 type LoginData = z.infer<typeof schema>;
 
-const inputClass = 'w-full px-4 py-3 text-sm rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
+const inputClass = 'w-full px-4 py-3 text-sm font-semibold rounded-xl border-2 border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:border-[var(--primary)] transition-colors';
 
 const LoginForm: React.FC = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginData>({
@@ -52,16 +53,20 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4" data-page="login">
-      <div className="w-full max-w-md bg-[var(--card-bg)] p-8 rounded-xl border border-[var(--border)] shadow-card">
-        <h2 className="text-center text-2xl font-bold text-[var(--text)] mb-6">Log In</h2>
+    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4" style={{ backgroundColor: 'var(--background)' }} data-page="login">
+      <div className="w-full max-w-md card-cozy p-8">
+        <div className="text-center mb-5">
+          <div className="cat-bounce inline-block mb-2"><PixelCatWave size={48} /></div>
+          <h2 className="text-2xl font-extrabold text-[var(--text)]">Welcome back!</h2>
+          <p className="text-sm text-[var(--text-muted)] font-semibold">MingMing missed you</p>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="login">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-[var(--text)] mb-1">Email</label>
+            <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email</label>
             <input id="email" type="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-[var(--text)] mb-1">Password</label>
+            <label htmlFor="password" className="block text-sm font-bold text-[var(--text)] mb-1">Password</label>
             <div className="relative">
               <input id="password" type={showPw ? 'text' : 'password'} placeholder="Enter your password" {...register('password')} className={inputClass} />
               <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
@@ -69,13 +74,13 @@ const LoginForm: React.FC = () => {
               </button>
             </div>
           </div>
-          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2" data-action="login">
+          <button type="submit" disabled={isSubmitting} className="btn-yarn w-full py-3 flex items-center justify-center gap-2 disabled:opacity-40" data-action="login">
             <LogIn size={18} /> {isSubmitting ? 'Logging in...' : 'Log In'}
           </button>
         </form>
         <div className="mt-4 flex justify-between text-sm">
-          <a href="/forgot-password" className="text-primary hover:underline">Forgot Password?</a>
-          <a href="/register" className="text-primary hover:underline">Don&apos;t have an account?</a>
+          <a href="/forgot-password" className="text-[var(--primary)] font-bold hover:underline">Forgot Password?</a>
+          <a href="/register" className="text-[var(--secondary)] font-bold hover:underline">Sign Up</a>
         </div>
       </div>
     </div>

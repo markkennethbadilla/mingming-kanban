@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ToastProvider, useToast } from '@/context/ToastContext';
 import Loader from '@/components/Loader';
+import { PixelCatIdle } from '@/components/pixel-cats';
 import { User, Lock, Trash2, Save, Eye, EyeOff } from 'lucide-react';
 
-const inputClass = 'w-full rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
-const btnPrimary = 'inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition-colors disabled:opacity-50';
-const btnDanger = 'inline-flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-50';
+const inputClass = 'w-full rounded-xl border-2 border-[var(--border)] bg-[var(--card-bg)] px-3 py-2 text-sm font-semibold text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--primary)] transition-colors';
+const btnPrimary = 'btn-yarn inline-flex items-center gap-2 px-4 py-2 text-sm disabled:opacity-40';
+const btnDanger = 'inline-flex items-center gap-2 rounded-xl border-2 border-[var(--yarn-red)] bg-red-50 dark:bg-red-950/30 px-4 py-2 text-sm font-bold text-[var(--yarn-red)] hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors disabled:opacity-40';
 
 const ProfileInner: React.FC = () => {
   const router = useRouter();
@@ -122,55 +123,58 @@ const ProfileInner: React.FC = () => {
   if (loading) return <Loader />;
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[var(--surface)] px-4 py-6" data-page="profile">
+    <div className="min-h-[calc(100vh-64px)] px-4 py-6" style={{ backgroundColor: 'var(--background)' }} data-page="profile">
       <div className="max-w-lg mx-auto space-y-6">
-        <h1 className="text-2xl font-bold text-[var(--text)]">Profile Settings</h1>
+        <div className="flex items-center gap-3">
+          <div className="cat-wiggle"><PixelCatIdle size={36} /></div>
+          <h1 className="text-2xl font-extrabold text-[var(--text)]">Profile Settings</h1>
+        </div>
 
         {/* Account Info */}
-        <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-5 space-y-4" data-section="account-info">
+        <div className="card-cozy p-5 space-y-4" data-section="account-info">
           <div className="flex items-center gap-2 text-[var(--text)]">
             <User size={18} />
-            <h2 className="text-base font-semibold">Account Information</h2>
+            <h2 className="text-base font-bold">Account Information</h2>
           </div>
           <div>
-            <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Username</label>
+            <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Username</label>
             <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className={inputClass} data-field="username" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Email</label>
+            <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} data-field="email" />
           </div>
         </div>
 
         {/* Password Section */}
-        <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border)] shadow-card p-5 space-y-4" data-section="password">
+        <div className="card-cozy p-5 space-y-4" data-section="password">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[var(--text)]">
               <Lock size={18} />
-              <h2 className="text-base font-semibold">Change Password</h2>
+              <h2 className="text-base font-bold">Change Password</h2>
             </div>
-            <button onClick={() => setShowPasswordSection(!showPasswordSection)} className="text-xs text-primary hover:underline" data-action="toggle-password">
+            <button onClick={() => setShowPasswordSection(!showPasswordSection)} className="text-xs text-[var(--primary)] font-bold hover:underline" data-action="toggle-password">
               {showPasswordSection ? 'Cancel' : 'Change'}
             </button>
           </div>
           {showPasswordSection && (
             <div className="space-y-3 animate-fade-in">
               <div className="relative">
-                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Current Password</label>
+                <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Current Password</label>
                 <input type={showCurrent ? 'text' : 'password'} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className={inputClass} data-field="current-password" />
                 <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-2.5 top-7 text-[var(--text-muted)]">
                   {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <div className="relative">
-                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">New Password</label>
+                <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">New Password</label>
                 <input type={showNew ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputClass} data-field="new-password" />
                 <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-2.5 top-7 text-[var(--text-muted)]">
                   {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Confirm New Password</label>
+                <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Confirm New Password</label>
                 <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} data-field="confirm-password" />
               </div>
             </div>
@@ -183,9 +187,9 @@ const ProfileInner: React.FC = () => {
         </button>
 
         {/* Danger Zone */}
-        <div className="bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-200 dark:border-red-800 p-5 space-y-3" data-section="danger-zone">
-          <h2 className="text-base font-semibold text-red-700">Danger Zone</h2>
-          <p className="text-sm text-red-600">Deleting your account is permanent and cannot be undone.</p>
+        <div className="card-cozy p-5 space-y-3" style={{ borderColor: 'var(--yarn-red)' }} data-section="danger-zone">
+          <h2 className="text-base font-extrabold text-[var(--yarn-red)]">Danger Zone</h2>
+          <p className="text-sm font-semibold text-[var(--yarn-red)] opacity-80">Deleting your account is permanent and cannot be undone.</p>
           <button onClick={() => setShowDeleteConfirm(true)} className={btnDanger} data-action="delete-account">
             <Trash2 size={16} /> Delete Account
           </button>
@@ -194,12 +198,12 @@ const ProfileInner: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" data-modal="delete-account">
-          <div className="bg-[var(--card-bg)] rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 animate-fade-in">
-            <h3 className="text-lg font-bold text-[var(--text)] mb-2">Delete Account?</h3>
-            <p className="text-sm text-[var(--text-muted)] mb-4">This action is irreversible. All your tasks and data will be permanently deleted.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" data-modal="delete-account">
+          <div className="card-cozy p-6 max-w-sm w-full mx-4 animate-fade-in">
+            <h3 className="text-lg font-extrabold text-[var(--text)] mb-2">Delete Account?</h3>
+            <p className="text-sm font-semibold text-[var(--text-muted)] mb-4">This action is irreversible. All your tasks and data will be permanently deleted.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 text-sm rounded-lg border border-[var(--border)] hover:bg-[var(--border)]/40 transition-colors">
+              <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 text-sm font-bold rounded-xl border-2 border-[var(--border)] hover:bg-[var(--surface-alt)] transition-colors">
                 Cancel
               </button>
               <button onClick={handleDeleteAccount} className={btnDanger}>

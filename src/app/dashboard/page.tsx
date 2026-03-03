@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import TaskCard from '../../components/TaskCard';
 import Loader from '../../components/Loader';
+import { PixelCatIdle, PixelCatHappy, PawPrint } from '@/components/pixel-cats';
 import quotes from '../../data/quotes.json';
 import { DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ToastProvider } from '@/context/ToastContext';
-import { Plus, SlidersHorizontal } from 'lucide-react';
+import { Plus, Send, MessageCircle } from 'lucide-react';
 
 interface Task {
   id: number;
@@ -136,55 +138,75 @@ const DashboardPage: React.FC = () => {
   };
 
   if (loading) return <Loader />;
-  if (error) return <p className="text-red-500 text-center py-10">{error}</p>;
+  if (error) return <p className="text-[var(--danger)] text-center py-10">{error}</p>;
 
   return (
     <ToastProvider>
       <DndProvider backend={HTML5Backend}>
-        <div className="min-h-screen bg-[var(--surface)] px-4 py-6" data-page="dashboard">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-[var(--text)]">
-                  Welcome, {user?.username || 'User'}!
-                </h2>
-                <p className="text-sm text-[var(--text-muted)] italic mt-1">&quot;{quote}&quot;</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal size={16} className="text-[var(--text-muted)]" />
-                  <select
-                    id="filter"
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                    className="px-3 py-1.5 text-sm rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    data-action="filter-tasks"
-                  >
-                    <option value="date">By Date</option>
-                    <option value="priority">By Priority</option>
-                  </select>
+        <div className="min-h-screen px-4 py-5" style={{ backgroundColor: 'var(--background)' }} data-page="dashboard">
+          <div className="max-w-5xl mx-auto">
+
+            {/* AI Chat Bar — the main interaction point */}
+            <div className="card-cozy p-4 mb-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="cat-wiggle"><PixelCatIdle size={32} /></div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-[var(--text)]">
+                    Meow, {user?.username || 'friend'}! <span className="text-[var(--text-muted)] font-normal italic">&quot;{quote}&quot;</span>
+                  </p>
                 </div>
+              </div>
+              <Link href="/ai" className="flex items-center gap-3 w-full">
+                <div className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] text-sm font-semibold hover:border-[var(--primary)] transition-colors cursor-pointer">
+                  <MessageCircle size={16} />
+                  Tell MingMing what you need...
+                </div>
+                <button className="btn-yarn flex items-center gap-1 text-sm shrink-0" type="button">
+                  <Send size={14} /> Chat
+                </button>
+              </Link>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <PawPrint size={14} className="text-[var(--paw-pink)]" />
+                <span className="text-sm font-bold text-[var(--text)]">Your Tasks</span>
+                <span className="text-xs bg-[var(--surface-alt)] text-[var(--text-muted)] px-2 py-0.5 rounded-full font-bold">
+                  {tasks.length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <select
+                  id="filter"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="px-3 py-1.5 text-sm rounded-xl border-2 border-[var(--border)] bg-[var(--card-bg)] text-[var(--text)] font-bold focus:outline-none focus:border-[var(--primary)]"
+                  data-action="filter-tasks"
+                >
+                  <option value="date">By Date</option>
+                  <option value="priority">By Priority</option>
+                </select>
                 <a
                   href="/tasks/create"
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
+                  className="btn-yarn inline-flex items-center gap-1.5 text-sm"
                   data-action="create-task"
                 >
-                  <Plus size={16} /> New Task
+                  <Plus size={16} /> New
                 </a>
               </div>
             </div>
 
             {/* Kanban columns */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {(['TO_DO', 'IN_PROGRESS', 'DONE'] as const).map((status) => {
                 const meta = columnMeta[status];
                 const columnTasks = grouped[status];
                 return (
                   <div key={status} className="flex flex-col">
-                    <div className="flex items-center gap-2 mb-3">
-                      <h3 className={`text-base font-semibold ${meta.color}`}>{meta.label}</h3>
-                      <span className="text-xs bg-[var(--border)]/50 text-[var(--text-muted)] px-2 py-0.5 rounded-full font-medium">
+                    <div className="flex items-center gap-2 mb-3 px-1">
+                      <h3 className={`text-sm font-extrabold ${meta.color}`}>{meta.label}</h3>
+                      <span className="text-xs bg-[var(--surface-alt)] text-[var(--text-muted)] px-2 py-0.5 rounded-full font-bold">
                         {columnTasks.length}
                       </span>
                     </div>
@@ -194,7 +216,10 @@ const DashboardPage: React.FC = () => {
                           <TaskCard key={task.id} {...task} onStatusChange={handleStatusChange} onDelete={handleDelete} />
                         ))
                       ) : (
-                        <p className="text-sm text-[var(--text-muted)] py-8 text-center">{meta.emptyText}</p>
+                        <div className="text-center py-8 text-[var(--text-muted)]">
+                          <PixelCatHappy size={28} className="mx-auto mb-2 opacity-30" />
+                          <p className="text-xs font-semibold">{meta.emptyText}</p>
+                        </div>
                       )}
                     </Column>
                   </div>
