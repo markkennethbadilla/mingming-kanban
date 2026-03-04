@@ -31,6 +31,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7465302364385209"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-screen bg-[var(--background)] text-[var(--text)] flex flex-col antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
