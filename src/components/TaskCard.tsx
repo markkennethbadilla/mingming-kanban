@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Link from 'next/link';
 import { useDrag } from 'react-dnd';
 import { Trash2, Pencil } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
@@ -119,13 +120,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
             {/* Actions */}
             <div className="flex items-center gap-2 border-t-2 border-[var(--border)] pt-2">
-              <a
+              <Link
                 href={`/tasks/${id}/edit`}
                 className="flex items-center gap-1 text-xs font-bold text-[var(--primary)] hover:text-[var(--primary-dark)] transition-colors"
                 data-action="edit-task"
               >
                 <Pencil size={13} /> Edit
-              </a>
+              </Link>
               <button
                 onClick={handleDelete}
                 className="flex items-center gap-1 text-xs font-bold text-[var(--danger)] hover:opacity-80 transition-colors ml-auto"

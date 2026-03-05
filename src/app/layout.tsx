@@ -27,6 +27,12 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
           <main className="flex-1">{children}</main>
+          <footer className="border-t-2 border-[var(--border)] px-4 py-5" style={{ backgroundColor: 'var(--card-bg)' }}>
+            <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+              <span className="text-sm font-bold text-[var(--text-muted)]">MingMing Kanban</span>
+              <span className="text-xs text-[var(--text-muted)]">Made with purrs &amp; pixels</span>
+            </div>
+          </footer>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -65,7 +66,7 @@ const ForgotForm: React.FC = () => {
           </button>
         </form>
         <div className="mt-4 flex justify-center text-sm">
-          <a href="/login" className="text-[var(--secondary)] font-bold hover:underline">Back to Login</a>
+          <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Back to Login</Link>
         </div>
       </div>
     </div>

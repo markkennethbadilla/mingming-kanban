@@ -167,6 +167,20 @@ const DashboardPage: React.FC = () => {
               </Link>
             </div>
 
+            {/* Stats Bar */}
+            <div className="grid grid-cols-3 gap-3 mb-5">
+              {(['TO_DO', 'IN_PROGRESS', 'DONE'] as const).map((status) => {
+                const meta = columnMeta[status];
+                const count = grouped[status].length;
+                return (
+                  <div key={status} className="card-cozy p-3 flex items-center gap-3" data-stat={status}>
+                    <span className={`text-2xl font-extrabold ${meta.color}`}>{count}</span>
+                    <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">{meta.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+
             {/* Controls */}
             <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
@@ -187,13 +201,13 @@ const DashboardPage: React.FC = () => {
                   <option value="date">By Date</option>
                   <option value="priority">By Priority</option>
                 </select>
-                <a
+                <Link
                   href="/tasks/create"
                   className="btn-yarn inline-flex items-center gap-1.5 text-sm"
                   data-action="create-task"
                 >
                   <Plus size={16} /> New
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -202,9 +216,14 @@ const DashboardPage: React.FC = () => {
               {(['TO_DO', 'IN_PROGRESS', 'DONE'] as const).map((status) => {
                 const meta = columnMeta[status];
                 const columnTasks = grouped[status];
+                const accentMap: Record<string, string> = {
+                  TO_DO: 'border-amber-400',
+                  IN_PROGRESS: 'border-blue-400',
+                  DONE: 'border-emerald-400',
+                };
                 return (
-                  <div key={status} className="flex flex-col">
-                    <div className="flex items-center gap-2 mb-3 px-1">
+                  <div key={status} className={`flex flex-col rounded-2xl border-2 border-[var(--border)] border-t-4 ${accentMap[status]} bg-[var(--surface)] p-3`}>
+                    <div className="flex items-center gap-2 mb-3">
                       <h3 className={`text-sm font-extrabold ${meta.color}`}>{meta.label}</h3>
                       <span className="text-xs bg-[var(--surface-alt)] text-[var(--text-muted)] px-2 py-0.5 rounded-full font-bold">
                         {columnTasks.length}

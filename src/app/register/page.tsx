@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -84,7 +85,7 @@ const RegisterForm: React.FC = () => {
           </button>
         </form>
         <div className="mt-4 flex justify-center text-sm">
-          <a href="/login" className="text-[var(--secondary)] font-bold hover:underline">Already have an account? Log in</a>
+          <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Already have an account? Log in</Link>
         </div>
       </div>
     </div>

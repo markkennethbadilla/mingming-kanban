@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ToastProvider, useToast } from '@/context/ToastContext';
 import { PixelCatWave } from '@/components/pixel-cats';
+import Link from 'next/link';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
 
 const schema = z.object({
@@ -79,8 +80,8 @@ const LoginForm: React.FC = () => {
           </button>
         </form>
         <div className="mt-4 flex justify-between text-sm">
-          <a href="/forgot-password" className="text-[var(--primary)] font-bold hover:underline">Forgot Password?</a>
-          <a href="/register" className="text-[var(--secondary)] font-bold hover:underline">Sign Up</a>
+          <Link href="/forgot-password" className="text-[var(--primary)] font-bold hover:underline">Forgot Password?</Link>
+          <Link href="/register" className="text-[var(--secondary)] font-bold hover:underline">Sign Up</Link>
         </div>
       </div>
     </div>
