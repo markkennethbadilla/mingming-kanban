@@ -49,24 +49,26 @@ const ForgotForm: React.FC = () => {
   }, [errors, showToast]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4" style={{ backgroundColor: 'var(--background)' }} data-page="forgot-password">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-6">
-          <div className="cat-bounce inline-block mb-3"><PixelCatSleep size={56} /></div>
-          <h2 className="text-3xl font-extrabold text-[var(--text)]">Forgot Password?</h2>
-          <p className="text-sm text-[var(--text-muted)] font-semibold mt-1">MingMing will help you reset it</p>
+    <div className="flex items-center justify-center min-h-screen px-4 md:px-8" style={{ backgroundColor: 'var(--background)' }} data-page="forgot-password">
+      <div className="w-full max-w-4xl flex flex-col md:flex-row md:items-center md:gap-16">
+        <div className="text-center md:text-left md:flex-1 mb-6 md:mb-0">
+          <div className="cat-bounce inline-block mb-3"><PixelCatSleep size={72} className="md:w-24 md:h-24" /></div>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-[var(--text)]">Forgot Password?</h2>
+          <p className="text-sm md:text-base text-[var(--text-muted)] font-semibold mt-1 md:mt-3">MingMing will help you reset it</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="forgot-password">
-          <div>
-            <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email address</label>
-            <input id="email" type="email" placeholder="example@domain.com" {...register('email')} className={inputClass} />
+        <div className="w-full md:flex-1 md:max-w-sm">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="forgot-password">
+            <div>
+              <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email address</label>
+              <input id="email" type="email" placeholder="example@domain.com" {...register('email')} className={inputClass} />
+            </div>
+            <button type="submit" disabled={isSubmitting} className="btn-yarn w-full py-3 flex items-center justify-center gap-2 disabled:opacity-40" data-action="send-reset">
+              <Mail size={18} /> {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+            </button>
+          </form>
+          <div className="mt-5 flex justify-center text-sm">
+            <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Back to Login</Link>
           </div>
-          <button type="submit" disabled={isSubmitting} className="btn-yarn w-full py-3 flex items-center justify-center gap-2 disabled:opacity-40" data-action="send-reset">
-            <Mail size={18} /> {isSubmitting ? 'Sending...' : 'Send Reset Link'}
-          </button>
-        </form>
-        <div className="mt-5 flex justify-center text-sm">
-          <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Back to Login</Link>
         </div>
       </div>
     </div>

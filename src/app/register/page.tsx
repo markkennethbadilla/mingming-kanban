@@ -55,37 +55,39 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4" style={{ backgroundColor: 'var(--background)' }} data-page="register">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-6">
-          <div className="cat-bounce inline-block mb-3"><PixelCatHappy size={56} /></div>
-          <h2 className="text-3xl font-extrabold text-[var(--text)]">Join MingMing!</h2>
-          <p className="text-sm text-[var(--text-muted)] font-semibold mt-1">Create your account</p>
+    <div className="flex items-center justify-center min-h-screen px-4 md:px-8" style={{ backgroundColor: 'var(--background)' }} data-page="register">
+      <div className="w-full max-w-4xl flex flex-col md:flex-row md:items-center md:gap-16">
+        <div className="text-center md:text-left md:flex-1 mb-6 md:mb-0">
+          <div className="cat-bounce inline-block mb-3"><PixelCatHappy size={72} className="md:w-24 md:h-24" /></div>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-[var(--text)]">Join MingMing!</h2>
+          <p className="text-sm md:text-base text-[var(--text-muted)] font-semibold mt-1 md:mt-3">Create your account</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="register">
-          <div>
-            <label htmlFor="username" className="block text-sm font-bold text-[var(--text)] mb-1">Username</label>
-            <input id="username" type="text" placeholder="Enter your username" {...register('username')} className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email</label>
-            <input id="email" type="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-bold text-[var(--text)] mb-1">Password</label>
-            <div className="relative">
-              <input id="password" type={showPw ? 'text' : 'password'} placeholder="Enter your password" {...register('password')} className={inputClass} />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
-                {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+        <div className="w-full md:flex-1 md:max-w-sm">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="register">
+            <div>
+              <label htmlFor="username" className="block text-sm font-bold text-[var(--text)] mb-1">Username</label>
+              <input id="username" type="text" placeholder="Enter your username" {...register('username')} className={inputClass} />
             </div>
+            <div>
+              <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email</label>
+              <input id="email" type="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-bold text-[var(--text)] mb-1">Password</label>
+              <div className="relative">
+                <input id="password" type={showPw ? 'text' : 'password'} placeholder="Enter your password" {...register('password')} className={inputClass} />
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
+                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+            <button type="submit" disabled={isSubmitting} className="btn-yarn w-full py-3 flex items-center justify-center gap-2 disabled:opacity-40" data-action="register">
+              <UserPlus size={18} /> {isSubmitting ? 'Creating...' : 'Sign Up'}
+            </button>
+          </form>
+          <div className="mt-5 flex justify-center text-sm">
+            <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Already have an account? Log in</Link>
           </div>
-          <button type="submit" disabled={isSubmitting} className="btn-yarn w-full py-3 flex items-center justify-center gap-2 disabled:opacity-40" data-action="register">
-            <UserPlus size={18} /> {isSubmitting ? 'Creating...' : 'Sign Up'}
-          </button>
-        </form>
-        <div className="mt-5 flex justify-center text-sm">
-          <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Already have an account? Log in</Link>
         </div>
       </div>
     </div>
