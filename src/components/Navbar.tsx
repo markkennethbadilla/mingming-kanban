@@ -6,11 +6,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { PixelCatIdle } from '@/components/pixel-cats';
 import {
-  LayoutDashboard,
-  CalendarDays,
-  PlusCircle,
+  Home,
   User,
-  MessageCircle,
   LogIn,
   UserPlus,
   LogOut,
@@ -60,10 +57,7 @@ const Navbar: React.FC = () => {
 
   const navItems = isLoggedIn
     ? [
-        { label: 'Board', href: '/dashboard', icon: LayoutDashboard },
-        { label: 'Calendar', href: '/calendar', icon: CalendarDays },
-        { label: 'New Task', href: '/tasks/create', icon: PlusCircle },
-        { label: 'Chat', href: '/ai', icon: MessageCircle },
+        { label: 'Home', href: '/home', icon: Home },
         { label: 'Profile', href: '/profile', icon: User },
       ]
     : [
@@ -81,7 +75,7 @@ const Navbar: React.FC = () => {
       <div className="max-w-5xl mx-auto flex items-center justify-between h-14">
         {/* Logo */}
         <Link
-          href={isLoggedIn ? '/dashboard' : '/'}
+          href={isLoggedIn ? '/home' : '/'}
           className="flex items-center gap-2 group"
           data-nav="home"
         >

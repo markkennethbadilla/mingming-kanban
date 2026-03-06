@@ -54,7 +54,7 @@ const EditTaskInner: React.FC = () => {
       });
       if (!res.ok) throw new Error('Failed to update task.');
       showToast({ severity: 'success', summary: 'Updated', detail: 'Task updated successfully.', life: 3000 });
-      setTimeout(() => router.push('/dashboard'), 1500);
+      setTimeout(() => router.push('/home'), 1500);
     } catch (err: unknown) {
       showToast({ severity: 'error', summary: 'Error', detail: err instanceof Error ? err.message : 'Failed to update.', life: 3000 });
     }
@@ -67,7 +67,7 @@ const EditTaskInner: React.FC = () => {
       const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` } });
       if (!res.ok) throw new Error('Failed to delete task.');
       showToast({ severity: 'success', summary: 'Deleted', detail: 'Task deleted successfully.', life: 3000 });
-      setTimeout(() => router.push('/dashboard'), 1500);
+      setTimeout(() => router.push('/home'), 1500);
     } catch (err: unknown) {
       showToast({ severity: 'error', summary: 'Error', detail: err instanceof Error ? err.message : 'Failed to delete.', life: 3000 });
     }

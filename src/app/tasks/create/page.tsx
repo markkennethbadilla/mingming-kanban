@@ -48,7 +48,7 @@ const CreateTaskInner: React.FC = () => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || 'Failed to create task.');
       showToast({ severity: 'success', summary: 'Created', detail: 'Task created successfully.', life: 3000 });
-      setTimeout(() => router.push('/dashboard'), 1500);
+      setTimeout(() => router.push('/home'), 1500);
     } catch (err: unknown) {
       showToast({ severity: 'error', summary: 'Error', detail: err instanceof Error ? err.message : 'An error occurred.', life: 5000 });
     }

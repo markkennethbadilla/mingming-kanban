@@ -26,7 +26,7 @@ const ForgotForm: React.FC = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
       const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) window.location.href = '/dashboard';
+      if (res.ok) window.location.href = '/home';
     };
     check();
   }, []);
