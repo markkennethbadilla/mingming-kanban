@@ -66,14 +66,14 @@ const UpdateForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4" style={{ backgroundColor: 'var(--background)' }} data-page="update-password">
-      <div className="w-full max-w-md card-cozy p-8">
-        <div className="text-center mb-5">
-          <div className="cat-bounce inline-block mb-2"><PixelCatIdle size={48} /></div>
-          <h2 className="text-2xl font-extrabold text-[var(--text)]">Reset Your Password</h2>
-          <p className="text-sm text-[var(--text-muted)] font-semibold">Choose a new password</p>
+    <div className="flex items-center justify-center min-h-screen px-4" style={{ backgroundColor: 'var(--background)' }} data-page="update-password">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-6">
+          <div className="cat-bounce inline-block mb-3"><PixelCatIdle size={56} /></div>
+          <h2 className="text-3xl font-extrabold text-[var(--text)]">Reset Your Password</h2>
+          <p className="text-sm text-[var(--text-muted)] font-semibold mt-1">Choose a new password</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="update-password">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="update-password">
           <div>
             <label htmlFor="password" className="block text-sm font-bold text-[var(--text)] mb-1">New Password</label>
             <div className="relative">

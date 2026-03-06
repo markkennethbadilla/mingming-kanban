@@ -54,14 +54,14 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4" style={{ backgroundColor: 'var(--background)' }} data-page="login">
-      <div className="w-full max-w-md card-cozy p-8">
-        <div className="text-center mb-5">
-          <div className="cat-bounce inline-block mb-2"><PixelCatWave size={48} /></div>
-          <h2 className="text-2xl font-extrabold text-[var(--text)]">Welcome back!</h2>
-          <p className="text-sm text-[var(--text-muted)] font-semibold">MingMing missed you</p>
+    <div className="flex items-center justify-center min-h-screen px-4" style={{ backgroundColor: 'var(--background)' }} data-page="login">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-6">
+          <div className="cat-bounce inline-block mb-3"><PixelCatWave size={56} /></div>
+          <h2 className="text-3xl font-extrabold text-[var(--text)]">Welcome back!</h2>
+          <p className="text-sm text-[var(--text-muted)] font-semibold mt-1">MingMing missed you</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="login">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="login">
           <div>
             <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email</label>
             <input id="email" type="email" placeholder="Enter your email" {...register('email')} className={inputClass} />
@@ -79,7 +79,7 @@ const LoginForm: React.FC = () => {
             <LogIn size={18} /> {isSubmitting ? 'Logging in...' : 'Log In'}
           </button>
         </form>
-        <div className="mt-4 flex justify-between text-sm">
+        <div className="mt-5 flex justify-between text-sm">
           <Link href="/forgot-password" className="text-[var(--primary)] font-bold hover:underline">Forgot Password?</Link>
           <Link href="/register" className="text-[var(--secondary)] font-bold hover:underline">Sign Up</Link>
         </div>

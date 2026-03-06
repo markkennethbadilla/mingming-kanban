@@ -55,14 +55,14 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4" style={{ backgroundColor: 'var(--background)' }} data-page="register">
-      <div className="w-full max-w-md card-cozy p-8">
-        <div className="text-center mb-5">
-          <div className="cat-bounce inline-block mb-2"><PixelCatHappy size={48} /></div>
-          <h2 className="text-2xl font-extrabold text-[var(--text)]">Join MingMing!</h2>
-          <p className="text-sm text-[var(--text-muted)] font-semibold">Create your account</p>
+    <div className="flex items-center justify-center min-h-screen px-4" style={{ backgroundColor: 'var(--background)' }} data-page="register">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-6">
+          <div className="cat-bounce inline-block mb-3"><PixelCatHappy size={56} /></div>
+          <h2 className="text-3xl font-extrabold text-[var(--text)]">Join MingMing!</h2>
+          <p className="text-sm text-[var(--text-muted)] font-semibold mt-1">Create your account</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="register">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="register">
           <div>
             <label htmlFor="username" className="block text-sm font-bold text-[var(--text)] mb-1">Username</label>
             <input id="username" type="text" placeholder="Enter your username" {...register('username')} className={inputClass} />
@@ -84,7 +84,7 @@ const RegisterForm: React.FC = () => {
             <UserPlus size={18} /> {isSubmitting ? 'Creating...' : 'Sign Up'}
           </button>
         </form>
-        <div className="mt-4 flex justify-center text-sm">
+        <div className="mt-5 flex justify-center text-sm">
           <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Already have an account? Log in</Link>
         </div>
       </div>

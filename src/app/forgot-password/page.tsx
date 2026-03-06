@@ -49,14 +49,14 @@ const ForgotForm: React.FC = () => {
   }, [errors, showToast]);
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4" style={{ backgroundColor: 'var(--background)' }} data-page="forgot-password">
-      <div className="w-full max-w-md card-cozy p-8">
-        <div className="text-center mb-5">
-          <div className="cat-bounce inline-block mb-2"><PixelCatSleep size={48} /></div>
-          <h2 className="text-2xl font-extrabold text-[var(--text)]">Forgot Password?</h2>
-          <p className="text-sm text-[var(--text-muted)] font-semibold">MingMing will help you reset it</p>
+    <div className="flex items-center justify-center min-h-screen px-4" style={{ backgroundColor: 'var(--background)' }} data-page="forgot-password">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-6">
+          <div className="cat-bounce inline-block mb-3"><PixelCatSleep size={56} /></div>
+          <h2 className="text-3xl font-extrabold text-[var(--text)]">Forgot Password?</h2>
+          <p className="text-sm text-[var(--text-muted)] font-semibold mt-1">MingMing will help you reset it</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4" data-form="forgot-password">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5" data-form="forgot-password">
           <div>
             <label htmlFor="email" className="block text-sm font-bold text-[var(--text)] mb-1">Email address</label>
             <input id="email" type="email" placeholder="example@domain.com" {...register('email')} className={inputClass} />
@@ -65,7 +65,7 @@ const ForgotForm: React.FC = () => {
             <Mail size={18} /> {isSubmitting ? 'Sending...' : 'Send Reset Link'}
           </button>
         </form>
-        <div className="mt-4 flex justify-center text-sm">
+        <div className="mt-5 flex justify-center text-sm">
           <Link href="/login" className="text-[var(--secondary)] font-bold hover:underline">Back to Login</Link>
         </div>
       </div>
