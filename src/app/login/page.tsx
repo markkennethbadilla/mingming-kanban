@@ -30,7 +30,7 @@ const LoginForm: React.FC = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
       const res = await fetch('/api/session', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) window.location.href = '/home';
+      if (res.ok) window.location.href = '/dashboard';
     };
     check();
   }, []);
@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
       localStorage.setItem('authToken', result.token);
-      window.location.href = '/home';
+      window.location.href = '/dashboard';
     } catch (err: unknown) {
       showToast({ severity: 'error', summary: 'Login Failed', detail: err instanceof Error ? err.message : 'An error occurred.', life: 3000 });
     }

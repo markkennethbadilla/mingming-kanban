@@ -38,8 +38,8 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               {isLoggedIn ? (
-                <Link href="/home" className="btn-yarn text-center">
-                  Go Home
+                <Link href="/dashboard" className="btn-yarn text-center">
+                  Go to Board
                 </Link>
               ) : (
                 <>
