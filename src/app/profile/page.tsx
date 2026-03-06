@@ -123,66 +123,68 @@ const ProfileInner: React.FC = () => {
   if (loading) return <Loader />;
 
   return (
-    <div className="min-h-[calc(100vh-64px)] px-4 py-6" style={{ backgroundColor: 'var(--background)' }} data-page="profile">
-      <div className="max-w-lg mx-auto space-y-6">
+    <div className="min-h-[calc(100vh-64px)] px-4 md:px-8 py-6" style={{ backgroundColor: 'var(--background)' }} data-page="profile">
+      <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
           <div className="cat-wiggle"><PixelCatIdle size={36} /></div>
           <h1 className="text-2xl font-extrabold text-[var(--text)]">Profile Settings</h1>
         </div>
 
-        {/* Account Info */}
-        <div className="card-cozy p-5 space-y-4" data-section="account-info">
-          <div className="flex items-center gap-2 text-[var(--text)]">
-            <User size={18} />
-            <h2 className="text-base font-bold">Account Information</h2>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Username</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className={inputClass} data-field="username" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} data-field="email" />
-          </div>
-        </div>
-
-        {/* Password Section */}
-        <div className="card-cozy p-5 space-y-4" data-section="password">
-          <div className="flex items-center justify-between">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Account Info */}
+          <div className="card-cozy p-5 space-y-4" data-section="account-info">
             <div className="flex items-center gap-2 text-[var(--text)]">
-              <Lock size={18} />
-              <h2 className="text-base font-bold">Change Password</h2>
+              <User size={18} />
+              <h2 className="text-base font-bold">Account Information</h2>
             </div>
-            <button onClick={() => setShowPasswordSection(!showPasswordSection)} className="text-xs text-[var(--primary)] font-bold hover:underline" data-action="toggle-password">
-              {showPasswordSection ? 'Cancel' : 'Change'}
-            </button>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Username</label>
+              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className={inputClass} data-field="username" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Email</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} data-field="email" />
+            </div>
           </div>
-          {showPasswordSection && (
-            <div className="space-y-3 animate-fade-in">
-              <div className="relative">
-                <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Current Password</label>
-                <input type={showCurrent ? 'text' : 'password'} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className={inputClass} data-field="current-password" />
-                <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-2.5 top-7 text-[var(--text-muted)]">
-                  {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+
+          {/* Password Section */}
+          <div className="card-cozy p-5 space-y-4" data-section="password">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[var(--text)]">
+                <Lock size={18} />
+                <h2 className="text-base font-bold">Change Password</h2>
               </div>
-              <div className="relative">
-                <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">New Password</label>
-                <input type={showNew ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputClass} data-field="new-password" />
-                <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-2.5 top-7 text-[var(--text-muted)]">
-                  {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Confirm New Password</label>
-                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} data-field="confirm-password" />
-              </div>
+              <button onClick={() => setShowPasswordSection(!showPasswordSection)} className="text-xs text-[var(--primary)] font-bold hover:underline" data-action="toggle-password">
+                {showPasswordSection ? 'Cancel' : 'Change'}
+              </button>
             </div>
-          )}
+            {showPasswordSection && (
+              <div className="space-y-3 animate-fade-in">
+                <div className="relative">
+                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Current Password</label>
+                  <input type={showCurrent ? 'text' : 'password'} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className={inputClass} data-field="current-password" />
+                  <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-2.5 top-7 text-[var(--text-muted)]">
+                    {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <div className="relative">
+                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">New Password</label>
+                  <input type={showNew ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputClass} data-field="new-password" />
+                  <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-2.5 top-7 text-[var(--text-muted)]">
+                    {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Confirm New Password</label>
+                  <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={inputClass} data-field="confirm-password" />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Save button */}
-        <button onClick={handleSaveProfile} disabled={saving} className={btnPrimary + ' w-full justify-center'} data-action="save-profile">
+        <button onClick={handleSaveProfile} disabled={saving} className={btnPrimary + ' w-full md:w-auto justify-center'} data-action="save-profile">
           <Save size={16} /> {saving ? 'Saving...' : 'Save Changes'}
         </button>
 
