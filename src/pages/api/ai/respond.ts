@@ -94,7 +94,11 @@ export default async function handler(
   ### Conversation History
   This is the conversation history so far. Use it to understand the user's intent and generate the appropriate response.
 
-  ${Array.isArray(conversationHistory) ? conversationHistory.join('\n') : conversationHistory}
+  ${Array.isArray(conversationHistory)
+    ? conversationHistory.map((m: { role?: string; content?: string }) =>
+        typeof m === 'string' ? m : `${m.role || 'user'}: ${m.content || ''}`
+      ).join('\n')
+    : conversationHistory}
 
   ### Today's Date
   Today's date is ${today}.

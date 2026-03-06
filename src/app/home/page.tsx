@@ -212,17 +212,8 @@ export default function HomePage() {
 
       {/* MAIN CHAT AREA */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        {/* Header bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[var(--border)] bg-[var(--card-bg)]">
-          <div className="flex items-center gap-2">
-            <div className="cat-wiggle"><PixelCatIdle size={28} /></div>
-            <div>
-              <p className="text-sm font-extrabold text-[var(--text)]">MingMing</p>
-              <p className="text-[10px] text-[var(--text-muted)] font-semibold">
-                {speechSupported ? (muted ? 'Voice off' : 'Voice on') : 'Voice unavailable'}
-              </p>
-            </div>
-          </div>
+        {/* Header bar — controls only */}
+        <div className="flex items-center justify-end px-4 py-2 border-b-2 border-[var(--border)] bg-[var(--card-bg)]">
           <div className="flex items-center gap-2">
             {speechSupported && (
               <button
