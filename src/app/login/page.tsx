@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
       localStorage.setItem('authToken', result.token);
-      window.location.href = '/dashboard';
+      window.location.href = '/home';
     } catch (err: unknown) {
       showToast({ severity: 'error', summary: 'Login Failed', detail: err instanceof Error ? err.message : 'An error occurred.', life: 3000 });
     }
