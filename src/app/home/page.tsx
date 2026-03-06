@@ -142,7 +142,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-56px)] flex items-center justify-center" data-page="home">
+      <div className="h-[calc(100dvh-56px)] flex items-center justify-center" data-page="home">
         <div className="text-center">
           <div className="cat-bounce inline-block mb-3"><PixelCatIdle size={48} /></div>
           <p className="text-sm font-bold text-[var(--text-muted)]">MingMing is stretching...</p>
@@ -152,9 +152,9 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-56px)] flex" data-page="home">
+    <div className="h-[calc(100dvh-56px)] flex" data-page="home">
       {/* Sidebar — Today's Overview */}
-      <aside className="hidden lg:flex flex-col w-72 border-r-2 border-[var(--border)] bg-[var(--card-bg)] p-4 overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-72 shrink-0 border-r-2 border-[var(--border)] bg-[var(--card-bg)] p-4 overflow-y-auto">
         <div className="flex items-center gap-2 mb-4">
           <PawPrint size={16} className="text-[var(--paw-pink)]" />
           <h2 className="text-sm font-extrabold text-[var(--text)]">Today</h2>
@@ -211,7 +211,7 @@ export default function HomePage() {
       </aside>
 
       {/* MAIN CHAT AREA */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Header bar */}
         <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[var(--border)] bg-[var(--card-bg)]">
           <div className="flex items-center gap-2">

@@ -20,7 +20,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-[calc(100vh-56px)] relative overflow-hidden" data-page="landing">
+    <div className="min-h-[calc(100dvh-56px)] relative overflow-y-auto overflow-x-hidden" data-page="landing">
       <FloatingCats count={5} />
 
       {/* HERO — AI Life Manager */}

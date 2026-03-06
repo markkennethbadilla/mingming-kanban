@@ -20,19 +20,45 @@ export function speak(text: string, opts?: { rate?: number; pitch?: number; volu
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = opts?.rate ?? 1.0;
-    utterance.pitch = opts?.pitch ?? 1.1;
-    utterance.volume = opts?.volume ?? 0.8;
+    utterance.rate = opts?.rate ?? 0.92;
+    utterance.pitch = opts?.pitch ?? 1.0;
+    utterance.volume = opts?.volume ?? 0.85;
 
-    // Prefer a natural-sounding voice
+    // Pick the most natural-sounding voice available
     const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(
-      (v) => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')
-    );
+    const preferred = pickBestVoice(voices);
     if (preferred) utterance.voice = preferred;
 
     window.speechSynthesis.speak(utterance);
   }
+}
+
+/** Rank voices by naturalness — prefers Online/Natural variants, then known good voices */
+function pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  if (!voices.length) return null;
+
+  // Priority tiers from most to least natural
+  const tiers = [
+    // Microsoft Edge Online voices (neural TTS — very human)
+    (v: SpeechSynthesisVoice) => v.name.includes('Online') && v.name.includes('Natural') && v.lang.startsWith('en'),
+    // Microsoft Edge regular online voices
+    (v: SpeechSynthesisVoice) => v.name.includes('Online') && v.lang.startsWith('en'),
+    // Google voices (Chrome — decent quality)
+    (v: SpeechSynthesisVoice) => v.name.includes('Google') && v.lang.startsWith('en'),
+    // macOS Samantha / Alex / premium voices
+    (v: SpeechSynthesisVoice) => (v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Daniel')) && v.lang.startsWith('en'),
+    // Any voice marked as "Natural"
+    (v: SpeechSynthesisVoice) => v.name.includes('Natural') && v.lang.startsWith('en'),
+    // Any English voice
+    (v: SpeechSynthesisVoice) => v.lang.startsWith('en'),
+  ];
+
+  for (const test of tiers) {
+    const match = voices.find(test);
+    if (match) return match;
+  }
+
+  return voices[0];
 }
 
 export function notify(title: string, body: string, opts?: { icon?: string; tag?: string }) {
