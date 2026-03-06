@@ -25,6 +25,9 @@ const Navbar: React.FC = () => {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
 
+  const authRoutes = ['/login', '/register', '/forgot-password', '/update-password'];
+  const isAuthPage = authRoutes.includes(pathname);
+
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   const handleLogout = () => {
@@ -64,6 +67,8 @@ const Navbar: React.FC = () => {
         { label: 'Log In', href: '/login', icon: LogIn },
         { label: 'Sign Up', href: '/register', icon: UserPlus },
       ];
+
+  if (isAuthPage) return null;
 
   return (
     <nav
