@@ -1,28 +1,43 @@
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Source of truth: elunari/public/free-models.json cascadeOrder
-// Starts with less-popular models (less rate-limited), falls through to popular ones
-const MODEL_CASCADE = [
+// Fallback model cascade — used if HQ API is unreachable. Synced 2026-03-09.
+const FALLBACK_MODELS = [
   'openai/gpt-oss-120b:free',
   'nousresearch/hermes-3-llama-3.1-405b:free',
-  'qwen/qwen3-coder:free',
-  'qwen/qwen3-next-80b-a3b-instruct:free',
   'arcee-ai/trinity-large-preview:free',
   'nvidia/nemotron-3-nano-30b-a3b:free',
-  'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
-  'upstage/solar-pro-3:free',
+  'qwen/qwen3-coder:free',
   'stepfun/step-3.5-flash:free',
   'z-ai/glm-4.5-air:free',
   'google/gemma-3-27b-it:free',
   'mistralai/mistral-small-3.1-24b-instruct:free',
   'meta-llama/llama-3.3-70b-instruct:free',
-  'nvidia/nemotron-nano-9b-v2:free',
   'google/gemma-3-12b-it:free',
-  'google/gemma-3-4b-it:free',
   'qwen/qwen3-4b:free',
-  'meta-llama/llama-3.2-3b-instruct:free',
 ];
+
+// Cache: fetch cascade from HQ, refresh every 5 minutes
+let cachedCascade: string[] | null = null;
+let cascadeExpiry = 0;
+
+async function getModelCascade(): Promise<string[]> {
+  if (cachedCascade && Date.now() < cascadeExpiry) return cachedCascade;
+  try {
+    const res = await fetch('https://hq.elunari.uk/api/models?cascade=true', {
+      signal: AbortSignal.timeout(3000),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.cascadeOrder?.length) {
+        cachedCascade = data.cascadeOrder;
+        cascadeExpiry = Date.now() + 5 * 60 * 1000;
+        return cachedCascade!;
+      }
+    }
+  } catch { /* HQ unreachable, use fallback */ }
+  return FALLBACK_MODELS;
+}
 
 // Paid fallback — only used when ALL free models are rate-limited
 const PAID_FALLBACK = 'openai/gpt-4o-mini';
@@ -33,6 +48,7 @@ export const processUserQuery = async (prompt: string): Promise<string> => {
   }
 
   let lastError: Error | null = null;
+  const modelCascade = await getModelCascade();
 
   // Try all models, then retry once after a delay if all 429'd
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -41,7 +57,7 @@ export const processUserQuery = async (prompt: string): Promise<string> => {
       console.warn('Retrying model cascade after rate limit cooldown...');
     }
 
-    for (const model of MODEL_CASCADE) {
+    for (const model of modelCascade) {
       try {
         const response = await fetch(OPENROUTER_URL, {
           method: 'POST',
